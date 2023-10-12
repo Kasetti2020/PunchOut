@@ -9,8 +9,8 @@ public class XMLgenerate {
         root.setAttribute('payloadID',payloadID );
         root.setAttribute('timestamp',timestamp );
         Dom.XmlNode header = root.addChildElement('Response', null, null);
-         
-         
+        
+        
         Dom.XmlNode fromCredential = header.addChildElement('Status ', null, null);
         fromCredential.setAttribute('code', '200');
         fromCredential.setAttribute('text', 'OK');

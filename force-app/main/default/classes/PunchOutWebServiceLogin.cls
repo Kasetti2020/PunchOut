@@ -1,5 +1,5 @@
-@RestResource(urlMapping='/v1/PunchOut/')
-global class PunchOutWebService {
+@RestResource(urlMapping='/v1/PunchOutLogin/')
+global class PunchOutWebServiceLogin {
     @HTTPPOST
     global static string doPost(){ 
         RestRequest request = RestContext.request;
@@ -9,8 +9,8 @@ global class PunchOutWebService {
     
        Map<String, Object> jsonResult =PunchOutWebServiceHandler.xmlToMap(xml);
         //system.debug('xmlData><>>>>>>'+jsonResult);
-        PunchOutWebServiceHandler.LoginUrl(jsonResult);
-       //PunchOutSetupRequestParser.parseXMl(jsonResult);
+       // PunchOutWebServiceHandler.LoginUrl(jsonResult);
+       PunchOutSetupRequestParser.parseXMl(jsonResult);
         return 'success';
     }
 }
