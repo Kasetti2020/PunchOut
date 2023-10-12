@@ -5,7 +5,7 @@ public without sharing class PunchOutWebServiceHandler {
         
         //initialzing XML document
         Dom.Document doc = new Dom.Document();
-        doc.load(xml);
+        doc.load(xml); 
         System.debug('doc::::'+doc);
         //getting the root element and parsing it recursively
         Dom.XMLNode root = doc.getRootElement();

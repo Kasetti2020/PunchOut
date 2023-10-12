@@ -9,7 +9,7 @@ global class PunchOutWebService {
         Map<String, Object> jsonResult =PunchOutWebServiceHandler.xmlToMap(xml);
         system.debug('xmlData><>>>>>>'+jsonResult);
         PunchOutWebServiceHandler.LoginUrl(jsonResult);
-      
+       
         return 'success';
     }
 }
