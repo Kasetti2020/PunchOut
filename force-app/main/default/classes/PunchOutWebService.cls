@@ -11,5 +11,5 @@ global class PunchOutWebService {
         PunchOutWebServiceHandler.LoginUrl(jsonResult);
        
         return 'success';
-    }
+    } 
 }
