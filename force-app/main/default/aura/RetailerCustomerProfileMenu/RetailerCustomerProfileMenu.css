@@ -1,0 +1,46 @@
+.THIS .slds-modal__header
+{
+    color:rgb(121, 23, 38);
+}
+
+.THIS .slds-button{
+    color:White;
+    text-overflow: ellipsis; 
+    white-space: nowrap;
+}
+.THIS .slds-button_neutral
+{
+    color:rgb(164, 31, 52);
+}
+.THIS .slds-button_brand{
+    color:White;
+}
+
+.THIS .slds-modal__container
+{
+    width:90%;
+}
+.THIS .customIcon
+{
+    white-space:pre;
+}
+
+
+.THIS .slds-box-no-border .slds-button_neutral
+{
+    line-height: 24px;
+}
+.THIS .slds-item_label
+{
+    font-size:90%;
+}
+.THIS .user-icon .slds-icon-text-default
+{
+    fill:white !important;
+    background:#8199af;
+    padding:4px;
+    border-radius:16px;
+    margin-right: 6px;
+    position: relative;
+    top: -2px;
+}

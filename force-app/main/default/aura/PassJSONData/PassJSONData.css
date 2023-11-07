@@ -1,0 +1,228 @@
+.THIS.margin {
+    margin-top:5px
+}
+
+
+
+.THIS .card{
+    height:800px;
+    width:800px;
+}
+
+.THIS .welcomepages {     
+    margin-bottom:40px;
+    margin-left:60px;
+    
+}
+.THIS .getbutton {
+    margin-bottom:20px;
+}
+.THIS .privious {
+    margin-left:10px;
+}
+.THIS .nextp {
+    margin-left:10px;
+   
+}
+
+.THIS .column21 {
+    float: left;
+    width: 70%;
+    padding: 10px;
+}
+.THIS .column22 {
+    float: left;
+    width: 30%;
+    padding: 10px;
+}
+.THIS .column23 {
+    float: left;
+    width: 70%;
+    padding: 10px;
+}
+.THIS .column24 {
+    float: left;
+    width: 30%;
+    padding: 10px;
+}
+
+.THIS .pageset{
+ width: 50%;
+ height: 50%;
+}
+.THIS .pagesets{
+    width: 50%;
+    height: 50%;
+   }
+     .THIS .page1next {
+    float: right;
+    width: 50%;
+    padding: 10px;
+   }
+   .THIS .page1welcome {
+    float: right;
+    width: 50%;
+    padding: 10px;
+   }
+   .THIS .page2size {     
+    margin-bottom:110px;
+}
+.THIS .columnwelcome {
+    float: left;
+    width: 100%;
+    padding: 10px;
+   background-color:blue;
+    
+} 
+.THIS .sizevary{
+    margin-bottom:600px;
+}
+.THIS .columnicon {
+    float: left;
+    width: 4%;
+    padding: 10px;
+}
+.THIS .columntext {
+    float: left;
+    width: 62%;
+    padding: 10px;
+}
+.THIS .columnbutton {
+    float: left;
+    width: 28%;
+    padding: 10px;
+}
+.THIS .extraspace {
+    float: left;
+    width: 6%;
+    padding: 10px;
+}
+.THIS .extraspaceforwelcomepage {
+    float: left;
+    width: 10px;
+    padding: 10px;
+}
+.THIS .row6 {
+   
+    width: 100%;
+  
+}
+.THIS .checkBox{
+    width:auto;
+    height:10px;
+}
+.THIS .slider{
+    width:80%;
+    
+}
+.THIS .pageOneAlighn{
+    width:90%;
+    height:50%
+   
+}
+.THIS .pagetwoAlighn{
+    width:90%;
+   
+}
+.THIS .pageThreeAlighn{
+    width:90%;
+   
+}
+.THIS .pageFourAlighn{
+    width:90%;
+   
+}
+
+.THIS .outerBox {
+    position:relative;
+    height:280px;
+    border:1px solid #666;
+    overflow:auto;
+    background-color:#eee
+   }
+    
+  
+   .THIS .outer-div {
+    position: relative;
+}
+.THIS .spinner {
+    position: absolute;
+}
+.THIS .indexpagealign{
+    width:70%;
+    height:70% ;
+    
+}
+.THIS .WelcomePagealighn{
+    width:70%;
+    height:70% ;
+    
+}
+
+.THIS .yo{
+    margin-top:10px; 
+}
+.THIS .box {  
+    width:800px;
+    margin-top:20px;
+} 
+.THIS .box2{
+    margin-bottom:20px;
+}
+.THIS .area{
+    --sds-c-textarea-sizing-min-height:300px;
+    }
+    .THIS .buttonsprev{
+        margin-top:20px;
+        margin-left:330px;
+    }
+    .THIS .yo1{
+        margin-top:10px;
+        width:730px;
+    }
+    .THIS .abc{
+        background-color: white;
+    }
+    .THIS .box8 { 
+       margin-top:15px;
+        width:800px;
+        margin-bottom:20px;
+    }
+    .THIS .hhh {  
+        margin-top:23px;
+    } 
+    .THIS .buttons{
+        margin-top:40px;
+        margin-left:210px;
+    }
+    .THIS .yo2{
+        margin-top:10px;
+        width:1419px;
+    }
+    .THIS .abcde{
+        margin-left:200px;
+    }
+    .THIS .buttonss{
+        margin-top:15px;
+        margin-left:660px;
+    }
+    
+  
+    .THIS .area1{
+        --sds-c-textarea-sizing-min-height:100px;
+        }
+        .THIS .detailes{
+            margin-top:20px;
+            margin-left:300px;
+        }
+        .THIS .selecteds{
+            margin-top:20px;
+            height:32px;
+            width:270px;
+            border-color:hsla(0, 100%, 55%, 0.3);
+            border-radius: 4px;
+        }
+.THIS button.slds-button.slds-button_brand{
+    background:#a41f34;
+    border-color:#a41f34;
+}

@@ -1,0 +1,194 @@
+<aura:component controller="SOController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="rowIndex" type="integer" /> 
+    <aura:attribute name="SOrder" type="Object"/> 
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    <aura:attribute name="expanded" type="String" default="false"/>
+    <aura:attribute name="canRevise" type = "Boolean" default ="true" />
+    <aura:attribute name="checkThis" type = "Boolean" default ="true" />
+    <aura:attribute name="showOrderChangeRequest" type="Boolean" default="false"/>
+    <aura:attribute name="isOpen" type="Boolean" default="false"/>
+    <aura:attribute name="isOpenSOLI" type="Boolean" default="false"/>
+    <aura:attribute name="toViewReviseReq" type="Boolean" default="false"/>
+    <aura:attribute name="isViewReviseReqAllowed" type="Boolean" default="false"/>
+    <aura:attribute name="viewSOLIID" type="String"/>
+    <aura:attribute name="viewSOLIName" type="String"/>
+    <aura:registerEvent name="StappComponentEvent" type="c:StappComponentEvent" />
+    
+    <tr data-index="{!v.rowIndex}">
+        <td>  
+            <button class="slds-button slds-button_neutral" aura:id="toggle" onclick="{!c.toggle}" value="{!v.checkThis}"  style="padding:0 2px;"> 
+                <lightning:Icon aura:id="chevronright" iconName="utility:chevronright" size="x-small"/>
+                <lightning:Icon class="slds-hide" aura:id="chevrondown" iconName="utility:chevrondown" size="x-small"/>
+            </button> 
+        </td>
+        <td>      
+                <lightning:buttonIcon onclick="{!c.changerequest}" disabled="{! !v.canRevise}" class ="slds-button_neutral1" iconName="utility:record_update" variant="bare" alternativeText="{!$Label.c.Revise_Order}" />  
+        </td>
+        <td scope="row" data-label="Row" title="Magnet Order No">
+            <span class="title" >{!v.SOrder.SO.Name}</span>
+        </td>
+        <td class="slds-list_horizontal" data-label="Status" title="Status">            
+            <lightning:buttonIcon onclick="{!c.viewchangerequest}" disabled="{! !v.isViewReviseReqAllowed}" class ="slds-m-right_x-small" iconName="utility:preview" variant="bare" alternativeText="{!$Label.c.View_Revise_Order}" />
+             
+            <lightning:buttonIcon onclick="{!c.cloneOrder}" disabled="{!v.SOrder.SO.OrderSource__c == 'Stage PO'}" class ="slds-m-right_x-small" iconName="utility:copy" variant="bare" alternativeText="{!$Label.c.Clone_Order}" />
+           
+            <span class="{!v.SOrder.SO.Status__c == 'Order Submitted'?'slds-badge slds-badge_success':v.SOrder.SO.Status__c == 'Order Confirmed'?'slds-badge slds-badge_success':v.SOrder.SO.Status__c == 'Revised'?'slds-badge slds-badge_success':v.SOrder.SO.Status__c == 'Under Processing'?'slds-badge slds-badge_warning':v.SOrder.SO.Status__c == 'Approve Pending'?'slds-badge slds-badge_warning':v.SOrder.SO.Status__c == 'Fully Shipped'?'slds-badge slds-badge_success':v.SOrder.SO.Status__c == 'Pending for change'?'slds-badge slds-badge_warning':v.SOrder.SO.Status__c == 'Cancelled'?'slds-badge slds-badge_danger':'slds-badge slds-badge_transparent'}">{!v.SOrder.SO.Status__c}</span> 
+        </td>
+      
+        <td scope="row" data-label="Retailer PO Number" title="{!v.SOrder.SO.Order_Number__c}" >
+           <div class="slds-truncate"  style="width:300px;">{!v.SOrder.SO.Order_Number__c}</div>
+        </td>
+       
+        <td scope="row" data-label="MSO Number" title="MSO Number">
+           <span>{!v.SOrder.SO.Mainetti_SO_SC__c}</span>
+        </td>
+        <td scope="row" data-label="Factory Internal PO #" title="Factory Internal PO #">
+            <span>{!v.SOrder.SO.Factory_Internal_PO__c}</span>
+        </td>
+        <td data-label="" title="Retailer Name">
+            <span>{!v.SOrder.SO.Retailer_Code1__r.Name}</span>
+        </td>
+        <td data-label="" title="Supplier Name">
+            <span>{!v.SOrder.SO.Company__c}</span>
+        </td>
+        <td data-label="" title="{!v.SOrder.SO.CreatedDate}" style="border-right:0px solid #d4d4d4">
+            <!--<lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.SOrder.SO.CreatedDate}"/>-->
+            <lightning:formattedDateTime value="{!v.SOrder.SO.CreatedDate}"/>
+        </td>
+        <td style="border-right:1px solid rgb(212, 212, 212);">  
+            <lightning:buttonIcon class ="slds-button_neutral1" iconName="utility:pop_in" value="{!v.SOrder.SO.Id}" variant="bare" onclick="{!c.ViewSO}" alternativeText="{!$Label.c.View}" />             
+        </td> 
+    </tr>
+    <tr>
+        <td colspan="12" style="padding-left:34px;border-bottom:1.5px solid gray;">
+            <aura:if isTrue="{!v.SOrder.SOLI}">
+                <aura:if isTrue="{!v.expanded}">
+                    <table class="slds-table_bordered slds-box" style="padding:0;border-radius:0;">
+                        <tr class="slds-text-title_caps">  
+                            <th scope="col" style=""><div class="slds-truncate"></div></th>
+                            <th scope="col" style=""><div class="slds-truncate"></div></th>
+                            <th scope="col" style=""><div class="slds-truncate">{!$Label.c.Order_Details}</div></th>
+                            <th scope="col" style=""><div class="slds-truncate">{!$Label.c.Mainetti_Model}<span style="visibility:hidden;">{!$Label.c.Model}</span></div></th>
+                            <!--<th scope="col" style=""><div class="slds-truncate">Status</div></th>-->
+                            <th scope="col" style=""><div class="slds-truncate">{!$Label.c.Quantity}</div></th>
+                            <th scope="col" style=""><div class="slds-truncate">{!$Label.c.Colour}</div></th>
+                            <th scope="col" style=""><div class="slds-truncate">{!$Label.c.Size}</div></th>
+                            <th scope="col" style=""><div class="slds-truncate">{!$Label.c.Print}</div></th>
+                            <th scope="col" style=""><div class="slds-truncate">{!$Label.c.remarks}</div></th>
+                            <th scope="col" style=""><div class="slds-truncate">{!$Label.c.Exp_Completion_Date}</div></th>
+                            <th scope="col" style=""><div class="slds-truncate"></div></th>
+                        </tr>
+                        <aura:iteration items="{!v.SOrder.SOLI}" var="soli" indexVar="row">
+                            <tr class="slds-box">
+                                <td></td>
+                                <td></td>
+                                <td scope="row" data-label="Row" title="">
+                                    {!row+1}
+                                </td>
+                                <td data-label="Mainetti Model Code" title="{!soli.Mainetti_Model_Code__c}">
+                                    <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!soli.Mainetti_Model_Code__c}"/>
+                                </td>
+                                <!--<td data-label="Purchase Order Date" title="{!soli.Status__c}">
+                                    <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!soli.Status__c}"/>
+                                </td>-->            
+                                <td data-label="Order Quantity" title="{!soli.Supply_Quantity__c}" class="slds-text-align_right">
+                                    <lightning:input type="number" name="" variant="label-hidden" readonly="true" label="" value="{!soli.Supply_Quantity__c}"/>
+                                </td>
+                                <td data-label="Colour" title="{!soli.Colour__c}">
+                                    <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!soli.Colour__c}"/>
+                                </td>
+                                <td data-label="Size" title="{!soli.Size__c}">
+                                    <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!soli.Size__c}"/>
+                                </td>
+                                <td data-label="Size" title="{!soli.Print__c}">
+                                    <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!soli.Print__c}"/>
+                                </td>
+                                <td data-label="Size" title="{!soli.Remarks__c}">
+                                    <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!soli.Remarks__c}"/>
+                                </td>
+                                <!--td scope="row" data-label="Expected delivary date" title="{!soli.Expected_Delivery_Date__c}"  style="border-right:0px solid #d4d4d4">
+                                    <lightning:formattedDateTime value="{!soli.Expected_Delivery_Date__c}"/>
+                                    <lightning:formattedDateTime value="{!soli.Expected_Delivery_Date__c}" year="numeric" month="short" day="numeric" hour="2-digit"
+                                                                 minute="2-digit"/>
+                                </td-->
+                                <td scope="row" data-label="Purchase Order Number" title="{!soli.Expected_Completion_Date__c}"  style="border-right:0px solid #d4d4d4">
+                                    <lightning:formattedDateTime value="{!soli.Expected_Completion_Date__c}"/>
+                                    <!--<lightning:formattedDateTime value="{!soli.Expected_Completion_Date__c}" year="numeric" month="short" day="numeric" hour="2-digit"
+                                                                 minute="2-digit"/>-->
+                                </td>
+                                
+                                <td style="border-right:1px solid rgb(212, 212, 212);">  
+                                    <lightning:buttonIcon name="{!soli.Id}" class ="slds-button_neutral1" iconName="utility:pop_in" value="{!soli.Name}" variant="bare" onclick="{!c.ViewSOLI}" alternativeText="{!$Label.c.View}" /> 
+                                </td>                    
+                            </tr>
+                        </aura:iteration>
+                    </table>
+                </aura:if>
+            </aura:if>
+        </td>
+    </tr>
+    <!-- Model Box Start for SO-->    
+    <aura:if isTrue="{!v.isOpen}">
+        <div class="demo-only" style="">
+            <section role="dialog" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeModal}">
+                            <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.Close}"/>
+                            <span class="slds-assistive-text" >{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.SOrder.SO.Name}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <!--<force:recordView recordId="{!v.POList.POwrap.Id}" />-->
+                        <lightning:recordForm
+                                              recordId="{!v.SOrder.SO.Id}"
+                                              objectApiName="Sales_Order__c"
+                                              layoutType="Full"
+                                              mode="readonly"
+                                              columns="2"/>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </div>
+    </aura:if>
+    <!-- Modal Box ends for SO here -->
+    
+    <!-- Model Box Start for SOLI-->    
+    <aura:if isTrue="{!v.isOpenSOLI}">
+        
+        <div class="demo-only" style="">
+            <section role="dialog" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeModalSOLI}">
+                            <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.Close}"/>
+                            <span class="slds-assistive-text" >{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.viewSOLIName} </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <!--<force:recordView recordId="{!v.POList.POwrap.Id}" />-->
+                        <lightning:recordForm
+                                              recordId="{!v.viewSOLIID}"
+                                              objectApiName="Sales_Order_Line_Items__c"
+                                              layoutType="Full"
+                                              mode="readonly"
+                                              columns="2"/>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </div>
+    </aura:if>
+    <!-- Modal Box ends for SOLI here -->
+    <aura:if isTrue="{!v.showOrderChangeRequest}" >
+        <c:OrderChangeRequest OpenOrderChangeRequest="{!v.showOrderChangeRequest}" SOdetails="{!v.SOrder}"/>
+    </aura:if>
+    <!-- Modal Box to View revise orders are here -->
+    <aura:if isTrue="{!v.toViewReviseReq}" >
+        <c:ViewReviseRequests isViewReviseReqEnabled="{!v.toViewReviseReq}" SOObj="{!v.SOrder.SO}"/>
+    </aura:if>
+
+</aura:component>

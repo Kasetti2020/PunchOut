@@ -1,0 +1,298 @@
+<aura:component controller="InventoryAllocationUploadController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="vfHost" type="String" default="https://mainetti--lightsand--c.cs31.visual.force.com"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>    
+    <!-- Imports -->    
+    <ltng:require scripts="{!$Resource.papaparse}"/>
+    <!-- <ltng:require scripts="{!$Resource.jQueryv341}"/> -->
+    
+    <!-- attributes -->    
+    <aura:attribute name="fromdate" type="Date" default=""/>
+    <aura:attribute name="todate" type="Date" default=""/>
+    
+    <aura:attribute name="data" type="object"/>
+    <aura:attribute name="errordata" type="object"/>
+    <aura:attribute name="flag" type="Boolean" default="true"/>
+    
+    
+    <aura:attribute name="toggleSpinner" type="boolean" default="false"/>
+    
+    <aura:attribute name="mainettiCompanyMap" type="Map"/>
+    <aura:attribute name="retailerCodeMap" type="Map"/>
+    <aura:attribute name="selectedMainettiCompany" type="string"/>
+    <aura:attribute name="selectedRetailerCode" type="string"/>
+    <aura:attribute name="cmp" type="Partner__c" default="{'sobjectType':'Partner__c',  
+                                                          'Name': ''}"/>
+    <aura:attribute name="retail" type="Retailer_Code__c" default="{'sobjectType':'Retailer_Code__c',  
+                                                                   'Name': ''}"/>
+    
+    <aura:attribute name="recordStatusMap" type="Map"/>
+    <aura:attribute name="batchStatusMap" type="Map"/>
+    
+    <aura:attribute name="record" type="Inventory_Transaction_Master__c" default="{'sobjectType':'Inventory_Transaction_Master__c',  
+                                                                                  'Record_Type__c': '',
+                                                                                  'Batch_Status__c': '' }"/>
+    
+    <!-- RecordType Search On Change for search button -->
+    <aura:attribute name="recordTypeSearch" type="string"/>
+    <aura:attribute name="srch" type="Inventory_Transaction_Master__c" default="{'sobjectType':'Inventory_Transaction_Master__c',  
+                                                                                'Record_Type__c': ''}"/>
+    <!-- Record Status Attributes  Started -->
+    <aura:attribute name="selectedRecordType" type="string"/>
+    <aura:attribute name="itm" type="Inventory_Transaction_Master__c" default="{'sobjectType':'Inventory_Transaction_Master__c',  
+                                                                               'Record_Type__c': ''}"/>
+    <!-- Record Status Attributed Ended -->   
+    
+    <aura:attribute name="options" type="List" />
+    <aura:attribute name="selectedValue" type="String" />
+    
+    <!-- 'fileName' attribute for display the selected file name -->  
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+    <aura:attribute name="fileSize" type="String" />
+    <aura:attribute name="reuploadBatchNo" type="string"/>
+    
+    <aura:attribute name="childRecordType" type="string"/>
+    <aura:attribute name="appName" type="string"/>
+    <aura:attribute name="submit" type="Boolean" default="true"/>
+    <aura:attribute name="submitSales" type="Boolean" default="true"/>
+    
+    <aura:attribute name="selectedMonth" type="string"/>
+    <aura:attribute name="yearList" type="List"/>
+    <aura:attribute name="selectedYear" type="String"/>
+    
+    <aura:attribute name="optionss" type="List" />
+    <aura:attribute name="selectedValues" type="String" />    
+    <aura:attribute name="companyWeekData" type="object"/>
+    <aura:attribute name="isDataSubmitted" type="Boolean" default="true"/>
+    
+    <!-- Date by which company should upload sales files for every month -->
+    <aura:attribute name="companyMonthDate" type="integer"/>    
+    
+    <!-- handlers -->
+    <aura:method name="rerenderWarning" action="{! c.viewError}" />
+    <aura:method name="rerenderList" action="{! c.show}" />
+    <aura:handler name="init" value="{!this}" action="{!c.show}" /> 
+    
+    <!--<aura:handler name="updateCommunication" event="c:batchMasterSalesCommunication" action="{!c.handleEvent}"/>-->
+    
+    <!-- handlers for Mainetti Sales Dropdown Starting -->
+    <aura:attribute name="SalesCompanyMap" type="Map"/>
+    <aura:attribute name="selectedSalesCompany" type="string"/>
+    <aura:attribute name="cmpsales" type="Partner__c" default="{'sobjectType':'Partner__c',  
+                                                               'Name': ''}"/>    
+    <!-- handlers for Mainetti Sales Dropdown Ending -->
+    
+    <!--<aura:handler name="initRecordType" value="{!thiss}" action="{!c.initRecordType}" />-->
+    
+    <aura:attribute name="selectedCompany" type="string"/>
+    <aura:attribute name="orderToCompanyList" type="String[]"/>
+    <aura:attribute name="selectedRetailer" type="string"/>
+    <aura:attribute name="retailerList" type="String[]"/>
+    
+    <!-- Page Header -->
+    <div class="slds-page-header" role="banner">
+        <div class="slds-grid">
+            <div class="slds-col slds-has-flexi-truncate">
+                <!-- HEADING AREA -->
+                <h1 class="slds-page-header__title slds-truncate" title="Inventory Transaction Master">Upload Interface</h1>
+                <!-- / HEADING AREA -->
+            </div>
+            <div class="slds-col slds-no-flex slds-grid slds-align-top">
+                <button class="slds-button slds-button_brand" name = "inventoryModal" onclick="{!c.newUpload}">Upload File</button>
+            </div>
+        </div>
+    </div>
+    <!-- Page Header -->
+    <!-- Modal PopUp -->
+    <div>
+        <section aura:id="inventoryModal" role="dialog" tabindex="-1"  aria-labelledby="customerdata" aria-modal="true" aria-describedby="customerBody" class="slds-modal">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.closeModal}" variant="bare-inverse" size="large"></lightning:buttonIcon>
+                    <h1 id="customerdata" class="slds-text-heading_medium slds-hyphenate">File Upload</h1>
+                </header>
+                <div  align='center' class="errorMissing" id="errorMissing"></div>                
+                <div class="slds-modal__content slds-p-around_medium" id="customerBody" >  
+                     <lightning:select aura:id="recordStatusPicklist" value="{!v.itm.Record_Type__c}" onchange="{!c.handleRecordStatusOnChange}" name="recordStatusPicklist" label="Record Type" required="true">
+                            <option value = "Inventory">Inventory</option>
+                    </lightning:select>
+                    <lightning:select aura:id="mainettiCompanyPicklist"  value="{!v.cmp.Name}" onchange="{!c.handleMainettiCmpOnChange}" name="mainettiCompanyPicklist" label="Mainetti Company" required="true">
+                            <option value = "">Select Mainetti Company</option>
+                            <aura:iteration items="{!v.mainettiCompanyMap}" var="itms" indexVar="key">
+                                <option text="{!itms.key}" value="{!itms.key}" selected="{!itms.key==v.cmp.Name}" />
+                            </aura:iteration>
+                        </lightning:select>
+                    <lightning:select aura:id="fileDelimiter"   name="fileDelimiter" label="File Delimiter" required="true" >
+                        <option value="," >Comma</option>
+                        <option value=";">Semi Colon</option>                    
+                    </lightning:select>
+                    <br/>
+                    <input aura:id="file" type="file" accept=".csv" label="Upload Attachment"/>
+                    <input aura:id="batchNo" type="hidden" label="Upload Attachment"/>
+                    <lightning:button variant="brand" label="Upload" aura:id="" onclick="{!c.handleParseClick}" />                     
+                </div>
+                
+            </div>
+        </section>
+        <div aura:id="inventoryModalBackdrop" class="slds-backdrop"></div>
+    </div>
+    <!-- Modal PopUp -->    
+    <!-- error validation Modal PopUp -->
+    <div>
+        <section aura:id="inventoryErrorModal" role="dialog" tabindex="-1" aria-labelledby="customerdata" aria-modal="true" aria-describedby="customerBody" class="slds-modal">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header" style="background-color:#66D3FA;">
+                    <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.closeErrorModal}" variant="bare-inverse" size="large"></lightning:buttonIcon>
+                    <h3 id="customerdata" style="text-align:center;color:white;font-family: Arial, sans-serif;"><b>Error in the data File Uploaded, Please click the 'Error Details' link</b></h3>
+                </header>        
+            </div>
+        </section>
+        <div aura:id="inventoryErrorModalBackdrop" class="slds-backdrop"></div>
+    </div>
+    <!--error validation Modal PopUp -->    
+    <!-- error file format Modal PopUp -->
+    <div>
+        <section aura:id="errorFileFormatModal" role="dialog" tabindex="-1" aria-labelledby="customerdata" aria-modal="true" aria-describedby="customerBody" class="slds-modal">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header" style="background-color:#66D3FA;">
+                    <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.closeErrorFileFormatModal}" variant="bare-inverse" size="large"></lightning:buttonIcon>
+                    <h3 id="customerdata" style="text-align:center;color:white;font-family: Arial, sans-serif;" >Error in Format of the data File Uploaded</h3>
+                </header>        
+            </div>
+        </section>
+        <div aura:id="errorFileFormatModalBackdrop" class="slds-backdrop"></div>
+    </div>
+    <!--error file format Modal PopUp -->    
+    <!-- data already submitted Modal PopUp -->
+    <div>
+        <section aura:id="dataSubmittedModal" role="dialog" tabindex="-1" aria-labelledby="customerdata" aria-modal="true" aria-describedby="customerBody" class="slds-modal">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header" style="background-color:#66D3FA;">
+                    <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.closeDataSubmittedModal}" variant="bare-inverse" size="large"></lightning:buttonIcon>
+                    <h3 id="customerdata" style="color:red;text-align:center;font-family: Arial, sans-serif;">The File data as already been submitted</h3>
+                </header>        
+            </div>
+        </section>
+        <div aura:id="dataSubmittedModalBackdrop" class="slds-backdrop"></div>
+    </div>
+    <!--data already submitted Modal PopUp -->    
+    <!-- Reduce Modal-Pop Starting -->
+    <aura:html tag="style">
+        .slds-modal__container{ 
+        height : auto; width: 80%; max-width: 65vh;
+        } 
+    </aura:html>
+    <!-- Reduce Modal-Pop Ending -->    
+    <br/>
+    <lightning:layout multipleRows="True">
+        <lightning:accordion aura:id="accordion" activeSectionName="A">
+            <lightning:accordionSection name="A" label="Upload Transaction Master">
+                <aura:if isTrue="{!v.toggleSpinner}">
+                    <div class="slds-spinner_container">
+                        <div class="slds-spinner--brand  slds-spinner slds-spinner--large slds-is-relative" role="alert">
+                            <span class="slds-assistive-text">Loading</span>
+                            <div class="slds-spinner__dot-a"></div>
+                            <div class="slds-spinner__dot-b"></div>
+                        </div>
+                    </div>
+                </aura:if> 
+                <lightning:layoutItem class="box" padding="around-small" size="12">
+                    <lightning:card title="Upload Transaction Master" >
+                        <div  style="height:200px;">
+                            <div class="slds-scrollable_y" style="height:100%;">
+                                <table id="row" class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_col-bordered slds-table_fixed-layout" >
+                                    <thead class="row">
+                                        <tr>
+                                            <th scope="col"><div align = "center" class="slds-truncate" title="Batch_No">Batch No</div></th>
+                                            <th scope="col"><div align = "center" class="slds-truncate" title="Uploaded_By">Uploaded By</div></th>
+                                            <th scope="col"><div align = "center" class="slds-truncate" title="Uploaded_Date">Uploaded Date</div></th>
+                                            <!-- <th scope="col"><div align = "center" class="slds-truncate" title="Record_Type">Record Type</div></th> -->
+                                            <th scope="col"><div align = "center" class="slds-truncate" title="Total_Row_Count">Total Row Count</div></th>
+                                            <th scope="col"><div align = "center" class="slds-truncate" title="Batch_Status">Batch Status</div></th>
+                                            <th scope="col"><div align = "center" class="slds-truncate" title="Actions">Action</div></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <aura:iteration items="{!v.data}" var="data">
+                                            <tr>
+                                                <td><div align="center" class="slds-truncate">{!data.Batch_No__c}&nbsp;</div></td>
+                                                <td><div align="center" class="slds-truncate">{!data.File_Uploaded_By__c}&nbsp;</div></td>
+                                                <td><div align="center" class="slds-truncate">{!data.CreatedDate}&nbsp;</div></td>
+                                                <!--  <td><div align="center" class="slds-truncate">{!data.Record_Type__c}&nbsp;</div></td> -->
+                                                <td><div align="center" class="slds-truncate">{!data.Total_Row_Count__c}&nbsp;</div></td> 
+                                                <td><div align="center" class="slds-truncate">{!data.Batch_Status__c == '5 - Azure File Upload In Progress'? 'Upload process was aborted by user' : data.Batch_Status__c}&nbsp;</div></td>                                               
+                                                
+                                                <aura:if isTrue="{!data.Batch_Status__c != '8 - Migration Success'}">
+                                                    <td>
+                                                        <div align="center" data-value="{!data.Record_Type__c}">
+                                                            <lightning:button class="slds-button_text-destructive" label="View Error" aura:id="{!data.Id}" name="{!data.Id}" value="{!data.Record_Type__c}" onclick="{!c.viewError}" />
+                                                            <lightning:button class="slds-button_text-destructive" label="Re-Upload" aura:id="{!data.Id}" name="{!data.Id}" onclick="{!c.reuploadfile}" />
+                                                            <!--<a id="{!data.Id}" href = "#" onclick = "{!c.viewError}">Error Details</a>&nbsp;|
+                                                            <a id="{!data.Id}" href = "#" onclick = "{!c.reuploadfile}">Re-Upload</a>-->
+                                                        </div>
+                                                    </td>
+                                                    <aura:set attribute="else">
+                                                        <td>
+                                                            <div align="left">
+                                                                <a id="{!data.Id}" class="slds-button slds-button_success" href="{!data.Azure_File_Link__c}" target="_blank">View File</a>
+                                                                <!-- <a id="{!data.Id}" href = "{!data.Azure_File_Link__c}" target="_blank">View Uploaded File</a>-->
+                                                            </div>
+                                                        </td>
+                                                    </aura:set>
+                                                </aura:if>                                                
+                                            </tr>
+                                        </aura:iteration>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </lightning:card>
+                </lightning:layoutItem>
+            </lightning:accordionSection>
+        </lightning:accordion>
+    </lightning:layout>
+    
+    <!-- company week missing Modal PopUp -->
+    <div>
+        <section aura:id="cmpWeekMissing" role="dialog" tabindex="-1" aria-labelledby="customerdata" aria-modal="true" aria-describedby="customerBody" class="slds-modal">
+            <div class="slds-modal__container"> 
+                <header class="slds-modal__header" style="background-color:#66D3FA;">
+                    Company and their Missing Weeks Data
+                </header>
+                <div class="slds-modal__content" id="customerBody">
+                    <!--<div class="slds-scrollable_x"> -->
+                    <table class = "modal-body">
+                        <tr>
+                            <td>
+                                <h3 id="customerdata" style="text-align:center;height:40px;">
+                                    <textarea disabled="true" cols="24" style="width:95%;height:100px;">{!v.companyWeekData[0].company_week__c}</textarea>
+                                </h3>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </table>
+                    <!-- </div> -->                
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="brand" label="Close" aura:id="" onclick="{!c.cmpWeekClose}" />
+                </footer>
+            </div>          
+        </section>
+        <div aura:id="cmpWeekMissingBackdrop" class="slds-backdrop"></div>
+    </div>
+    <!--company week missing Modal PopUp -->    
+    <!--  <aura:if isTrue="{!v.childRecordType =='Target'}"> -->
+    <c:InventoryAllocationUploadDetail aura:id="batchDetail"/>
+    <!--  </aura:if> -->
+</aura:component>

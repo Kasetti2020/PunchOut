@@ -1,0 +1,552 @@
+<aura:component controller="CustomerInfoModifyController" implements="forceCommunity:profileMenuInterface,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+
+    <!--<aura:attribute name="options" type="String[]" default="Home, My Profile , My Messages , My Options ,Dashboards ,Settings ,LogOut"/>-->
+    <aura:attribute name="options" type="String[]" default="My Profile,Edit Retailer Data,Edit Address,Change Password,Logout"/>
+    <aura:attribute name="showProfileSection" type="Boolean" default="false" />
+    <aura:attribute name="showRetailerDataSection" type="Boolean" default="false" />
+    
+    <aura:attribute name="showLanguageSection" type="Boolean" default="false" />
+    <aura:attribute name="defaultLanguage" type="String"/>
+    <aura:attribute name="availableLanguage" type="List"/>
+    <aura:attribute name="selectedLanguage" type="String"/>
+    
+    <aura:attribute name="showPasswordSection" type="Boolean" default="false" />
+    <aura:attribute name="password" type="String"/>
+    <aura:attribute name="passwordStrength" type="String" default="Very Weak"/>
+    <aura:attribute name="strengthValue" type="Map"/>
+    <aura:attribute name="passwordPolicy" type="String"/>
+    
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:attribute name="loadSpinner" type="Boolean" default="false" />
+    <aura:attribute name="CustomerInfo" type="Customer_Information__c"/>
+    <aura:attribute name="saved" type="Boolean" default="false" />
+    
+    <aura:attribute name="GetInitDetailsWrapper" type="Map"/>
+    <aura:attribute name="depnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="SubDepnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="listDependingValues" type="list" default="['--- None ---']" description="to store dependent field values"/>
+    <aura:attribute name="listOrderToCompanyControllingValues" type="list" default="[]" description="to store controller field values"/>
+    <aura:attribute name="listPreferredCurrencyDependingValues" type="list" default="['--- None ---']" description="to store dependent field values"/>
+    <aura:attribute name="TemplistPreferredCurrencyDependingValues" type="list" default="['--- None ---']" description="to store dependent field values"/>
+    <aura:attribute name="CountryList" type="List"/>
+    <aura:attribute name="CustomerInfoTemp" type="Customer_Information__c"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="idListStr" type="String"/>
+    <!-- Address Section Variables  below-->
+    <aura:attribute name="showAddressSection" type="boolean" default="false"/>
+    
+    <aura:attribute name="ErrorMesssage" type="String"/>
+    <aura:attribute name="ShowErrorMesssage" type="boolean" default="false"/>
+    <aura:attribute name="ShowSectionWiseMesssage" type="String" default="false"/>
+    <aura:attribute name="RetailerDataList" type="List" default="[]"/>
+    <aura:attribute name="RetailerDataListToDelete" type="List" default="[]"/>
+    <aura:attribute name="MainMap" type="Map" />
+    <aura:attribute name="RetailerCodeMap" type="Map" />
+    <aura:attribute name="ShowInvoiceToBuyerToComp" type="boolean" default="false"/>
+    <aura:attribute name="ShowBillToLockedComp" type="boolean" default="false"/>    
+    <aura:attribute name="OrdertoMainettiCompany" type="String"/>
+    <!--<aura:attribute name="AddressWrapperObject" type="Object" default=""/>-->
+    <aura:attribute name="AddressWrapperObject" type="Object" default="'{'CustomerInfoId':'','BillToRecordTypeId':'','ShipToRecordTypeId':'','InvoiceToRecordTypeId':'','BuyerToRecordTypeId':'','ShowInvoiceToBuyerToComp':'','BillToAddressList':'[]',
+                                                                       'ShippToAddressList':'[]','InvoiceToAddressList':'[]','BuyerToAddressList':'[]',
+                                                                       'Old_BillToAddressList':'[]','Old_ShippToAddressList':'[]','Old_InvoiceToAddressList':'[]','Old_BuyerToAddressList':'[]','BillToLockedAddressList':'[]','ShowBillToLockedComp':'','BillToLockedRecordTypeId':''}'"/>
+    <aura:attribute name="billtovalidationflag" type="boolean" />
+    <aura:attribute name="shiptovalidationflag" type="boolean" />
+    <aura:attribute name="invoicetovalidationflag" type="boolean" />
+    <aura:attribute name="buyertovalidationflag" type="boolean" />
+    <aura:handler name="componentEventFlag" event="c:EditAddressFlag" action="{!c.handleAddressvalidation}"></aura:handler>
+    <aura:attribute name="Allvalidationflag" type="boolean" />
+    <aura:attribute name="RetailerDataListBackup" type="List" default="[]"/>
+    <aura:attribute name="addednewRetailer" type="boolean" default="false"/>
+    <aura:attribute name="beforeEmailMod" type="String"/>
+    <!--<aura:attribute name="BillToAddressList" type="Ship_Bill_Address__c[]" default="[]"/>
+    <aura:attribute name="ShippToAddressList" type="Ship_Bill_Address__c[]" default="[]"/>
+    <aura:attribute name="InvoiceToAddressList" type="Ship_Bill_Address__c[]" default="[]"/>
+    <aura:attribute name="BuyerToAddressList" type="Ship_Bill_Address__c[]" default="[]"/>-->
+    
+    
+    <!--<aura:attribute name="Old_BillToAddressList" type="AddressWrapperObject.Ship_Bill_Address__c[]" default="[]"/>
+    <aura:attribute name="Old_ShippToAddressList" type="AddressWrapperObject.Ship_Bill_Address__c[]" default="[]"/>
+    <aura:attribute name="Old_InvoiceToAddressList" type="AddressWrapperObject.Ship_Bill_Address__c[]" default="[]"/>
+    <aura:attribute name="Old_BuyerToAddressList" type="AddressWrapperObject.Ship_Bill_Address__c[]" default="[]"/>-->
+    
+    <aura:handler name="appEvent" event="c:DataTransferEvent" action="{!c.getData}"/>
+    <aura:handler name="ModifyRetailerdata" event="c:ModifyRetailerdata" action="{!c.DeleteRetailerData}"/>
+    <aura:attribute name="RetailerCodeValidationMap" type="Map" />
+    <aura:handler event="force:refreshView" action="{!c.isRefreshed}" />
+    
+    <!-- Address Section Variables  till here-->
+    
+      
+    <div class="slds-hide" aura:id="mySpinner">
+        <lightning:spinner style="position: fixed" variant="brand" alternativeText="{!$Label.c.Loading}" size="large" />
+    </div>
+    
+    <aura:if isTrue="{!v.loadSpinner}">    
+        <lightning:spinner class="slds-is-fixed" alternativeText="{!$Label.c.Loading}" size="large" />
+    </aura:if>
+    
+    <aura:if isTrue="{!v.showSpinner}">
+        <lightning:spinner />
+    </aura:if>
+    
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    <div style="display:flex;margin-right:20px;">	
+        
+        <div class="slds-p-around_medium lgc-bg">
+                    <td>
+                    <lightning:icon size="small"  alternativeText="{!$Label.c.Event}" iconName="utility:user" class="user-icon" />
+           </td> <td>
+            <lightning:buttonMenu label="{!v.CustomerInfo.First_Name__c +' '+ v.CustomerInfo.Last_Name__c}" onselect="{!c.handleClick}" variant="bare">
+                <lightning:menuItem value="1" label="{!$Label.c.My_Profile}"/>
+                <lightning:menuItem value="2" label="{!$Label.c.Edit_Address}"/>
+                <lightning:menuItem value="3" label="{!$Label.c.Edit_Retailer_Data}"/>
+                <lightning:menuItem value="4" label="{!$Label.c.Change_Password}"/>
+                <lightning:menuItem value="6" label="{!$Label.c.Change_Language}"/>
+                <lightning:menuItem value="5" label="{!$Label.c.Logout}"/>
+            </lightning:buttonMenu>
+            </td>
+        </div>
+    </div>
+    <aura:if isTrue="{!v.showProfileSection}">
+        <div style="">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}">
+                            
+                            <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Customer_Profile_Edit}</h2>
+                    </header>
+                    <lightning:spinner aura:id="mySpinner" class="slds-hide"/>
+                    <div class="slds-modal__content slds-p-around_x-large" id="modal-content-id-1">
+                        
+                        <div class="slds-grid slds-gutters slds-p-bottom_small">
+                            <div class="slds-col slds-size--1-of-3">
+                                
+                                <!--<lightning:input value="{!v.CustomerInfo.First_Name__c}" required="true" label="First Name" class=" " />-->
+                                <!--<lightning:input value="{!v.CustomerInfoTemp.Title__c}" required="true" label="Title" class=" " />-->
+                                
+                                <lightning:select name="select1" label="{!$Label.c.Title}" required="true" value="{!v.CustomerInfoTemp.Title__c}">
+                                    <option value="">{!$Label.c.Select}</option>
+                                    <option value="Mr">Mr</option>
+                                    <option value="Mrs">Mrs</option>
+                                    <option value="Ms">Ms</option>                                    
+                                </lightning:select>               
+                            </div>
+                            <div class="slds-col slds-size--1-of-3">
+                                <!--<lightning:input label="Last Name" class=" " value="{!v.CustomerInfo.Last_Name__c}"/>-->
+                                <lightning:input label="{!$Label.c.Company_Name}" class=" " required="true" value="{!v.CustomerInfoTemp.Name}"/>
+                                
+                            </div>
+                            <div class="slds-col slds-size--1-of-3">
+                                <!--<lightning:helptext content="This is will be your Login username" class="customIcon"/> 
+              
+                                <lightning:input label="Username" type="email" disabled="true" value="{!v.CustomerInfoTemp.Username__c}" variant="label-hidden"/>-->
+                                
+                                <!--<c:CustomLookup  whereCondition="and Online_Enquiry__c=true" objectAPIName='Retailer_Code__c' IconName="standard:account" recordID="{!v.MainWrapperObject.RetailerCode}" recordName="{!v.MainWrapperObject.RetailerName}" />-->
+                                <lightning:input label="{!$Label.c.Retailer_Code}" type="text" value="{!v.GetInitDetailsWrapper.RetailerName}"  disabled="true"/>
+                                
+                            </div>
+                        </div> 
+                        <div class="slds-grid slds-gutters slds-p-bottom_small">
+                            <div class="slds-col slds-size--1-of-3">
+                                
+                                <!--<lightning:input value="{!v.CustomerInfo.First_Name__c}" required="true" label="First Name" class=" " />-->
+                                <lightning:input value="{!v.CustomerInfoTemp.First_Name__c}" required="true" label="{!$Label.c.First_Name}" class=" " />
+                            </div>
+                            <div class="slds-col slds-size--1-of-3">
+                                
+                                <!--<lightning:input label="Last Name" class=" " required="true" value="{!v.CustomerInfoTemp.Last_Name__c}"/>-->
+                                <lightning:input label="{!$Label.c.Phone}"  type="tel"  maxlength="14" required="true" class=" " value="{!v.CustomerInfoTemp.Phone__c}"/>
+                            </div>
+                            
+                            <div class="slds-col slds-size--1-of-3">
+                                <!--<lightning:input label="Email"  class=" " required="true" value="{!v.CustomerInfoTemp.Email__c}"/>-->
+                                <lightning:select name="dependentFld"
+                                                  value="{!v.GetInitDetailsWrapper.DefaultOrderToCompany}"
+                                                  label="{!$Label.c.Order_To_Company}"
+                                                  
+                                                  onchange="{!c.onChangeOrdeToCompany}"
+                                                  required="true">
+                                    <aura:iteration items="{!v.listDependingValues}" var="val">
+                                        <option value="{!val}" selected="{!val==v.GetInitDetailsWrapper.DefaultOrderToCompany}">{!val}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </div> 
+                        <div class="slds-grid slds-gutters slds-p-bottom_small">
+                            <div class="slds-col slds-size--1-of-3">
+                                <lightning:input label="{!$Label.c.Last_Name}"  required="true" class=" " value="{!v.CustomerInfoTemp.Last_Name__c}"/>
+                                
+                            </div>
+                            <div class="slds-col slds-size--1-of-3">
+                                <!--<lightning:input label="Position" class=" " required="true" value="{!v.CustomerInfoTemp.Position__c}"/>-->
+                                <lightning:input value="{!v.CustomerInfoTemp.Fax__c}" label="{!$Label.c.Fax}" class=" " />
+                            </div>
+                            <div class="slds-col slds-size--1-of-3">
+                                <!--<lightning:input label="Phone"  type="tel"  maxlength="14" pattern="[0-9]{14}" required="true" class=" " value="{!v.CustomerInfoTemp.Phone__c}"/>-->
+                                
+                                <lightning:select name="dependentFld"
+                                                  value="{!v.GetInitDetailsWrapper.DefaultPreferredCurrency}"
+                                                  label="{!$Label.c.Preferred_Currency}"
+                                                  
+                                                  onchange="{!c.onChangePreferredCurrency}"
+                                                  required="true">
+                                    <aura:iteration items="{!v.listPreferredCurrencyDependingValues}" var="val">
+                                        <option value="{!val}" selected="{!val==v.GetInitDetailsWrapper.DefaultPreferredCurrency}">{!val}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </div>
+                        </div>  
+                        
+                        <div class="slds-grid slds-gutters slds-p-bottom_small">
+                            <div class="slds-col slds-size--1-of-3">
+                                <lightning:input label="{!$Label.c.Job_Tittle}" class=" " required="true" value="{!v.CustomerInfoTemp.Position__c}"/>
+                                
+                            </div>
+                            <div class="slds-col slds-size--1-of-3">
+                                <lightning:input label="{!$Label.c.Email}"  class=" " required="true" value="{!v.CustomerInfoTemp.Email__c}"/>
+                                
+                            </div>
+                            <div class="slds-col slds-size--1-of-3">
+                                <!--<lightning:input label="Username" type="email" disabled="true" value="{!v.CustomerInfoTemp.Username__c}" variant="label-hidden"/>-->
+                                <lightning:input label="{!$Label.c.Username}" type="email" disabled="true" value="{!v.CustomerInfoTemp.Username__c}" />
+                            </div>
+                        </div>  
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.CloseModal}">{!$Label.c.Cancel}</button>
+                        <button class="slds-button slds-button_brand" onclick="{!c.UpdateCustomerInfo}">{!$Label.c.Update}</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    
+    <!-- Retailer Data Section Starts Here -->
+    <aura:if isTrue="{!v.showRetailerDataSection}">
+        <div style="">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" >
+                <div class="slds-modal__container" style="width:70%;font-size:11px;">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}">
+                            
+                            <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Edit_Retailer_Data}	</h2>
+                    </header> 
+                    <aura:if isTrue="{!and(v.ShowErrorMesssage,(v.ShowSectionWiseMesssage=='Retailer Data'))}">
+                        <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                            <span class="slds-assistive-text">{!$Label.c.Error}</span>
+                            <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                                <lightning:icon iconName="utility:error" size="xx-small" alternativeText="{!$Label.c.section}" />
+                            </span>
+                            <h1>{!v.ErrorMesssage}</h1>
+                            <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeErrorMessage}">
+                                <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.section}" />
+                                <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                            </button>
+                        </div>
+                    </aura:if>                    
+                    
+                    <div class="slds-modal__content slds-p-around_small" style="height:75vh;min-height:75vh;">
+                        <div class="slds-box slds-p-around_none slds-m-top_small1">
+                            <article class="slds-card">
+                                <div class="slds-card__header slds-grid slds-m-around_none slds-p-around_x-small">
+                                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                        <div class="slds-media__figure">
+                                            <span class="slds-icon_container slds-icon-standard-task" title="{!$Label.c.Buyer}">
+                                                <lightning:icon size="x-small" iconName="standard:user" alternativeText="{!$Label.c.Event}" />
+                                            </span>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <h2 class="slds-card__header-title">
+                                                <span>{!$Label.c.Retailer}</span>
+                                            </h2>
+                                        </div>
+                                        <div class="slds-no-flex">
+                                            <button class="slds-button slds-button_neutral" onclick="{!c.addNewRetailerData}">{!$Label.c.Add}</button>
+                                        </div>
+                                    </header>
+                                </div>
+                                
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                    <thead>
+                                        <tr class="slds-line-height_reset">
+                                            <th class="" scope="col" >
+                                                <div class="slds-truncate" title="Opportunity Name">{!$Label.c.Retailer_Code}</div>
+                                            </th>
+                                            <th class="" scope="col">
+                                                <div class="slds-truncate" title="Opportunity Name">{!$Label.c.Manufacturer_ID_Factory_ID_Location_ID}</div>
+                                            </th>
+                                            <th class="" scope="col">
+                                                <div class="slds-truncate" title="Account Name">{!$Label.c.Supplier_ID_Vendor_No}</div>
+                                            </th>
+                                            <th class="" scope="col">
+                                                <div class="slds-truncate" title="Order To Company">{!$Label.c.Order_To_Company}</div>
+                                            </th>
+                                            <th class="" scope="col">
+                                                <div class="slds-truncate" title="Preferred Currency">{!$Label.c.Preferred_Currency}</div>
+                                            </th>
+                                            
+                                            <th class="" scope="col">
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <aura:iteration items="{!v.RetailerDataList}" var="IndRetailerData" indexVar="Ind">
+                                            <c:AddRetailerData IndRetailerData="{!IndRetailerData}" rowIndex="{!Ind}" idListStr="{!v.idListStr}" depnedentFieldMap="{!v.depnedentFieldMap}" SubDepnedentFieldMap="{!v.SubDepnedentFieldMap}"/>
+                                        </aura:iteration>
+                                        
+                                    </tbody>
+                                </table>                                
+                            </article> 
+                        </div>
+                        
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.CloseModal}">{!$Label.c.Cancel}</button>
+                        <button class="slds-button slds-button_brand" onclick="{!c.UpdateRetailerData}">{!$Label.c.Update}</button>
+                    </footer>
+                </div>
+            </section>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+    
+    <!-- Retailer Data Section ends here -->
+    
+    <!--  Address Info Section Starts here  -->
+    <aura:if isTrue="{!v.showAddressSection}" >
+        <div style="">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}">
+                            
+                            <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Edit_Address}</h2>
+                    </header>
+                    <lightning:spinner aura:id="mySpinner" class="slds-hide"/>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        
+                        <div style="color:#16325c;font-weight:bold;padding-left:10px;font-style:italic;font-size:13px;" class="slds-text-heading_small">{!$Label.c.Checked_are_default_address}</div>
+                        <lightning:layout >
+                            <lightning:layoutItem padding="around-small" size="6">
+                                <div class="slds-box slds-box-no-border slds-m-bottom_x-large">
+                                    <h2 class="box-title" style="width:62px">{!$Label.c.Bill_To}</h2>	
+                                    <div class="slds-text-align_right">
+                                        <button class="slds-button slds-button_neutral slds-float_right1" onclick="{!c.addNewBillAddress}">{!$Label.c.Add}</button>									
+                                    </div>
+                                    <aura:if isTrue="{!and(v.ShowErrorMesssage,(v.ShowSectionWiseMesssage=='BillToAddress'))}">
+                                        
+                                        <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                                            <span class="slds-assistive-text">{!$Label.c.Error}</span>
+                                            <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                                                <lightning:icon iconName="utility:error" size="x-small" alternativeText="{!$Label.c.section}" />
+                                            </span>
+                                            <h1>{!v.ErrorMesssage}</h1>
+                                            <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeErrorMessage}">
+                                                <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.section}" />
+                                                <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                                            </button>
+                                        </div>
+                                    </aura:if>									
+                                    <aura:iteration items="{!v.AddressWrapperObject.BillToAddressList}" var="billAddress" indexVar="Ind">
+                                        <c:BillToComp billAddress="{!billAddress}" rowIndex="{!Ind}" aura:id="childComp" CountryList="{!v.CountryList}" billtovalidationflag="{!v.billtovalidationflag}"/>
+                                    </aura:iteration>
+                                    
+                                    <aura:if isTrue="{!v.ShowBillToLockedComp}">                                    
+                                        <aura:iteration items="{!v.AddressWrapperObject.BillToLockedAddressList}" var="BillToLockedAddress" indexVar="Ind">
+                                            <c:BillToLocked BillToLockedAddress="{!BillToLockedAddress}" rowIndex="{!Ind}" />
+                                        </aura:iteration>
+                                    </aura:if>
+                                </div>                
+                                
+                                 <aura:if isTrue="{!v.ShowInvoiceToBuyerToComp}">
+                                    <div class="slds-box slds-box-no-border slds-m-bottom_x-large">
+                                        <h2 class="box-title" style="width:84px">{!$Label.c.Invoice_To}</h2>	
+                                        <div class="slds-text-align_right">
+                                            <button class="slds-button slds-button_neutral slds-float_right1" onclick="{!c.addNewInvoiceToddress}">{!$Label.c.Add}</button>									
+                                        </div>
+                                        <article class="slds-card">
+                                            <aura:if isTrue="{!and(v.ShowErrorMesssage,(v.ShowSectionWiseMesssage=='InvoiceToAddress'))}">
+                                                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                                                    <span class="slds-assistive-text">{!$Label.c.Error}</span>
+                                                    <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                                                        <lightning:icon iconName="utility:error" size="x-small" alternativeText="{!$Label.c.section}" />
+                                                    </span>
+                                                    <h1>{!v.ErrorMesssage}</h1>
+                                                    <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeErrorMessage}">
+                                                        <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.section}" />
+                                                        <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                                                    </button>
+                                                </div>
+                                            </aura:if>
+                                            <aura:iteration items="{!v.AddressWrapperObject.InvoiceToAddressList}" var="InvoiceToAddress" indexVar="Ind">
+                                                <c:InvoiceToComp InvoiceToAddress="{!InvoiceToAddress}" rowIndex="{!Ind}" aura:id="InvoicechildComp" CountryList="{!v.CountryList}" invoicetovalidationflag="{!v.invoicetovalidationflag}"/>
+                                            </aura:iteration>                                        
+                                        </article>
+                                    </div>
+                                </aura:if>
+                                
+                                
+                                
+                            </lightning:layoutItem>
+                            <lightning:layoutItem padding="around-small" size="6">
+                                <div class="slds-box slds-box-no-border slds-m-bottom_x-large">
+                                    <h2 class="box-title" style="width:70px">{!$Label.c.Ship_To}</h2>	
+                                    <div class="slds-text-align_right">
+                                        <button class="slds-button slds-button_neutral slds-float_right1" onclick="{!c.addNewShippAddress}">{!$Label.c.Add}</button>									
+                                    </div>
+                                    
+                                    <aura:if isTrue="{!and(v.ShowErrorMesssage,(v.ShowSectionWiseMesssage=='ShipToAddress'))}">
+                                        
+                                        <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                                            <span class="slds-assistive-text">{!$Label.c.Error}</span>
+                                            <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                                                <lightning:icon iconName="utility:error" size="x-small" alternativeText="{!$Label.c.section}" />
+                                            </span>
+                                            <h1>{!v.ErrorMesssage}</h1>
+                                            <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeErrorMessage}">
+                                                <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.section}" />
+                                                <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                                            </button>
+                                        </div>
+                                    </aura:if>
+                                    <aura:iteration items="{!v.AddressWrapperObject.ShippToAddressList}" var="ShippAddress" indexVar="Ind">
+                                        <c:ShippToComp ShippAddress="{!ShippAddress}" rowIndex="{!Ind}" aura:id="shipchildComp" CountryList="{!v.CountryList}" shiptovalidationflag="{!v.shiptovalidationflag}"/>
+                                    </aura:iteration>
+                                    
+                                </div>
+                                
+                                <!-- code for BuyerToAddres section starts here-->
+                                <aura:if isTrue="{!v.ShowInvoiceToBuyerToComp}">
+                                    <div class="slds-box slds-box-no-border slds-m-bottom_x-large">
+                                        <h2 class="box-title" style="width:80px">{!$Label.c.Buyer}</h2>	
+                                        <div class="slds-text-align_right">
+                                            <button class="slds-button slds-button_neutral slds-float_right1" onclick="{!c.addNewBuyerToAddress}">{!$Label.c.Add}</button>									
+                                        </div>
+                                        <article class="slds-card">
+                                            <aura:if isTrue="{!and(v.ShowErrorMesssage,(v.ShowSectionWiseMesssage=='BuyerToAddress'))}">
+                                                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+                                                    <span class="slds-assistive-text">{!$Label.c.Error}</span>
+                                                    <span class="slds-icon_container slds-icon-utility-error slds-m-right_x-small" title="Description of icon when needed">
+                                                        <lightning:icon iconName="utility:error" size="x-small" alternativeText="{!$Label.c.section}" />
+                                                    </span>
+                                                    <h1>{!v.ErrorMesssage}</h1>
+                                                    <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeErrorMessage}">
+                                                        <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.section}" />
+                                                        <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                                                    </button>
+                                                </div>
+                                            </aura:if>                                            
+                                            
+                                            <aura:iteration items="{!v.AddressWrapperObject.BuyerToAddressList}" var="BuyerToAddress" indexVar="Ind">
+                                                <c:BuyerToComp BuyerToAddress="{!BuyerToAddress}" rowIndex="{!Ind}" aura:id="buychildComp" CountryList="{!v.CountryList}" buyertovalidationflag="{!v.buyertovalidationflag}"/>
+                                            </aura:iteration>
+                                            
+                                        </article>
+                                    </div>
+                                </aura:if>
+                                <!-- code for BuyerToAddres section ends here-->
+                            </lightning:layoutItem>
+                          
+                        </lightning:layout >
+                    </div>                    
+                    
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.CloseModal}">{!$Label.c.Cancel}</button>
+                        <lightning:button class="slds-button slds-button_brand" label="{!$Label.c.save}" onclick="{!c.UpdateCustomerAddressDetails}" />
+                        
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+        
+    </aura:if>  
+    
+    <!--  Address Info Section Starts here   -->
+    
+    
+    <!--  Code to reset password starts from here -->
+    <aura:if isTrue="{!v.showPasswordSection}">
+        <div style="">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container" style="width:35%;min-width:35%;">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}"> 
+                            <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Change_Password}</h2>
+                    </header> 
+                    
+                    <div class="slds-modal__content slds-p-around_x-large" id="modal-content-id-1">   
+                        <div>					
+                            <!--<lightning:input label="Last Name" class=" " value="{!v.CustomerInfo.Last_Name__c}"/>-->
+                            <lightning:input class="slds-m-bottom_small" label="{!$Label.c.User_Name}" disabled="true" value="{!v.CustomerInfo.Username__c}"/>
+                            <!--<div class="slds-text-align_center slds-text-heading_medium">Password Strength Check</div>-->
+                            <lightning:input autocomplete="off" aura:id="pass" class="slds-m-bottom_medium" name="password" label="{!$Label.c.password}" value="{!v.password}" onchange="{!c.checkPasswordStrength}" type="password"/>
+                            
+                            <lightning:badge label="{!v.passwordStrength}" aura:id="psBadge" class="slds-m-right_small slds-theme--error" /><button class="slds-button slds-button_icon" title="{!$Label.c.Password_policy}" onmouseover="{!c.displayTooltip}" onmouseout="{!c.hideTooltip}">
+                            <lightning:icon iconName="utility:info" size="x-small" alternativeText="{!$Label.c.Approved}" />
+                            <span class="slds-assistive-text">{!$Label.c.Password_policy}</span>
+                            </button>
+                            <div class="slds-popover slds-popover_tooltip slds-nubbin_bottom-left slds-hide" role="tooltip" aura:id="helpText" style="position: absolute;top: 272px;left: 108px;">
+                                <div class="slds-popover__body" style="white-space:pre;">{!v.passwordPolicy}</div>
+                            </div>
+                            <!--<lightning:helptext content="{!v.passwordPolicy}" class="customIcon"/> -->
+                        </div> 
+                    </div>    
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.CloseModal}">{!$Label.c.Cancel}</button>
+                        <button class="slds-button slds-button_brand" onclick="{!c.ChangePass}">{!$Label.c.Change_Password}</button>
+                    </footer>
+                </div>
+            </section>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+    
+    <!--  Code to reset Language starts from here --> 
+    
+      <aura:if isTrue="{!v.showLanguageSection}">
+        <div style="">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container" style="width:35%;min-width:35%;">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}">
+                            <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Change_Language}</h2>
+                    </header> 
+                    
+                    <div class="slds-modal__content slds-p-around_x-large" id="modal-content-id-1">   
+                        <div>					
+                            <lightning:input aura:id="DefaultLanguage" class="slds-m-bottom_small" label="{!$Label.c.Default_Language}" disabled="true" value="{!v.defaultLanguage}"/>
+                            <!--lightning:input aura:id="pass" class="slds-m-bottom_medium" name="Select a Language" label="{!$Label.c.Select_a_Language}" value="{!v.password}" onchange="{}"/-->
+                            
+                            <lightning:select name="Language" label="{!$Label.c.Select_a_Language}" aura:id="Language" value="{!v.selectedLanguage}" onchange="{!c.changeLanguage}">
+                                <option>{!$Label.c.None}</option>
+                                <aura:iteration items="{!v.availableLanguage}" var="option">
+                                    <option text="{!option}" value="{!option.value}" selected="{!option.selected}"/>
+                                </aura:iteration>
+                            </lightning:select>
+
+                        </div> 
+                    </div>    
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.CloseLanguageData}">{!$Label.c.Cancel}</button>
+                        <button class="slds-button slds-button_brand" onclick="{!c.UpdateLanguageData}">{!$Label.c.Submit}</button>
+                    </footer>
+                </div>
+            </section>
+        </div>
+    </aura:if>
+</aura:component>

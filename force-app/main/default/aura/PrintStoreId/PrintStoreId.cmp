@@ -1,0 +1,130 @@
+<aura:component implements="force:lightningQuickAction" controller="PrintStoreIdController">
+
+    <!-- retailer search attributes -->
+    <aura:attribute name="objectName" type="String" default="Account"/>
+    <aura:attribute name="fieldName" type="String" default="Name"/>
+    <aura:attribute name="selectRecordId" type="String"/>
+    <aura:attribute name="selectRecordName" type="String"/>
+    <aura:attribute name="Label" type="String"/>
+    <aura:attribute name="searchRecords" type="List"/>
+    <aura:attribute name="required" type="Boolean" default="false"/>
+    <aura:attribute name="iconName" type="String" default="action:new_account"/>
+    <aura:attribute name="LoadingText" type="Boolean" default="false"/>
+
+    <!-- Very simple addition -->
+	 <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+ 	<!--Boolean attribute to indicate if modal is open or not 
+       default value is false as modal is closed when page is loaded 
+    -->
+    
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="printPdfBtn" type="boolean" default="false"/>
+    <aura:attribute name="retailerSelected" type="boolean" default="false"/>
+    <aura:attribute name="storeDetails" type="Customer_Warehouse__c"/>
+    <!-- Custom lookjup attributes -->
+    <aura:attribute name="SearchUserKeyWord" type="string"/>
+    <aura:attribute name="SearchRetailerKeyWord" type="string"/>
+    <aura:attribute name="listOfUserSearchRecords" type="List" description="Use,for store the list of search records which returns from apex class"/>
+    <aura:attribute name="listOfRetailerRecords" type="List" description="Use,for store the list of search records which returns from apex class"/>
+    <aura:attribute name="Message" type="String" default="Search Result.."/>
+    <aura:handler name="oRetailerdataEvent" event="c:printStoreEvent" action="{!c.handleComponentEvent}"/>
+    <aura:attribute name="selectedUserRecord" type="List" description="Use,for store SELECTED sObject Record" default="[]"/>
+    <aura:attribute name="selectedStore" type="Customer_Warehouse__c"/>
+    <aura:attribute name="selectedRetailer" type="Retailer_Code__c"/>
+    <div class="slds-m-around_xx-large">
+       
+        <!--Use aura:if tag to display/hide popup based on isModalOpen value-->  
+        <aura:if isTrue="{!v.isModalOpen}">
+             
+            <!-- Modal/Popup Box starts here-->
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container" style="width: auto; max-width: 400px;">
+                    <div style="box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;">
+
+                        <!-- Modal/Popup Box Header Starts here-->
+                        <header class="slds-modal__header"  style="background-color: rgb(164, 31, 52); border-radius: 5px;">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{! c.closeModel }"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" style="color: white;">Print Store ID Label</h2>
+                    </header>
+                    <!--Modal/Popup Box Body Starts here-->
+                    <div class="slds-modal__content slds-p-around_medium" id="retailer search" style="height: 200px;">
+                       
+
+                        <div onmouseleave="{!c.onblur}" aura:id="searchRetailerRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
+                            <label class="slds-form-element__label" for="horizontal-input-id-01">Retailer</label>                     
+                        <div class="slds-form-element__control">
+                            <div class="slds-input-has-icon slds-input-has-icon--right">
+                                <div aura:id="lookupUserField" class="slds-show">
+                                    <lightning:icon class="slds-input__icon slds-show" iconName="standard:search" size="x-small" alternativeText="search"/>
+                                    <span class="slds-icon_container  slds-combobox__input-entity-icon" title="record">
+                                        <span class="slds-assistive-text"></span>
+                                    </span>
+                                    <ui:inputText  aura:id="searchRetailer"   size="25"   updateOn="keyup" keyup="{!c.keyPressRetailerController}" class="slds-lookup__search-input slds-input leftPaddingClass" value="{!v.SearchRetailerKeyWord}" placeholder="search Store" />
+                                    <input type="hidden"  id='valueHolder'  name = "" value = ""  />                                                       
+                                </div>                                                
+                            </div>
+               
+                            <ul style="min-height:40px;margin-right:68px;" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-lookup__menu slds" role="listbox">
+                                <lightning:spinner class="slds-hide" variant="brand" size="small" aura:id="mySpinner"/>
+                                <center> {!v.Message}</center>
+                                <aura:iteration items="{!v.listOfRetailerRecords}" var="singleRec">
+                                    <c:customLookupforStore oUser="{!singleRec}" rowIndex="{!index}" IconName="standard:skill"/>
+                                </aura:iteration>
+                            </ul>
+                        </div>
+                        </div>
+
+                         <lightning:recordEditForm aura:id="recordEditForm"
+                           objectApiName="Customer_Warehouse__c">
+                            <lightning:messages />
+                             
+                            <aura:if isTrue="{!v.retailerSelected}">
+                                <div onmouseleave="{!c.onblur}" aura:id="searchUserRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
+                                    <label class="slds-form-element__label" for="horizontal-input-id-01">Store ID</label>                     
+                                <div class="slds-form-element__control">
+                                    <div class="slds-input-has-icon slds-input-has-icon--right">
+                                        <div aura:id="lookupUserField" class="slds-show">
+                                            <lightning:icon class="slds-input__icon slds-show" iconName="standard:search" size="x-small" alternativeText="search"/>
+                                            <span class="slds-icon_container  slds-combobox__input-entity-icon" title="record">
+                                                <span class="slds-assistive-text"></span>
+                                            </span>
+                                            <ui:inputText  aura:id="searchUserValue"   size="25"   updateOn="keyup" keyup="{!c.keyPressUserController}" class="slds-lookup__search-input slds-input leftPaddingClass" value="{!v.SearchUserKeyWord}" placeholder="search Store" />
+                                            <input type="hidden"  id='valueHolder'  name = "" value = ""  />                                                       
+                                        </div>                                                
+                                    </div>
+                       
+                                    <ul style="min-height:40px;margin-right:68px;" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-lookup__menu slds" role="listbox">
+                                        <lightning:spinner class="slds-hide" variant="brand" size="small" aura:id="mySpinner"/>
+                                        <center> {!v.Message}</center>
+                                        <aura:iteration items="{!v.listOfUserSearchRecords}" var="singleRec">
+                                            <c:customLookupforStore oUser="{!singleRec}" rowIndex="{!index}" IconName="standard:skill"/>
+                                        </aura:iteration>
+                                    </ul>
+                                </div>
+                                </div>
+                            </aura:if>
+                        </lightning:recordEditForm>
+                    </div>
+                    <!--Modal/Popup Box Footer Starts here-->
+                    <footer class="slds-modal__footer">
+                      
+                        <aura:if isTrue="{!v.printPdfBtn}">
+                            <lightning:button variant="brand"
+                                              label="Generate PDF"
+                                              title="OK"
+                                              onclick="{! c.submitDetails }"
+                                              />
+                        </aura:if>  
+                    </footer>
+                </div>
+                    </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    </div>
+</aura:component>

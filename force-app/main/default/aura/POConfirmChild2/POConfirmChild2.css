@@ -1,0 +1,44 @@
+.THIS .highlight input,.THIS .highlight select{
+    border-color: rgb(21, 137, 238) !important;
+    background:lemonchiffon !important;
+    color:black !important;    
+}
+.THIS input
+{
+    min-height: 22px !important;
+    line-height: 14px !important;
+    font-size: 11px;
+}
+.THIS .highlight_TLA input
+{
+    color: black !important;
+    background-color: #d3d3d3 !important;
+}
+.THIS .highlight_TLA select
+{
+    color: black !important;
+    background-color: #d3d3d3 !important;
+}
+.THIS select
+{
+    height: 22px !important;
+    min-height: 22px !important;
+    line-height: 14px !important;
+    font-size: 11px;
+}
+.THIS .slds-select_container:before
+{
+    top: 5px !important;
+}
+.THIS .slds-select_container:after
+{
+    bottom: 5px !important;
+}
+.THIS .uiInput--datetime .datePicker-openIcon
+{
+    top:4px !important;
+}
+.THIS .label-hidden label
+{
+    display:none !important;
+}

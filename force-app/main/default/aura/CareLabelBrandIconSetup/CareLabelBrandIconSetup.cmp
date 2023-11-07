@@ -1,0 +1,194 @@
+<aura:component  controller="CareLabelMaintenanceService" implements="force:appHostable" >
+    <aura:attribute name="retailerID" type="String"/>
+    <aura:attribute name="retailerName" type="String"/>
+    <aura:attribute name="productID" type="String" />
+    <aura:attribute name="productName" type="String" />
+    <aura:attribute name="showLoadingSpinner" type="boolean" default="false" />
+    <aura:attribute name="Brands" type="List"  />
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+     <aura:attribute name="ImagefileName" type="String" default="No File Selected.." />
+    <aura:attribute name="BrandIconsetup" type="Brand__c" default="{ 'sobjectType': 'Brand__c',
+                                                                   'Name': '',
+                                                                   'Art_Code__c': '',
+                                                                   'Brand_Icon__c': '',
+                                                                   'Product__c': '',
+                                                                   'Retailer_Code__c':''
+                                                                   }"/>
+     <aura:attribute name="BrandIconlist" type="Brand__c[]" default="{ 'sobjectType': 'Brand__c',
+                                                                   'Name': '',
+                                                                   'Art_Code__c': '',
+                                                                   'Brand_Icon__c': '',
+                                                                   'Product__c': '',
+                                                                   'Retailer_Code__c':''
+                                                                   }"/>
+    
+    <aura:attribute name="SetupFlag" type="boolean" default="false"/>
+    <aura:attribute name="isEditOpenModal" type="boolean" default="false"/>
+    <aura:attribute name="isEditImageModal" type="boolean" default="false"/>
+     <aura:attribute name="selctedimages" type="List" />
+    <aura:attribute name="Imageid" type="Id"/>
+    <aura:handler name="change" value="{!v.productID}" action="{!c.handleLookupEvent}" />
+    <aura:handler name="change" value="{!v.retailerID}" action="{!c.retailerChangeEvent}" />
+    <aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordEvent" action="{!c.handleLookupEvent}"/>
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="standard:quotes" alternativeText="" size="medium"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>{!$Label.c.Brand_Icon_Setup}</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body">
+            <div class="slds-grid">
+                <div class="slds-col slds-size_1-of-4 slds-p-around_x-small">
+                    <c:CustomLookup recordID="{!v.retailerID}" recordName="{!v.retailerName}" whereCondition ="AND Online_Enquiry__c=true" objectAPIName="Retailer_Code__c" IconName="standard:account" label="{!$Label.c.Retailer_Code}" />
+                </div>
+                <aura:if isTrue="{!v.retailerID}">
+                    <div class="slds-col slds-size_1-of-4 slds-p-around_x-small">
+                        <c:CustomLookup recordID="{!v.productID}" recordName="{!v.productName}" objectAPIName="Product__c" whereCondition ="{!v.retailerID != null ? 'AND Business_Vertical__c =\'Labels &amp; Tickets\' AND Status__c=\'Active\'  AND Variable_Data_Product__c=\'Yes\'  AND Id IN (select Product_Unique_ID__c  from Price_Specification_Book_Product__c  where Retailer_Code__c =\''+v.retailerID+'\')':''}" IconName="standard:account" label="{!$Label.c.Label}" />
+                    </div>
+                </aura:if>
+              
+            </div>
+        </div>
+        <aura:if isTrue="{!v.SetupFlag}">
+            <div class="">
+                <lightning:input class="slds-hide" label="{!$Label.c.Retailer}" name="Retailer" value="{!v.BrandIconsetup.Retailer__c}" />
+                <div class="slds-grid"> 
+                    <!-- <div class="slds-size_1-of-2 slds-p-around_x-small">
+                            BrandIconImage:<lightning:inputRichText  label="BrandIcon" value="{!v.BrandIconsetup.Brand_Icon__c}" >
+                            <lightning:insertImageButton />
+                            </lightning:inputRichText>
+                        </div>-->
+                    
+                      <div class="slds-col slds-size_1-of-4 slds-p-around_x-small">
+                    <lightning:input label="{!$Label.c.Art_Code}" name="Art Code" value="{!v.BrandIconsetup.Art_Code__c}" aura:id="acodeid"    onkeypress="{!c.checkval}" required='true'/>
+                      </div>
+                    <div class="slds-col slds-size_1-of-3 slds-p-around_x-small">
+                        <lightning:input aura:id="fileId" onchange="{!c.handleFilesChange}" type="file" name="file" label="{!$Label.c.BrandIcon_Image}" multiple="false" required='true'/>
+                        <div class="slds-text-body_small slds-text-color_error">{!v.fileName} </div>
+                        <!--use aura:if for show-hide the loading spinner image--> 
+                        <aura:if isTrue="{!v.showLoadingSpinner}">
+                            <div class="slds-text-body_small slds-text-color_error">{!$Label.c.Uploading} 
+                                <img src="/auraFW/resources/aura/images/spinner.gif" class="spinner-img" alt="{!$Label.c.Loading}"/>'
+                            </div>
+                        </aura:if>
+                    </div>
+                    <div class="slds-col slds-size_1-of-5 slds-p-around_x-small">
+                        <div class="uiOutputRichText" linkify="true" >
+                            <aura:unescapedHtml value="{!v.BrandIconsetup.Brand_Icon__c}"/>
+                        </div>    
+                    </div>
+                </div>
+            </div>
+            <aura:if isTrue="{!v.isEditOpenModal}">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeBrandModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Brand_Icon_Details}</h2>
+                   </header>
+                    <div class="slds-modal__content slds-p-around_medium1" id="modal-content-id-1">
+                       <table style="">
+                           <thead>
+                               <tr style="text-transform:uppercase;">
+                                    <th scope="col"   width="10%" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;"></div></th>
+                                    <th scope="col"  style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;"></div></th>
+                                    <th scope="col" width="30%" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;">{!$Label.c.Art_Code}</div></th>
+                                    <th scope="col"   width="10%" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;"></div></th>
+                                   <th scope="col" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;">{!$Label.c.Brand_Image}</div></th>
+                               </tr>
+                           </thead>
+                            <aura:iteration items="{!v.BrandIconlist}" var="brands" >
+                                  <tr>
+                                       <td scope="row"  width="10%">
+                                        <div class="slds-truncate" title="">  </div>
+                                       </td>
+                                       <td scope="row">
+                                        <ui:inputRadio aura:id="checkimageNames" value="{!brands.selctedimages}" text="{!brands.Id}" change="{!c.onchangedSelected}"/>   
+                                      </td> 
+                                      <td scope="row" width="30%">
+                                        <div class="slds-truncate" title="{!brands.Art_Code__c}"><ui:inputText value="{!brands.Art_Code__c}"  disabled="true" /></div>
+                                      </td>
+                                      <td>
+                                      </td>
+                                     <td scope="row">
+                                       <div class="symbol-image">
+                                            <ui:outputRichText value="{!brands.Brand_Icon__c}" />
+                                        </div>
+                                    </td>
+                                </tr>
+                           </aura:iteration>
+                        </table>
+                    </div>
+                     <footer class="slds-modal__footer">
+                            <lightning:button variant="brand"
+                                      label="{!$Label.c.Cancel}"
+                                      title="{!$Label.c.Cancel}"
+                                      onclick="{!c.closeBrandModel}"/> 
+                          <lightning:button variant="brand"
+                                      label="{!$Label.c.DELETE}"
+                                      title="{!$Label.c.DELETE}"
+                                      onclick="{!c.Deleterecord}"/> 
+                          <lightning:button variant="brand"
+                                      label="{!$Label.c.Edit_Image}"
+                                      title="{!$Label.c.Edit_Image}"
+                                      onclick="{!c.Editimagemodel}"/>
+                    </footer>
+                 </div>
+                
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>
+            <footer class="slds-card__footer slds-text-align_right">
+                <lightning:button iconName="utility:check" variant="brand" label="{!$Label.c.View_and_Edit}" title="{!$Label.c.View_and_Edit}" onclick="{!c.checkingExist}" />
+                <lightning:button iconName="utility:check" variant="brand" label="{!$Label.c.save}" title="{!$Label.c.save}" onclick="{!c.submitSetup }" />
+                <lightning:button iconName="utility:close" variant="brand" label="{!$Label.c.Cancel}" title="{!$Label.c.Cancel}" onclick="{!c.cancelmethod }" />
+            </footer>
+        </aura:if>
+          <aura:if isTrue="{!v.isEditImageModal}">
+                <section class="slds-modal slds-fade-in-open" style="z-index:10001">
+                     <div class="slds-modal__container">
+                           <header class="slds-modal__header">
+                           <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{!c.closeimageModel }"
+                                          alternativeText="{!$Label.c.Close}"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                                  <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Edit_Brand_Icon}</h2>
+                         </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning:input name="file1" aura:id="fileId1" type="file" label="{!$Label.c.Symbol_Image}" multiple="false" onchange="{! c.handleFilesChange1 }"/>
+                    <!--<lightning:input aura:id="fileId1" onchange="{!c.handleFilesChange1}" type="file" name="file" label="Symbol Image" multiple="false"/>-->
+                    <div class="slds-text-body_small slds-text-color_error">{!v.ImagefileName} </div>
+                    <aura:if isTrue="{!v.showLoadingSpinner1}">
+                        <div class="slds-text-body_small slds-text-color_error">{!$Label.c.Uploading}
+                            <img src="/auraFW/resources/aura/images/spinner.gif" class="spinner-img" alt="{!$Label.c.Loading}"/>'
+                        </div>
+                    </aura:if>
+                </div>
+                 <footer class="slds-modal__footer">
+                    <lightning:button variant="brand"
+                                      label="{!$Label.c.save}"
+                                      title="{!$Label.c.save}"
+                                      onclick="{!c.submitSetup1}"/>
+                    <lightning:button variant="brand"
+                                      label="{!$Label.c.Cancel}"
+                                      title="{!$Label.c.Cancel}"
+                                      onclick="{!c.closeimageModel}"/>
+                </footer>     
+                    </div>
+                </section>
+             <div class="slds-backdrop slds-backdrop_open" style="z-index:10000"></div>    
+         </aura:if>
+    </article>
+</aura:component>

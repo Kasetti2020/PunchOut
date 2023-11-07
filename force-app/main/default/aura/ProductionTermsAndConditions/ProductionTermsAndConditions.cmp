@@ -1,0 +1,36 @@
+<aura:component Controller="CustomerInfoModifyController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="isSelected" type="Boolean" default="false"/>
+    <aura:attribute name="termsSection" type="Boolean" default="true"/>
+    <aura:attribute name="LoggedInUser" type="User"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+   
+    <!--<aura:if isTrue="{!and(v.ShowErrorMesssage,(v.ShowSectionWiseMesssage=='ShipToAddress'))}">-->
+    <aura:if isTrue="{!and(v.LoggedInUser,(v.termsSection))}"> 
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    
+                    <lightning:buttonIcon class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" iconName="utility:close" variant="bare" onclick="{! c.CloseModal }" alternativeText="{!$Label.c.Settings}" />
+                    
+                    <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                    
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" style="color:#791726">{!$Label.c.Terms_and_Conditions}</h2>
+                </header>
+                <div  class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <c:ProductionTermsAndConditions_Inputs />
+                </div>
+                
+                <footer class="slds-modal__footer slds-modal__footer_directional">
+                    <div class="slds-form-element slds-float_left">
+                        <div class="slds-form-element__control">
+                            <lightning:input type="checkbox" label="{!$Label.c.I_agree}" checked="{!v.LoggedInUser.Accepted_Terms_And_Conditions__c}" name="input1"/>
+                        </div>
+                    </div>
+                    <lightning:button variant="brand" label="{!$Label.c.OK}" onclick="{!c.Proceed}" />
+                </footer>
+                
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    </aura:component>

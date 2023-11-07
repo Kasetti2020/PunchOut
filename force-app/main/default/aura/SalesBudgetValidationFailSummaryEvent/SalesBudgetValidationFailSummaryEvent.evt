@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="Component event" >
+    <aura:attribute type="Integer" name="rowNo"/> 
+    <aura:attribute type="List" name="errorCodeDetailList"/> 
+</aura:event>

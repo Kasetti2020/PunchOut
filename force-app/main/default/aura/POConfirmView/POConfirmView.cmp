@@ -1,0 +1,197 @@
+<aura:component controller="POConfirmPageHandler" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doint}"/>
+    <aura:attribute name="page" type="integer"/>
+    <aura:attribute name="pages" type="integer"/>
+    <aura:attribute name="Acclist" type="list"/>
+    <aura:attribute name="total" type="integer"/>
+    <aura:attribute name="POList" type="Object"/>
+    <aura:attribute name="SelecPOList" type="Object"/>
+    <aura:handler event="c:PageChange" action="{!c.pageChange}"/>
+    <aura:attribute name="expanded" type="String" default="false"/>
+    <aura:handler name="selectcheck" event="c:SelectCheck" action="{!c.selectchild}" /> 
+    <aura:attribute name="selectvalchild" type="list"/>
+    <aura:attribute name="isBoxValidationRqd" type="boolean" default="false" />
+    <aura:attribute name="shipadd" type="boolean" default="false" />
+    <aura:attribute name="supadd" type="Object"/>
+    <aura:attribute name="flag" type="boolean" default="false" />
+    <aura:attribute name="Errorflag" type="boolean" default="false" />
+    <aura:attribute name="errorMsg" type="String" default=""/>
+    <aura:attribute name="isError" type="Boolean" default="false"/>
+    <aura:attribute name="mainCheckbox" type="Boolean" default="false"/>
+    <aura:attribute name="customerInfoId" type="Id"/>
+    <aura:attribute name="searchText" type="String" default=""/>
+    <aura:attribute name="selectedRetailer" type="String"/>
+    <aura:attribute name="selectedRetailerId" type="String"/>
+    <aura:attribute name="clearPOListIds" type="list"/>
+    <aura:attribute name="toclearConfirmPOList" type="list"/>
+    <aura:attribute name="MainFlag" type="Boolean" default="true"/>
+    <aura:attribute name="ConfirmPO" type="Boolean" default="false"/>
+    <aura:attribute name="supplierCode" type="String"/>
+    
+    <aura:attribute name="tablesize" type="boolean" default="false"/>
+    <aura:attribute name="tablesizeExpand" type="boolean" default="true"/>
+    <!--added attribute for CR: both mutlple SO COnversion and Single SO Conversion -->  
+    <aura:attribute type="List" name="options" default="[]" /><!-- Added by SUSHIL on 7-12-21 --> 
+    <aura:attribute type="String" name="value" />
+    <aura:attribute name="openChoicePopup" type="boolean" default="false"/>
+    <aura:attribute name="Defaultvalue" type="String" default="Multiple SO Conversion"/>
+    <aura:attribute name="SOChoiceFlag" type="String" default=""/>
+    <!-- Ends Here -->
+    <aura:handler name="change" value="{!v.tablesize}" action="{!c.tablesizeChange}"/>
+    
+    <aura:handler name="searchEvent" event="c:GlobalSearchEventForChild" action="{!c.handleSearchEvent}"/>
+    
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position: fixed" alternativeText="{!$Label.c.Loading}" size="large" />
+    </div>
+    <aura:if isTrue="{!v.MainFlag}">
+    <div class="content">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container1" title="contact">
+                        <!--<lightning:icon iconName="standard:entitlement" size="small" alternativeText="Warning!" variant="brand"/>-->
+                        <img src="{!$Resource.MagNETIcons + '/View.png'}" width="50"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_1-of-3">
+                            <h2 class="slds-card__header-title header slds-text-title_caps slds-p-top_x-small">
+                                <strong>{!$Label.c.Selected_Purchase_Order}</strong>
+                            </h2>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                           <!-- <c:GlobalSearchForChildPO POList="{!v.POList}" searchType="OpenPO"/>	-->
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-no-flex slds-m-right_medium">
+                    <lightning:button variant="brand" label="{!$Label.c.Back_to_PO}" iconName="utility:back" iconPosition="left" onclick="{!c.backToPO}"/>
+                </div>
+                 <div class="slds-no-flex slds-m-right_medium">
+                    <lightning:button variant="brand" label="{!$Label.c.Clear_Selected}" iconName="utility:delete" iconPosition="left" onclick="{!c.uncheckPO}"/>
+                </div>
+                <div class="slds-no-flex ">
+                    <lightning:button variant="brand" label="{!$Label.c.Confirm}" iconName="utility:send" iconPosition="left" onclick="{!c.ConfirmOrder}"/>
+                </div>
+            </header>
+        </div>
+        <div class="slds-box1" style="">
+            <aura:renderIf isTrue="{!v.isError}">
+                <ui:message title="Error" severity="error" closable="false">
+                    {!v.errorMsg}
+                </ui:message>
+                <aura:set attribute="else">  
+                </aura:set>
+            </aura:renderIf> 
+        </div>
+        <div class="slds-card__body">
+            <div class="table-scroll">
+                <!--<table class="slds-table slds-table"> -->
+                <table class="{!v.tablesizeExpand?'slds-table slds-table1 1':'slds-table slds-table2 2'}">
+                    <thead>
+                        <tr class="slds-text-title_caps slds-gray">
+                            <th style="width: 2.5%;"><div class="slds-truncate"></div></th>
+                            <th><div class="slds-truncate"><ui:inputCheckbox aura:id="cbox" class="cBox" value="{!v.mainCheckbox}" change="{!c.selectAll}"/></div></th>
+                            <th><div class="slds-truncate">{!$Label.c.RETAILER_PO_NO} </div></th>
+                            <th><div class="slds-truncate">{!$Label.c.REVISE_VERSION_NO}</div></th>
+							<th><div class="slds-truncate">{!$Label.c.PO_STATUS}</div></th>                            
+                            <th><div class="slds-truncate">{!$Label.c.Retailer} </div></th>
+                            <th><div class="slds-truncate">{!$Label.c.FACTORY_CODE} </div></th>
+                            <!--<th><div class="slds-truncate">Retailer Vendor Country</div></th>-->
+                            <th><div class="slds-truncate">{!$Label.c.EX_FACTORY_DATE} </div></th>
+                            <th><div class="slds-truncate">{!$Label.c.VERTICAL} </div></th>
+                            <th><div class="slds-truncate slds-text-align_center">{!$Label.c.STATUS}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.CREATED_DATE} </div></th>
+                            <!--<th><div class="slds-truncate">Last Modified Date </div></th>-->
+                            <th style="border-right:1px solid gray;"> </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.POList.POLIList}" var="var1" indexVar="index">
+                            <c:POConfirmChild POList="{!var1}"  rowIndex="{!index}" tablesize="{!v.tablesize}"/> 
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <footer class="slds-card__footer footer">
+            <div class="slds-text-align_center">
+                <c:PaginationComponentForInventory POList="{!v.POList}" page="{!v.page}" pages="{!v.pages}" total="{!v.total}" txt="{!v.searchText}"/>
+                {!V.body}
+            </div>
+        </footer>                
+    </div>
+    </aura:if>
+    <aura:if isTrue="{!v.shipadd}">
+        <c:SalesOrderAddress SOChoiceFlag= "{!v.SOChoiceFlag}" CustomerInfoID ="{!v.customerInfoId}" AddressPopUpFlag="{!v.shipadd}" comfirmPOList="{!v.SelecPOList}" OrderSource="PO" retailerName="{!v.selectedRetailer}" retailerCodeId="{!v.selectedRetailerId}" toUncheck="{!v.toclearConfirmPOList}" supplierCode="{!v.supplierCode}"/>
+    </aura:if>
+     <aura:if isTrue="{!v.ConfirmPO}">
+        <c:POConfirmView/>
+    </aura:if>
+    <!-- Modal Box ends here -->
+    
+    <!-- Model Box Start for confirm Box qty validation-->    
+    <aura:if isTrue="{!v.isBoxValidationRqd}">
+        
+        <div class="demo-only" style="">
+            <section role="dialog" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container" style="width: 50%;font-size:11px;">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeBoxRqdModal}">
+                            <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.Close}"/>
+                            <span class="slds-assistive-text" >{!$Label.c.Close}</span>
+                        </button>
+                        <h2 class="slds-text-heading_medium slds-hyphenate" style="color: #a90533;font-size:17px;">{!$Label.c.Full_Box_Quantity_Required}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" >
+                        {!$Label.c.Supply_Quantity_will_be_changed_to_nearest_Box_quantity_defined_by_the_Retailer}
+                        <br/>
+                        {!$Label.c.Click_Ok_to_confirm_or_Cancel_to_refuse}
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_brand" iconName="utility:new_window" onclick="{!c.openConfirmOrderModal}" label="{!$Label.c.OK}"/>
+                        <lightning:button class="slds-button slds-button_brand" iconName="utility:close" onclick="{!c.closeBoxRqdModal}" label="{!$Label.c.Cancel}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </div>        
+    </aura:if>
+    <!-- Modal Box ends here -->
+    <!-- Model Box Start for check multiple SO or Single choice-->    
+    <aura:if isTrue="{!v.openChoicePopup}">
+        
+        <div class="demo-only" style="">
+            <section role="dialog" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container" style="width: 50%;font-size:11px;">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.cancelMethod}">
+                            <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.Close}"/>
+                            <span class="slds-assistive-text" >{!$Label.c.Close}</span>
+                        </button>
+                        <h2 class="slds-text-heading_medium slds-hyphenate" style="color: #a90533;font-size:17px;">{!$Label.c.Select_SO_Conversion}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" >
+                       <lightning:radioGroup name="radioGroup"
+                          label="{!$Label.c.Select_SO_Conversion}"
+                          options="{!v.options }"
+                          value="{!v.Defaultvalue}"
+                          type="radio"
+                          onchange="{!c.handleChangeRadio}"
+                          required="true"/>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_brand" iconName="utility:new_window" onclick="{!c.openConfirmOrderPageModal}" label="{!$Label.c.OK}"/>
+                        <lightning:button class="slds-button slds-button_brand" iconName="utility:close" onclick="{!c.cancelMethod}" label="{!$Label.c.Cancel}"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </div>        
+    </aura:if>
+    <!-- Modal Box ends here -->
+</aura:component>

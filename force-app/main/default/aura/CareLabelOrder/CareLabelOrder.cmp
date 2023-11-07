@@ -1,0 +1,448 @@
+<aura:component  Controller="CareLabelOrder" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <!--Handler-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:handler name="change" value="{!v.selectedProduct}" action="{!c.doInit}" />
+      <aura:registerEvent name="CloseLogoEvent" type="c:CloseLogo"/>
+     <aura:attribute name="logo" type="Boolean" />
+    
+     <aura:attribute name="DevSize" type="boolean" default="false"/>
+    <aura:attribute name="DevFabric" type="boolean" default="false"/>
+    <aura:attribute name="DevCountry" type="boolean" default="false"/>
+    <aura:attribute name="DevCare" type="boolean" default="false"/>
+    <aura:attribute name="DevExcare" type="boolean" default="false"/>
+    <aura:attribute name="DevFree" type="boolean" default="false"/>
+    <aura:attribute name="Devlogo" type="boolean" default="false"/> 
+      <aura:attribute name="DevViewEdit" type="boolean" default="true"/> 
+    <aura:attribute name="LogoGeneratorURL" type="String" />
+    
+    <!--changeTabColor -->
+    <aura:handler name="changeTabColorBrandIcon" event="c:changeTabColor" action="{!c.changeTabColorBrandIcon}"/>
+    <aura:handler name="changeTabColorFabricComponent" event="c:changeTabColor" action="{!c.changeTabColorFabricComponent}"/>
+    <aura:handler name="changeTabColorSizeChart" event="c:changeTabColor" action="{!c.changeTabColorSizeChart}"/>
+    <aura:handler name="changeTabColorCountryOfOrigin" event="c:changeTabColor" action="{!c.changeTabColorCountryOfOrigin}"/>
+    <aura:handler name="changeTabColorCareInstructionDetails" event="c:changeTabColor" action="{!c.changeTabColorCareInstructionDetails}"/>
+    <aura:handler name="changeTabColorExcareInstructions" event="c:changeTabColor" action="{!c.changeTabColorExcareInstructions}"/>
+    <aura:handler name="changeTabColorFreeText" event="c:changeTabColor" action="{!c.changeTabColorFreeText}"/>
+    <!--complete wrap detail-->
+    <aura:attribute name="retailerID" type="String"/>
+    <aura:attribute name="onselectcustomeid" type="String"/>
+    <aura:attribute name="selectedProduct" type="object"/>
+    <aura:attribute name="completewrapdata" type="object"/>
+    <aura:attribute name="retailerName" type="String"/>
+    <aura:attribute name="picvalue" type="String[]"/>
+    <aura:attribute name="Quantity" type="Integer"/>
+    <aura:attribute name="uomOrder" type="string" default="" />
+    <aura:attribute name="fullboxQty" type="boolean" default="false" />
+    <aura:attribute name="boxquantity" type="String" default="" />
+    <aura:attribute name="MOQ" type="Integer" default="" />
+    <aura:attribute name="careLabelOrder" type="boolean" default="true"/>
+    <aura:attribute name="catalogOrder" type="boolean"/>
+    <aura:attribute name="careLabelOrderDetail" type="boolean" default="false"/>
+    <aura:attribute name="catalogVertical" type="boolean" default="false"/>
+    <aura:attribute name="completeWrap" type="list" />  
+    <aura:attribute name="displayPagination" type="Boolean"/>
+    <aura:attribute name="selectedTab" type="String"/>
+     <aura:attribute name="flagFamily" type="Boolean" default="true" />
+    <!--view carelavebel-->
+    <aura:attribute name="viewCarelabelFlag" type="boolean" default="false"/>
+    <aura:attribute name="quickview" type="boolean"/>
+    <aura:attribute name="viewedIndex" type="Integer"/>
+    <aura:attribute name="viewedCarelabelData" type="Map"/>
+    <aura:attribute name="finalviewedCarelabelData" type="Map" default="{}"/>
+    <!--BrandIcon-->
+    <aura:attribute name="isBrandOpenModal" type="boolean" default="false"/>
+    <aura:attribute name="Brandlist" type="List" default="[]"/>
+    <aura:attribute name="selectedBrand" type="string"/>
+    <aura:attribute name="min" type="Integer" default="5"/>
+    <aura:attribute name="max" type="Integer" default="10"/>
+    <!--Attributes for view And edit-->
+    <aura:attribute name="itemMasterForView" type="Item_Master__c"/>
+    <aura:attribute name="picvalueForView" type="String[]"/>
+    <aura:attribute name="BrandlistForView" type="List" default="[]"/>
+    <aura:attribute name="sizelistForView" type="List"/>
+    <aura:attribute name="lstcmpnameForView" type="List" default="[]"/>
+    <aura:attribute name="lstfabnameForView" type="List" default="[]"/>
+    <aura:attribute name="lstcountrynameForView" type="List" default="[]"/>
+    <aura:attribute name="selectedcountryForView" type="String" />
+    <aura:attribute name="CareinstructionForView" type="List"/>
+    <aura:attribute name="ExcareinstructionForView" type="List"/>
+    <aura:attribute name="ExcarecmpnameForView" type="List" default="[]"/>
+    <!--ItemMaster-->
+    <aura:attribute name="aname" type="Item_Master__c" default="{'sObjectType':'Item_Master__c'}"/>
+    <aura:attribute name="itemMaster" type="Item_Master__c"/>
+    <aura:attribute name="itmsid" type="Id"/>
+    <aura:attribute name="Amount" type="Integer" default ="0"/>
+    <!--fabricattributes-->
+    <aura:attribute name="isfabricModal" type="boolean" default="false"/>
+    <aura:attribute name="selectedArray" type="List" default="[]"/>
+    <aura:attribute name="lstcmpname" type="List" default="[]"/>
+    <aura:attribute name="lstfabname" type="List" default="[]"/>
+    <aura:attribute name="LangCountryList" type="List"/>   
+    <!--Country-->
+    <aura:attribute name="isCountryModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="lstcountryname" type="List" default="[]"/>
+    <aura:attribute name="selectedcountry" type="String" />
+    <!--size-->
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/> 
+    <aura:attribute name="sizelist" type="List"/>
+    <aura:attribute name="selectedSize" type="string"/>
+    <!--care Instruction-->
+    <aura:attribute name="isCareInstructionModal" type="boolean" default="false"/> 
+    <aura:attribute name="Careinstruction" type="List"/>
+    <!--ExCare Instruction-->
+    <aura:attribute name="isExCareInstructionModal" type="boolean" default="false"/>   
+    <aura:attribute name="Excareinstruction" type="List" default="[]"/> 
+    <aura:attribute name="Excarecmpname" type="List" default="[]"/>
+    <!--freeTextmodal-->
+    <aura:attribute name="isFreetextmodal" type="boolean" default="false"/>
+    <aura:attribute name="Style_Number1" type="String" />
+    <!--all Carelabel selected data-->
+    <aura:attribute name="careLabelSelectedData" type="Map" default="{'exCareSelectedData':'{}','brandIcondata':'{}','sizeChartData':'{}','ChartData':'{}','countryOriginData':'{}','CareSelectedData':[],'FabricSelectedData':[],'freetextData':'{}'}"/>
+    <aura:attribute name="careLabelSelectedDataList" type="List"/>
+    
+    <aura:attribute name="BrandIconContent" type="boolean" default="true"/>
+    <aura:attribute name="FabricComponentContent" type="boolean"/>
+    <aura:attribute name="SizeChartComponetContent" type="boolean"/>
+    <aura:attribute name="CountryOfOriginContent" type="boolean"/>
+    <aura:attribute name="CareLabelInstructionDetailContent" type="boolean" default="false"/>
+    <aura:attribute name="ExcareInstructionContent" type="boolean" default="false"/>
+    <aura:attribute name="FreeTextContent" type="boolean" default="false"/> 
+    <aura:registerEvent name="CatalogEvent" type="c:CatalogEvent"/>
+    
+    <aura:attribute name="selectedTabId" type="string" default="1"/> 
+    <aura:attribute name="AddedToCart" type="string" default=""/> 
+    <aura:attribute name="deletedCLLIIdList" type="List" default="[]"/>
+    
+    <aura:attribute name="selectedCarTabId" type="string"/> 
+  	<aura:attribute name="selectedCurrency" type="String"/>
+    <aura:attribute name="searchedCurrency" type="String"/>
+    <aura:attribute name="selectedLang" type="String"/>
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:if isTrue="{!v.showSpinner}">    
+        <lightning:spinner class="slds-is-fixed" variant="brand" alternativeText="{!$Label.c.Loading}" size="large" />
+    </aura:if>
+    <lightning:spinner variant="brand" size="large" aura:id="Id_spinner" class="slds-hide" />
+    
+    <!-- Content-Security-Policy-->
+    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src	'self' 'unsafe-inline' *; img-src 'self' data: *"/>
+    <aura:If isTrue="{!v.careLabelOrder}">
+        <article class="slds-box slds-m-around_none slds-p-around_none ">
+            <div class="slds-card__header slds-p-around_x-small">
+                <div class="slds-grid">
+                    <div class="slds-col slds-size_1-of-3 slds-p-top_small">
+                        <h2 class="slds-card__header-title">
+                            <lightning:icon iconName="action:google_news" alternativeText="" size="x-small"/> {!$Label.c.Carelabel_Order} : {!v.selectedProduct.Name}
+                        </h2>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <div class="slds-grid">
+                            <div class="slds-col slds-size_2-of-5">
+                                <lightning:select aura:id="picList" value="{!v.selectedLang}" label="{!$Label.c.Language}" onchange="{!C.getWrapper}">      
+                                    <option value="">{!$Label.c.Selected_Language}</option>
+                                    <!--option value="">English</option--> 
+                                    <aura:iteration items="{!v.picvalue}" var="s">
+                                        <option value="{!s}">{!s}</option>
+                                    </aura:iteration> 
+                                </lightning:select>
+                            </div>
+                            
+                            <div class="slds-col slds-m-horizontal_medium slds-size_2-of-5">
+                                <aura:if isTrue="{!v.fullboxQty}">
+                                    <lightning:input label="{!$Label.c.Box_Quantity +v.boxquantity}" class="input-qty" placeholder="{!$Label.c.Quantity}"  type="number"  name="" id="Quant" value="{!v.Quantity}"/>
+                                    <aura:set attribute="else"> 
+                                        <lightning:input label="{!$Label.c.Quantity}" class="input-qty" placeholder="{!$Label.c.Quantity}"  type="number"  name="" id="Quant" value="{!v.Quantity}"/>
+                                    </aura:set>
+                                </aura:if>                                 
+                            </div>
+                            
+                            <div class="slds-col slds-size_1-of-5">
+                                <lightning:input label="{!$Label.c.UOM}" class="input-qty"  type="string" placeholder="" name="" id="uom" value="{!v.uomOrder}" readonly="true"/>
+                            </div>
+                        </div>				
+                    </div>
+                    
+                    <div class="slds-col slds-size_1-of-3 slds-text-align_right slds-p-top_large">   
+                        <lightning:button variant="brand" label="{!$Label.c.Add_Label}" iconName="utility:add" iconPosition="left" onclick="{!c.newAddAndClone}" class="slds-p-horizontal_x-small"/>
+                        <!--lightning:button label="Add and Clear" iconName="utility:clear" iconPosition="left" onclick="{!c.addAndClear }" class="slds-p-horizontal_x-small"/-->	
+                        <lightning:button label="{!$Label.c.Clear}" iconName="utility:clear" iconPosition="left" onclick="{!c.ClearData }" class="slds-p-horizontal_x-small"/>	
+                        
+                    </div>                    
+                </div>                
+            </div>
+            <!--aura:If isTrue="{(!v.itemMaster)=='{}'}"-->
+            <!-- <aura:If isTrue="{!not(empty(!v.itemMaster))}"> -->
+            <div class="slds-card__body">
+                <div class="slds-m-around_medium">
+                    <div class="slds-tabs_scoped">
+                        <ul class="slds-tabs_scoped__nav" role="tablist">
+                            <aura:If isTrue="{!v.itemMaster.Brand_Icon__c}">
+                                <li class="slds-tabs_scoped__item slds-is-active"  aura:id="BrandIconTab" role="presentation">
+                                    <a class="slds-tabs_scoped__link" id="BrandIconTab" onclick="{!c.BrandIconTab}"><b>{!$Label.c.Brand_Icon}</b></a>
+                                </li>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMaster.Fabric_Component__c}">
+                                <li class="slds-tabs_scoped__item" aura:id="FabricComponentTab" title="">
+                                    <a class="slds-tabs_scoped__link" id="FabricComponentTab" onclick="{!c.FabricComponentTab}"><b>{!$Label.c.Fabric_Component}</b></a>
+                                </li>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMaster.Size_Chart__c}">
+                                <li class="slds-tabs_scoped__item" aura:id="SizeChartTab" title="">
+                                    <a class="slds-tabs_scoped__link" id="SizeChartTab" onclick="{!c.SizeChartTab}"><b>{!$Label.c.Size_Chart}</b></a>
+                                </li>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMaster.Country_Of_Origin__c}">
+                                <li class="slds-tabs_scoped__item" aura:id="CountryOfOriginTab" title="">
+                                    <a class="slds-tabs_scoped__link" id="CountryOfOriginTab" onclick="{!c.CountryOfOriginTab}"><b>{!$Label.c.COUNTRY_OF_ORIGIN}</b></a>
+                                </li>
+                            </aura:If>
+                            <aura:If isTrue="{!v.Careinstruction.length>0}">
+                                <li class="slds-tabs_scoped__item" aura:id="CareInstructionDetailsTab" title="">
+                                    <a class="slds-tabs_scoped__link" id="CareInstructionDetailsTab" onclick="{!c.CareInstructionDetailsTab}"><b>{!$Label.c.CARE_INSTRUCTION_DETAILS}</b></a>
+                                </li>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMaster.Excare_Instruction__c}">
+                                <li class="slds-tabs_scoped__item" aura:id="ExcareInstructionsTab" title="">
+                                    <a class="slds-tabs_scoped__link" id="ExcareInstructionsTab" onclick="{!c.ExcareInstructionsTab}"><b>{!$Label.c.EXCARE_INSTRUCTIONS}</b></a>
+                                </li>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMaster.Free_Text__c}">
+                                <li class="slds-tabs_scoped__item" aura:id="FreeTextTab" title="">
+                                    <a class="slds-tabs_scoped__link" id="FreeTextTab" onclick="{!c.FreeTextTab}"><b>{!$Label.c.FREE_TEXT}</b></a>
+                                </li>
+                            </aura:If>
+                        </ul>
+                        <aura:If isTrue="{!v.itemMaster.Brand_Icon__c}">
+                            <!--<aura:if isTrue="{!v.BrandIconContent}">-->
+                            <div id="tab-scoped-1" class="{!v.BrandIconContent?'slds-tabs_scoped__content':'slds-hide'}">                               
+                                <c:CareLabelOrderBrandIcon aura:id="CareInstruction" viewBrandOpenModal="{!v.isBrandOpenModal}" Brandlist="{!v.Brandlist}" selectedBrand="{!v.selectedBrand}" brandIcondata="{!v.careLabelSelectedData.brandIcondata}"/>
+                            </div>
+                        </aura:If>
+                        <!--</aura:if>-->
+                        <aura:If isTrue="{!v.itemMaster.Fabric_Component__c}">
+                            <!--<aura:if isTrue="{!v.FabricComponentContent}">-->
+                            <div id="tab-scoped-2" class="{!v.FabricComponentContent?'slds-tabs_scoped__content':'slds-hide'}">
+                                <c:CareLabelOrderFabricComponent aura:id="CareInstruction" viewisfabricModal="{!v.isfabricModal}" lstcmpname="{!v.lstcmpname}" lstfabname="{!v.lstfabname}" selectedArray="{!v.selectedArray}" FabricSelectedData="{!v.careLabelSelectedData.FabricSelectedData}"/>  
+                            </div>
+                        </aura:If>
+                        <!--</aura:if>-->
+                        <aura:If isTrue="{!v.itemMaster.Size_Chart__c}">
+                            <!--<aura:if isTrue="{!v.SizeChartComponetContent}">-->
+                            <div id="tab-scoped-3" class="{!v.SizeChartComponetContent?'slds-tabs_scoped__content':'slds-hide'}">			 
+                                <c:CareLabelOrderSizeChart aura:id="CareInstruction" viewisModalOpen="{!v.isModalOpen}" sizelist="{!v.sizelist}" selectedSize="{!v.selectedSize}" sizeChartData="{!v.careLabelSelectedData.sizeChartData}"/>
+                            </div>
+                        </aura:If>
+                        <aura:If isTrue="{!v.itemMaster.Country_Of_Origin__c}">
+                            <!--</aura:if>-->
+                            <!--<aura:if isTrue="{!v.CountryOfOriginContent}">-->
+                            <div id="tab-scoped-4" class="{!v.CountryOfOriginContent?'slds-tabs_scoped__content':'slds-hide'}">
+                                <c:CareLabelCountryComponent  aura:id="CareInstruction" viewisCountryModal="{!v.isCountryModalOpen}" lstcountryname="{!v.lstcountryname}" LangCountryList="{!v.LangCountryList}" retailerID="{!v.retailerID}" selectedcountry="{!v.selectedcountry}" countryOriginData="{!v.careLabelSelectedData.countryOriginData}"/>
+                            </div>
+                        </aura:If>
+                        <aura:If isTrue="{!v.Careinstruction.length>0}">
+                            <!--</aura:if>-->
+                            <!--<aura:if isTrue="{!v.CareLabelInstructionDetailContent}">-->
+                            <div id="tab-scoped-5" class="{!v.CareLabelInstructionDetailContent?'slds-tabs_scoped__content':'slds-hide'}"> 
+                                <c:CareLabelCareInstructionComponent selectedCarTabId="{!v.selectedCarTabId}" aura:id="CareInstruction" viewisCareInstructionmodal="{!v.isCareInstructionModal}" Careinstruction="{!v.Careinstruction}" CareSelectedData="{!v.careLabelSelectedData.CareSelectedData}"/>
+                            </div>
+                        </aura:If>
+                        <!--</aura:if>-->
+                        <aura:If isTrue="{!v.itemMaster.Excare_Instruction__c}">
+                            <!--<aura:if isTrue="{!v.ExcareInstructionContent}">-->
+                            <div id="tab-scoped-6" class="{!v.ExcareInstructionContent?'slds-tabs_scoped__content':'slds-hide'}">
+                                <c:CareLabelExCareInstructionComponent aura:id="CareInstruction" viewisExCareInstructionmodal="{!v.isExCareInstructionModal}" Excareinstruction="{!v.Excareinstruction}" exCareSelectedData="{!v.careLabelSelectedData.exCareSelectedDataList}" Excarecmpname="{!v.Excarecmpname}"/>
+                            </div>
+                        </aura:If>
+                        <aura:If isTrue="{!v.itemMaster.Free_Text__c}">
+                            <!--</aura:if>-->
+                            <!--<aura:if isTrue="{!v.FreeTextContent}">-->
+                            <div id="tab-scoped-7" class="{!v.FreeTextContent?'slds-tabs_scoped__content':'slds-hide'}">
+                                <c:CareLabelOrderFreeText aura:id="CareInstruction" viewisFreetextmodal="{!v.isFreetextmodal}" freetextData="{!v.careLabelSelectedData.freetextData}" itemMaster="{!v.itemMaster}"/>
+                            </div>
+                        </aura:If>
+                        <!--</aura:if>-->
+                    </div>
+                </div>
+                  <aura:If isTrue="{!!v.careLabelSelectedDataList.length>0}">
+                   <lightning:button variant="brand" class="slds-m-horizontal_medium" iconName="utility:insert_template" iconPosition="left" label="{!$Label.c.Change_Label}" title="Change Label" onclick="{!c.addLabel}"/>
+                </aura:If>         
+            </div>
+            <aura:set attribute="else"> 
+                <h1 style="margin-left: 31%;padding: 2rem;font-size: 21PX;">{!$Label.c.Configuration_Not_Done_For_This_Product}</h1>
+            </aura:set>
+            <!--</aura:If>-->
+            <!-- </aura:If>-->
+            <!-- Carelabel Order Details Start-->
+            
+            <aura:If isTrue="{!v.careLabelSelectedDataList.length>0}">
+                <div class="slds-box slds-p-around_none slds-m-around_medium">
+                    <div class="slds-card__header slds-p-around_small">
+                        
+                        <h2 class="slds-card__header-title" style="color:rgb(164, 31, 52);">
+                            <lightning:icon iconName="standard:contract" alternativeText="" size="x-small"/> {!$Label.c.Selected_Label}
+                        </h2>
+                    </div>
+                    
+                    <table class="slds-table slds-table_fixed-layout slds-table-padding slds-table-1 ">
+                        <thead>
+                            <tr style="text-transform:uppercase;">
+                                <th><b>{!$Label.c.Cust_Ref_Model}</b></th>
+                                <aura:If isTrue="{!v.itemMaster.Brand_Icon__c}">
+                                    <th scope="col" style=""><div class="slds-truncate"><b>{!$Label.c.Brand_Icon_Image}</b></div></th>
+                                </aura:If>
+                                <aura:If isTrue="{!v.itemMaster.Size_Chart__c}">
+                                    <th scope="col" style=""><div class="slds-truncate"><b>{!$Label.c.Size_Chart}</b></div></th> 
+                                </aura:If>
+                                <aura:If isTrue="{!v.itemMaster.Country_Of_Origin__c}">
+                                    <th scope="col" style=""><div class="slds-truncate"><b>{!$Label.c.COUNTRY_OF_ORIGIN}</b></div></th> 
+                                </aura:If>
+                                <th scope="col" style=""><div class="slds-truncate"><b>{!$Label.c.Quantity}</b></div></th>   
+                                <th scope="col" style=""><div class="slds-truncate"><b>{!$Label.c.Language}</b></div></th> 
+                                <th scope="col" style=""><div class="slds-truncate"><b>{!$Label.c.Action}</b></div></th>   
+                            </tr>
+                        </thead>
+                        <tbody> 
+                            <aura:iteration items="{!v.careLabelSelectedDataList}" var="excareinst" indexVar="index">
+                                
+                                <tr>
+                                    <td>{!excareinst.custRefModel} </td>
+                                    <aura:If isTrue="{!v.itemMaster.Brand_Icon__c}">
+                                        <td >
+                                            <!-- <img class="icon-image" src="{!excareinst.brandIcondata.Image__c}" alt='image' name="" style="width: 40px;max-width: 40px;height: auto;" />-->
+                                            <div class="img-zoom-container">
+                                                <div class="img-zoom-container-inner">
+                                                    <div  aura:id="myimageDiv" id="{!'my-div1-'+index}" tabindex="1"  onmouseenter="{!c.magnify}" onmouseleave="{!c.magnifyleave}">
+                                                        <img id="{!'my-img1-'+index}" class="myimage" src="{!excareinst.brandIcondata.Image__c}" width="100"/>
+                                                    </div>
+                                                </div>
+                                                <div id="myresult1" class="img-zoom-result" aura:id="myresult1" style="display:none;"></div>
+                                            </div>
+                                            
+                                        </td>
+                                    </aura:If>
+                                    <aura:If isTrue="{!v.itemMaster.Size_Chart__c}">
+                                        <td>{!excareinst.sizeChartData.EngSize1__c}</td>
+                                    </aura:If>
+                                    <aura:If isTrue="{!v.itemMaster.Country_Of_Origin__c}">
+                                        <td>{!excareinst.countryOriginData.selectedcountry}</td>
+                                    </aura:If>
+                                    <td><lightning:formattedNumber value="{!excareinst.quantity}" /></td>
+                                    <td>{!excareinst.selectedLang}</td>
+                                    <td>
+                                        <lightning:buttonIcon iconName="utility:preview" size="large" onclick="{!c.viewCareLabel}" name="{!index}" variant="bare" alternativeText="{!$Label.c.View}" title="{!$Label.c.View}" iconClass="dark"/>
+                                        <lightning:buttonIcon iconName="utility:close" size="large" onclick="{!c.removeCarelabelLine}" name="{!index}" variant="bare" alternativeText="{!$Label.c.Remove}" title="{!$Label.c.Remove}" iconClass="dark"/>
+                                    </td>
+                                </tr>    
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                    <footer class="slds-card__footer " style="margin-top:0;">   
+                        <div class="slds-grid">
+                            <div class="slds-col slds-size_1-of-4 slds-text-align_left">
+                                <lightning:button variant="brand" iconName="utility:insert_template" iconPosition="left" label="{!$Label.c.Change_Label}" title="{!$Label.c.Change_Label}" onclick="{!c.addLabel}"/>
+                            </div>
+                            <div class="slds-col slds-size_2-of-4 slds-text-align_center">
+                                <h1><b style="color:rgb(164, 31, 52);">{!$Label.c.Please_click_Add_to_Cart_to_add_all_the_selected_Labels_to_CART} </b></h1>
+                            </div>
+                            <div class="slds-col slds-size_1-of-4 slds-text-align_right">
+                                <lightning:button variant="brand" iconName="utility:cart" iconPosition="left" label="{!$Label.c.ADD_TO_CART}" title="{!$Label.c.ADD_TO_CART}" onclick="{!c.addDataToCart}"/>
+                            </div>
+                        </div>
+                        
+                        
+                    </footer>
+                </div>
+            </aura:If>
+            <!-- Carelabel Order Details End-->
+        </article>
+    </aura:If>
+    <aura:if isTrue="{!v.catalogVertical}">
+        <c:CatalogVertical  completeWrap="{!v.completeWrap}" SelectedRetailerId="{!v.retailerID}" quickviewedProduct="{!v.selectedProduct}"/>
+    </aura:if>
+    
+    <!--Care Label View/Edit Start -->
+    <aura:if isTrue="{!v.viewCarelabelFlag}">
+        <section role="dialog" class="slds-modal slds-fade-in-open" style="top:50px;">
+            <div class="slds-modal__container" style="height: 100%;width: 90%;max-width: 100%;">
+                <header class="slds-modal__header">
+                    <button onclick="{!c.closeViewCareLabel}" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}">
+                        <lightning:icon iconName="utility:close" size="small" alternativeText="{!$Label.c.Close}" />
+                    </button>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Care_Label_View_Edit}</h2>
+                </header>
+                <div class="slds-modal__content">
+                    <div class="slds-p-left_medium slds-col slds-size_1-of-3">
+                        <div class="slds-grid">
+                            <div class="slds-col slds-size_2-of-5">
+                                <lightning:select aura:id="viewedpicList" value="" label="{!$Label.c.Language}" >      
+                                    <option value="">{!$Label.c.Select_Language}</option>
+                                    <!--option value="">English</option--> 
+                                    <aura:iteration items="{!v.picvalue}" var="s">
+                                        <option value="{!s}">{!s}</option>
+                                    </aura:iteration> 
+                                </lightning:select>
+                            </div>
+                            <div class="slds-col slds-m-horizontal_medium slds-size_2-of-5">
+                                <aura:if isTrue="{!v.fullboxQty}">
+                                    <lightning:input aura:id="viewedQuant" label="{!$Label.c.Box_Quantity +v.viewedCarelabelData.boxquantity}" class="input-qty" placeholder="{!$Label.c.Quantity}"  type="number"  name="" id="Quant" value="{!v.Quantity}"/>
+                                    <aura:set attribute="else"> 
+                                        <lightning:input aura:id="viewedQuant" label="{!$Label.c.Quantity}" class="input-qty" placeholder="{!$Label.c.Quantity}"  type="number"  name="" id="Quant" value="{!v.Quantity}"/>
+                                    </aura:set>
+                                </aura:if>                                 
+                            </div>
+                            <div class="slds-col slds-size_1-of-5">
+                                <lightning:input label="{!$Label.c.UOM}" class="input-qty"  type="string" placeholder="" name="" id="uom" value="{!v.uomOrder}" readonly="true"/>
+                            </div>
+                        </div>				
+                    </div>
+                    <div class="slds-m-around_medium">
+                        <lightning:tabset variant="scoped">
+                            <aura:If isTrue="{!v.itemMasterForView.Brand_Icon__c}">
+                                <lightning:tab label="{!$Label.c.Brand_Icon}" id="1"> 
+                                    <c:CareLabelOrderBrandIcon aura:id="viewCareLabel" Brandlist="{!v.BrandlistForView}"  selectedBrand="{!v.selectedBrand}" viewBrandIcondata="{!v.finalviewedCarelabelData.brandIcondata}" brandIcondata="{!v.viewedCarelabelData.brandIcondata}" attributeVar="Sub"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMasterForView.Fabric_Component__c}">
+                                <lightning:tab label="{!$Label.c.Fabric_Component}" id="2">
+                                    <c:CareLabelOrderFabricComponent aura:id="viewCareLabel" lstcmpname="{#v.lstcmpnameForView}" lstfabname="{#v.lstfabnameForView}" selectedArray1="{#v.viewedCarelabelData.FabricSelectedData}" viewedSelectedArray="{!v.finalviewedCarelabelData.FabricSelectedData}" deletedCLLIIdList="{!v.deletedCLLIIdList}" Displayfabval="true"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMasterForView.Size_Chart__c}">
+                                <lightning:tab label="{!$Label.c.Size_Chart}" id="3">
+                                    <c:CareLabelOrderSizeChart aura:id="viewCareLabel" sizelist="{!v.sizelistForView}" selectedSize="{!v.selectedSize}" sizeChartData="{!v.viewedCarelabelData.sizeChartData}" viewSizeChartData="{!v.finalviewedCarelabelData.sizeChartData}"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMasterForView.Country_Of_Origin__c}">
+                                <lightning:tab label="{!$Label.c.COUNTRY_OF_ORIGIN}" id="4">
+                                    <c:CareLabelCountryComponent aura:id="viewCareLabel" lstcountryname="{!v.lstcountrynameForView}" LangCountryList="{!v.LangCountryListForView}" retailerID="{!v.retailerID}" selectedcountry="{#v.viewedCarelabelData.countryOriginData.selectedcountry}" countryOriginData="{!v.viewedCarelabelData.countryOriginData}" viewCountryOriginData="{!v.finalviewedCarelabelData.countryOriginData}"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.Careinstruction.length>0}">
+                                <lightning:tab label="{!$Label.c.CARE_INSTRUCTION_DETAILS}" id="5">
+                                    <c:CareLabelCareInstructionComponent aura:id="viewCareLabel" Careinstruction="{!v.CareinstructionForView}" CareSelectedData="{!v.viewedCarelabelData.CareSelectedData}" vaiwCareSelectedData="{!v.finalviewedCarelabelData.CareSelectedData}"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMasterForView.Excare_Instruction__c}">
+                                <lightning:tab label="{!$Label.c.EXCARE_INSTRUCTIONS}" id="6">
+                                    <c:CareLabelExCareInstructionComponent aura:id="viewCareLabel" Excareinstruction="{!v.ExcareinstructionForView}" exCareSelectedData="{!v.viewedCarelabelData.exCareSelectedDataList}" viewExCareSelectedData="{!v.finalviewedCarelabelData.exCareSelectedDataList}"  deletedCLLIIdList="{!v.deletedCLLIIdList}" Excarecmpname="{!v.ExcarecmpnameForView}"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMasterForView.Free_Text__c}">
+                                <lightning:tab label="{!$Label.c.FREE_TEXT}" id="7">
+                                    <c:CareLabelOrderFreeText aura:id="viewCareLabel" viewisFreetextmodal="{!v.isFreetextmodal}" freeTextId="{!v.viewedCarelabelData.freetextData.freeTextId}" StyleNumber="{#v.viewedCarelabelData.freetextData.StyleNumber}" RNNumber="{#v.viewedCarelabelData.freetextData.RNNumber}" LotNumber="{#v.viewedCarelabelData.freetextData.LotNumber}" careinstruct="{#v.viewedCarelabelData.freetextData.careinstruct}" freetextData="{!v.viewedCarelabelData.freetextData}" viewFreetextData="{!v.finalviewedCarelabelData.freetextData}" SupplierNumber="{#v.viewedCarelabelData.freetextData.SupplierNumber}" LabellingCode="{#v.viewedCarelabelData.freetextData.LabellingCode}" PackagingCode="{#v.viewedCarelabelData.freetextData.PackagingCode}"  SeasonMonth="{#v.viewedCarelabelData.freetextData.SeasonMonth}" SeasonYear="{#v.viewedCarelabelData.freetextData.SeasonYear}" ItemNumber="{#v.viewedCarelabelData.freetextData.ItemNumber}" itemMaster="{!v.itemMasterForView}"/>
+                                </lightning:tab>
+                            </aura:If>
+                        </lightning:tabset> 
+                    </div>
+                     <c:LogoGenerator  img="{!v.viewedCarelabelData.brandIcondata.Image__c}" size="{!v.viewedCarelabelData.sizeChartData.EngSize1__c}" SelectedFabricArray="{!v.viewedCarelabelData.FabricSelectedData}" Country="{!v.viewedCarelabelData.countryOriginData.selectedcountry}" SelectedInstImage="{!v.viewedCarelabelData.CareSelectedData}" ExCareIns="{!v.viewedCarelabelData.exCareSelectedDataList}" FreeText="{!v.viewedCarelabelData.freetextData}" DevCountry="{!v.DevCountry}" DevSize="{!v.DevSize}" DevFabric="{!v.DevFabric}" DevCare="{!v.DevCare}" DevExcare="{!v.DevExcare}" Devlogo="{!v.Devlogo}" DevFree ="{!v.DevFree}" DevViewEdit ="{!v.DevViewEdit}" /> 
+    
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="{!c.closeViewCareLabel}">{!$Label.c.Cancel}</button>
+                    <button class="slds-button slds-button_neutral" onclick="{!c.LatestSubmitViewedCareLabl}">{!$Label.c.OK}</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <!--Care Label View/Edit End -->
+</aura:component>

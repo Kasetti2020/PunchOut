@@ -1,0 +1,40 @@
+.THIS .add-icon .slds-button__icon{
+    fill: white;
+    background: rgb(164, 31, 52);
+    border-radius: 20px;
+    padding: 2px;
+}
+.THIS .add-icon .slds-button__icon:hover{
+    fill: white;
+}
+.THIS .slds-card__header
+{
+    background:#f2f2f2;
+    border-radius:0;
+    border-bottom:1.5px solid rgb(212, 212, 212);
+}
+.THIS .slds-card__footer
+{
+    background:#f2f2f2;
+    border-top:1.5px solid rgb(212, 212, 212);
+}
+.THIS .slds-button_neutral
+{
+    color:rgb(164, 31, 52);
+}
+.THIS .slds-button_neutral:hover
+{
+    color:rgb(164, 31, 52);
+}
+.THIS .slds-button_brand
+{
+    background:rgb(164, 31, 52);
+    border-color:rgb(164, 31, 52);
+    color:white;
+}
+.THIS .slds-button_brand:hover
+{
+    background:rgb(164, 31, 52);
+    border-color:rgb(164, 31, 52);
+    color:white;
+}

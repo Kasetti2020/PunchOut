@@ -1,0 +1,14 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="SHLILIST" type="Object"/>
+    <tr> 
+        <td>
+        </td>
+        <td><div>{!v.SHLILIST.Name}</div> </td>
+        <td><div> {!v.SHLILIST.Mainetti_Order_Line_Item__r.Name}</div></td>
+        <td><div> {!v.SHLILIST.Mainetti_Order_Line_Item__r.Mainetti_Model_Code__c}</div></td>
+        <td><div> {!v.SHLILIST.Mainetti_Order_Line_Item__r.Customer_Ref_Model__c}</div></td>
+        <td class="slds-text-align_right"><div> {!v.SHLILIST.Shipped_Quantity__c}</div></td> 
+        <td><div><span class="{!v.SHLILIST.Status__c == 'Shipped'?'slds-badge slds-badge_success':v.SHLILIST.Status__c == 'Partially Shipped'?'slds-badge slds-badge_warning':''}">{!v.SHLILIST.Status__c}</span></div></td>
+        <td><div> <lightning:formattedDateTime value="{!v.SHLILIST.Shipment_Delivery_Date__c}" year="numeric" month="numeric" day="numeric" /></div></td> 
+    </tr>
+</aura:component>

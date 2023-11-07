@@ -1,0 +1,194 @@
+<aura:component controller="CareLabelMaintenanceService" >
+    <aura:attribute name="retailerID" type="String"/>
+    <aura:attribute name="cooId" type="String"/>
+    <aura:attribute name="retailerName" type="String"/>
+    <aura:attribute name="countries" type="List" />
+    <aura:attribute name="CountryOforigin" type="Country_Of_Origin__c" />
+    <aura:attribute name="countryval" type="string" />
+    <aura:attribute name="ctry1" type="String"/>
+    <aura:attribute name="ctry2" type="String"/>
+    <aura:attribute name="ctry3" type="String"/>
+    <aura:attribute name="ctry4" type="String"/>
+    <aura:attribute name="ctry5" type="String"/>
+    <aura:attribute name="ctrynew1" type="String"/>
+    <aura:attribute name="ctrynew2" type="String"/>
+    <aura:attribute name="ctrynew3" type="String"/>
+    <aura:attribute name="ctrynew4" type="String"/>
+    <aura:attribute name="ctrynew5" type="String"/>
+    <aura:attribute name="lang1Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang2Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang3Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang4Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang5Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang1newFlag" type="boolean" default="false"/>
+    <aura:attribute name="lang2newFlag" type="boolean" default="false"/>
+    <aura:attribute name="lang3newFlag" type="boolean" default="false"/>
+    <aura:attribute name="lang4newFlag" type="boolean" default="false"/>
+    <aura:attribute name="lang5newFlag" type="boolean" default="false"/>
+    
+    
+    <aura:attribute name="newfile" type="boolean" default="false"/>
+    <aura:attribute name="closeflag" type="boolean" default="false"/>
+    <aura:attribute name="config" type="Country_Of_Origin__c" default="{ 'sobjectType': 'Country_Of_Origin__c',
+                                                                       'Name': '',
+                                                                       'Country__c': '',
+                                                                       'Language1__c': '',
+                                                                       'Language2__c': '',
+                                                                       'Language3__c': '',
+                                                                       'Language4__c':'',
+                                                                       'Language5__c':'',
+                                                                       'EnglishLanguage__c':'',
+                                                                       'Retailer_Code__c':''
+                                                                       }" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.retailerID}" action="{!c.retailerChangeEvent}" />
+    <aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordEvent" action="{!c.handleLookupEvent}"/>
+    <!--aura:handler name="init" value="{!this}" action="{!c.doInit}" /-->   
+   <aura:attribute name="spinner" type="boolean" default="false"/>
+    <aura:if isTrue="{!v.spinner}">
+        <lightning:spinner variant="brand" alternativeText="{!$Label.c.Loading}" size="large" />
+    </aura:if>
+    
+    
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="standard:quotes" alternativeText="" size="medium"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>{!$Label.c.COUNTRY_OF_ORIGIN}</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-3 slds-form-element slds-form-element_horizontal1"> 
+                    <c:CustomLookup recordID="{!v.retailerID}" recordName="{!v.retailerName}" whereCondition ="AND Online_Enquiry__c=true" objectAPIName="Retailer_Code__c" IconName="standard:account" label="{!$Label.c.Retailer_Code}" />
+                </div>
+                <div class="slds-col slds-size_1-of-3 slds-form-element_horizontal1">
+                    <aura:if isTrue="{!v.retailerID}">
+                        <!--<label class="slds-form-element__label slds-m-left_xx-small slds-m-bottom_none">Country</label> 
+                        <lightning:inputField class="hide-label" fieldName="Country__c" aura:id="ctry" value="{!v.countryval}" onchange="{!c.oncountryChange}"/-->
+                        
+                        <lightning:select label="{!$Label.c.Country}" aura:id="ctry" name="Country " value="{!v.countryval}" onchange="{!c.oncountryChange}">       
+                            <option value="-NONE-">{!$Label.c.None}</option>
+                            <aura:iteration items="{!v.countries}" var="item">
+                                <option value="{!item.value}">
+                                    {!item}
+                                </option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </aura:if>
+                </div>
+            </div>
+        </div>
+        <aura:if isTrue="{!v.closeflag}">
+            <div class="slds-box slds-p-vertical_small"> 
+                <div class="slds-grid slds-gutters slds-m-horizontal_xxx-small slds-wrap">	
+                    
+                    <div class="slds-col slds-size_1-of-4">
+                        <span style="color:red">*</span>
+                        <span class="slds-form-element__label slds-m-left_xx-small slds-m-top_small">{!$Label.c.English}</span> 
+                        <lightning:input variant="label-hidden" name="English" value="{!v.config.EnglishLanguage__c}"  required="true" />									
+                    </div> 
+                    <aura:if isTrue="{!v.lang1Flag}">                            
+                        <div class="slds-col slds-size_1-of-4">
+                             <span style="color:red">*</span>
+                            <span class="slds-form-element__label slds-m-left_xx-small slds-m-top_small">{!v.ctry1}</span>   
+                            <lightning:input variant="label-hidden" name="Language5" value="{!v.config.Language1__c}"   required="true"  />									
+                        </div>        
+                    </aura:if>
+                    <aura:if isTrue="{!v.lang2Flag}">
+                        <div class="slds-col slds-size_1-of-4">
+                             <span style="color:red">*</span>
+                            <span class="slds-form-element__label slds-m-left_xx-small slds-m-top_small">{!v.ctry2}</span>   
+                            <lightning:input variant="label-hidden" name="Language5" value="{!v.config.Language2__c}"   required="true"  />								
+                        </div>
+                        
+                    </aura:if>
+                    <aura:if isTrue="{!v.lang3Flag}">
+                        <div class="slds-col slds-size_1-of-4">
+                             <span style="color:red">*</span>
+                            <span class="slds-form-element__label slds-m-left_xx-small slds-m-top_small"  >{!v.ctry3}</span>   
+                            <lightning:input variant="label-hidden" name="Language5" value="{!v.config.Language3__c}"   required="true"  />									
+                        </div>
+                    </aura:if>
+                    
+                    <aura:if isTrue="{!v.lang4Flag}">
+                        <div class="slds-col slds-size_1-of-4">
+                             <span style="color:red">*</span>
+                            <span class="slds-form-element__label slds-m-left_xx-small slds-m-top_small">{!v.ctry4}</span>   
+                            <lightning:input variant="label-hidden" name="Language5" value="{!v.config.Language4__c}"   required="true"  />									
+                        </div>                           
+                    </aura:if>
+                    <aura:if isTrue="{!v.lang5Flag}">
+                        <div class="slds-col slds-size_1-of-4">
+                             <span style="color:red">*</span>
+                            <span class="slds-form-element__label slds-m-left_xx-small slds-m-top_small">{!v.ctry5}</span>   
+                            <lightning:input variant="label-hidden" name="Language5" value="{!v.config.Language5__c}"   required='true' />									
+                        </div>
+                    </aura:if>
+                </div>
+            </div>
+            <footer class="slds-card__footer slds-text-align_right">
+                <lightning:button iconName="utility:check" variant="brand" label="{!$Label.c.Update}" title="{!$Label.c.Update}" onclick="{!c.submitSetup }"  />
+            </footer>
+            
+        </aura:if>
+        <aura:if isTrue="{!v.newfile}">            
+            <div class="slds-box slds-m-horizontal_small">
+                <div class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xxx-small">
+                    <div class="slds-col slds-size_1-of-4">
+                         <span style="color:red">*</span>
+                        <span class="slds-form-element__label slds-m-top_small">English</span> 
+                        <lightning:input variant="label-hidden" name="English" value="{!v.config.EnglishLanguage__c}"   required="true"   />
+                    </div>  
+                    <aura:if isTrue="{!v.lang1newFlag}">                    
+                        <div class="slds-col slds-size_1-of-4"> 
+                             <span style="color:red">*</span>
+                            <span class="slds-form-element__label slds-m-top_small">{!v.ctrynew1}</span>       
+                            <lightning:input variant="label-hidden" name="Language1" value="{!v.config.Language1__c}"   required="true"  />
+                        </div>                        
+                    </aura:if>
+                    <aura:if isTrue="{!v.lang2newFlag}">
+                        <div class="slds-col slds-size_1-of-4"> 
+                             <span style="color:red">*</span>
+                            <span class="slds-form-element__label slds-m-top_small">{!v.ctrynew2}</span>       
+                            <lightning:input variant="label-hidden" name="Language2" value="{!v.config.Language2__c}"   required="true"  />
+                        </div>                            
+                    </aura:if>
+                    <aura:if isTrue="{!v.lang3newFlag}">
+                        
+                        <div class="slds-col slds-size_1-of-4">
+                             <span style="color:red">*</span>
+                            <span class="slds-form-element__label slds-m-top_small">{!v.ctrynew3}</span>       
+                            <lightning:input variant="label-hidden" name="Language3" value="{!v.config.Language3__c}"  required="true"  />
+                        </div>   
+                    </aura:if>
+                    <aura:if isTrue="{!v.lang4newFlag}">
+                        <div class="slds-col slds-size_1-of-4">
+                             <span style="color:red">*</span>
+                            <span class="slds-form-element__label slds-m-top_small">{!v.ctrynew4}</span>       
+                            <lightning:input variant="label-hidden" name="Language4" value="{!v.config.Language4__c}"  required="true"   />
+                        </div>   
+                    </aura:if>
+                    <aura:if isTrue="{!v.lang5newFlag}">
+                        <div class="slds-col slds-size_1-of-4">
+                             <span style="color:red">*</span>
+                            <span class="slds-form-element__label slds-m-top_small">{!v.ctrynew5}</span>       
+                            <lightning:input variant="label-hidden" name="Language5" value="{!v.config.Language5__c}"   required="true"  />
+                        </div>   
+                    </aura:if>
+                </div>
+            </div>
+            <footer class="slds-card__footer slds-text-align_right">
+                <lightning:button iconName="utility:check" variant="brand" label="{!$Label.c.save}" title="{!$Label.c.save}" onclick="{!c.submitSetup }" />
+            </footer>
+            
+        </aura:if>
+    </article>
+</aura:component>

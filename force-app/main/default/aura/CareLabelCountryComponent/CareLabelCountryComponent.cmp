@@ -1,0 +1,42 @@
+<aura:component  Controller="CareLabelOrder" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global"> 
+    <!--Handler-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="viewisCountryModal" type="boolean" default="true"/>
+    <aura:attribute name="lstcountryname" type="List"/>
+     <aura:attribute name="Country" type="String" /> 
+    <aura:attribute name="LangCountryList" type="List"/>   
+    <aura:attribute name="selectedcountry" type="String"/>  
+    <aura:attribute name="retailerID" type="String"/>   
+    <aura:attribute name="FetchCountry" type="String" />
+    <aura:attribute name="selectedList" type="List" />
+    <aura:attribute name="countryOriginData" type="Object"/>
+    <aura:attribute name="viewCountryOriginData" type="Object"/>
+    
+    <aura:registerEvent name="changeTabColorCountryOfOrigin" type="c:changeTabColor"/> 
+    <aura:registerEvent name="loadMyEvent" type="c:LogoEvent"/>
+    
+    <aura:method name="getSelectedData" action="{!c.FetchCountry}" access="public"></aura:method>
+    <aura:method name="viewSelectedData" action="{!c.viewFetchCountry}" access="public"></aura:method>
+    <aura:method name="clearSelectedData" action="{!c.clearData}" 
+                 access="public">
+        <aura:attribute name="CloneORClear" type="String"/> 
+    </aura:method>
+     <aura:If isTrue="{!v.lstcountryname.length>0}">
+    <!--Modal/Popup Box Body Starts here-->
+         <div class="slds-size_1-of-4 slds-p-horizontal_medium">
+             
+             <label>{!$Label.c.Select_Country}</label>
+             <ui:inputSelect aura:id="ddcountry" class="slds-col" change="{!c.getSelectedCountryValue}" value="{!v.selectedcountry}">
+                 <!--ui:inputSelectOption label="-NONE-" value="true"/-->
+                 <option value="-NONE-"> {!$Label.c.None}</option>
+                 <aura:iteration items="{!v.lstcountryname}" var="value">           
+                     <!--<ui:inputSelectOption label="{!value}" text="{!value}"/>-->
+                     <option value="{!value}" selected="{!v.selectedcountry==value}"> {!value}</option>
+                 </aura:iteration>
+             </ui:inputSelect> 
+         </div>
+         <aura:set attribute="else"> 
+             <h1 style="margin-left: 31%;padding: 1rem;font-size: 18PX;">{!$Label.c.Configuration_Not_Done_For_This_Product}</h1>
+         </aura:set>
+    </aura:If>
+</aura:component>

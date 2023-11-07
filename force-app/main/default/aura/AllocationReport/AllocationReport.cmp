@@ -1,0 +1,56 @@
+<aura:component controller="AllocationReportController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="AllocationReportList" type="Object[]"/>
+    <aura:attribute name="AllocationReportColumns" type="List"/>
+    <aura:attribute name="selectedRetailer" type="String"/>
+    <aura:attribute name="selectedCompany" type="String"/>
+    
+    
+    <div style="width:300px; margin:0 auto;">
+        <lightning:select value="{!v.selectedRetailer}" label="Retailer" required="true">
+            <option value="Select" text="Select Retailer"></option>
+            <option value="Target" text="Target"></option>
+            <!--<aura:iteration items="{!v.orderToCompanyList}" var="option">
+                <option text="{!option}" value="{!option}" />
+            </aura:iteration>-->
+        </lightning:select>
+        
+        <lightning:select value="{!v.selectedCompany}" label="Order to Company" required="true">
+            <option value="Select" text="Select Order to Company"></option>
+            <option value="Italy" text="Italy"></option>
+            <option value="USA" text="USA"></option>
+            <!--<aura:iteration items="{!v.orderToCompanyList}" var="option">
+                <option text="{!option}" value="{!option}" />
+            </aura:iteration>-->
+        </lightning:select>
+        <br/>
+        <lightning:button variant="brand" label="Search" onclick="{! c.onSearch }" />
+    </div>
+    
+    <div class="slds-m-around_small">
+        <!--<div class="slds-page-header" > 
+            <div class="slds-page-header__row slds-align-right" align="right">
+                <p class="slds-page-header__title slds-truncate">Total Demand Forecast &nbsp; {!v.total}  </p>
+                &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;  &nbsp;
+                <p class="slds-page-header__title slds-truncate slds-align-right" >( Page {!v.page} of {!v.pages} )</p> 
+                <div class="slds-col" Style="width:110px" align="right">  
+                    <ui:inputSelect aura:id="recordSize" label="Records Per Page: " change="{!c.onSelectChange}" class="Table_size"> 
+                        <ui:inputSelectOption text="10" label="10" value="true"/> 
+                        <ui:inputSelectOption text="15" label="15"/> 
+                        <ui:inputSelectOption text="20" label="20"/> 
+                    </ui:inputSelect> 
+                </div>
+            </div> 
+        </div> -->
+        
+        <p class="slds-p-horizontal_small slds-box">
+            <lightning:datatable class="tableHeader" data="{!v.AllocationReportList}" columns="{!v.AllocationReportColumns}" keyField="id" hideCheckboxColumn="true" min-column-width="30px"/>        
+        </p>
+        <!--<div class="slds-align_absolute-center">             
+            <lightning:button disabled="{!v.page == 1}" variant="brand" label="Previous Page" onclick="{! c.navigate }" />             
+            <lightning:button disabled="{!v.page == v.pages}" aura:id="previousPage" variant="brand" label="Next Page" onclick="{! c.navigate }" /> 
+        </div>-->
+    </div>
+    
+</aura:component>

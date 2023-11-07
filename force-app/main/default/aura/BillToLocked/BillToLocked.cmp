@@ -1,0 +1,43 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="BillToLockedAddress" type="Ship_Bill_Address__c"/>
+    <aura:attribute name="rowIndex" type="Integer"/>
+    <aura:registerEvent name="appEvent" type="c:DataTransferEvent"/>
+    
+    
+    <article class="slds-tile slds-media">
+        <div class="slds-media__figure">
+            <force:inputField value="{!v.BillToLockedAddress.Is_Default__c}"  change="{! c.selectDefailtBuyerToAddress}"/>
+            
+        </div>
+        <div class="slds-media__body">
+            
+            <div class="slds-tile__detail">
+                <dl class="slds-list_horizontal slds-wrap">
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title="">{!$Label.c.Factory_Name}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input class="hide-label" type="text" disabled="true" value="{!v.BillToLockedAddress.Factory_Name__c}" /></dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title="">{!$Label.c.Street}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><!--<force:inputField  value="{!v.BillToLockedAddress.Address_1__c}"/>--><lightning:input class="hide-label" type="text" disabled="true" value="{!v.BillToLockedAddress.Address_1__c}" /></dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title="">{!$Label.c.City}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><!--<force:inputField  value="{!v.BillToLockedAddress.City__c}"/>--><lightning:input class="hide-label" type="text" disabled="true" value="{!v.BillToLockedAddress.City__c}" /></dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title="">{!$Label.c.State}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><!--<force:inputField  value="{!v.BillToLockedAddress.State__c}"/>--><lightning:input class="hide-label" type="text" disabled="true" value="{!v.BillToLockedAddress.State__c}" /></dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title="">{!$Label.c.Country}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><!--<force:inputField class="slds-input" value="{!v.BillToLockedAddress.Country__c}"/>--><lightning:input class="hide-label" type="text" disabled="true" value="{!v.BillToLockedAddress.Country__c}" /></dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title="">{!$Label.c.Postal_Code}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><!--<force:inputField  value="{!v.BillToLockedAddress.Postcode__c}"/>--><lightning:input class="hide-label" type="text" disabled="true" value="{!v.BillToLockedAddress.Postcode__c}" /></dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title="">{!$Label.c.Contact_Name}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><!--<force:inputField  value="{!v.BillToLockedAddress.Contact__c}"/>--><lightning:input class="hide-label" type="text" disabled="true" value="{!v.BillToLockedAddress.Contact__c}" /></dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title="">{!$Label.c.Contact_Number}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input type="tel" disabled="true" variant="label-hidden" maxlength="14" value="{!v.BillToLockedAddress.Tel_No__c}" /></dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title="">{!$Label.c.Contact_Email}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input variant="label-hidden" type="email" disabled="true" value="{!v.BillToLockedAddress.Email_Address__c}"/></dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="" style="visibility:hidden;">{!$Label.c.Action}</dt>
+                    <dd class="slds-item_detail slds-truncate" title="" style="visibility:hidden;"></dd>
+                    <!--<lightning:buttonIcon iconName="utility:close" variant="bare"  alternativeText="Settings" />-->
+                </dl>
+            </div>
+        </div>
+    </article>
+    <hr/>
+    
+</aura:component>

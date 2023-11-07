@@ -1,0 +1,94 @@
+.THIS .slds-modal__container {
+    width:98% !important;
+    max-width:98% !important;
+}
+.THIS .slds-form-element__legend
+{
+    color:rgb(164, 31, 52);
+}
+.THIS .slds-dueling-list__column_responsive .slds-dueling-list__options{
+   /* max-width:33rem !important;*/
+    
+}
+.THIS .slds-dueling-list__column_responsive {
+    flex: 0 1 25rem!important;
+}
+.THIS li.slds-tabs_default__item:before
+{
+    background:none !important;
+}
+.THIS .myclass
+{
+    color:green !important;
+}
+.THIS .black li
+{
+    color:black !important;
+}
+.THIS .slds-tabs_default__item.slds-is-active::after
+{
+    height:2px !important;
+}
+.THIS .tabset0 li:nth-child(1):after
+{
+    content:'';
+    border-bottom: 2px solid green;
+}
+.THIS .tabset1 li:nth-child(2):after
+{
+    content:'';
+    border-bottom: 2px solid green;
+}
+.THIS .tabset2 li:nth-child(3):after 
+{
+    content:'';
+    border-bottom: 2px solid green;
+}
+.THIS .tabset3 li:nth-child(4):after 
+{
+    content:'';
+    border-bottom: 2px solid green;
+}
+.THIS .tabset4 li:nth-child(5):after  
+{
+    content:'';
+    border-bottom: 2px solid green;
+}
+.THIS .tabset5 li:nth-child(6):after  
+{
+    content:'';
+    border-bottom: 2px solid green;
+}
+.THIS .tabset6 li:nth-child(7):after  
+{
+    content:'';
+    border-bottom: 2px solid green;
+}
+
+.THIS .tabset7 li:nth-child(8):after  
+{
+    content:'';
+    border-bottom: 2px solid green;
+}
+
+.THIS .tabset8 li:nth-child(9):after  
+{
+    content:'';
+    border-bottom: 2px solid green;
+}
+.THIS .tabset9 li:nth-child(10):after  
+{
+    content:'';
+    border-bottom: 2px solid green;
+}
+.THIS .tabset10 li:nth-child(11):after  
+{
+    content:'';
+    border-bottom: 2px solid green;
+}
+.THIS .slds-textarea {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    height: 240px;
+    resize: none;
+}

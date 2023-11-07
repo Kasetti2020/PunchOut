@@ -1,0 +1,136 @@
+<aura:component controller="POViewPageHandler" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <!--  <aura:handler name="init" value="{!this}" action="{!c.doint}"/> -->
+    <aura:attribute name="POList" type="Object"/>
+    <aura:attribute name="itemIndex" type="String" />
+    <aura:attribute name="expanded" type="Boolean" default="false"/>
+    <aura:attribute name="checkThis" type = "Boolean" default ="true" />
+    <aura:registerEvent name="selectcheck" type="c:SelectCheck"/> 
+    <aura:attribute name="selectpar" type="boolean"/>
+    <aura:attribute name="rowIndex" type="String" />
+    <aura:attribute name="isOpen" type="Boolean" default="false"/>
+    <aura:attribute name="IsPOLI" type="Boolean" default="false"/>
+    <aura:attribute name="POliRecordId" type="String"/>
+    <aura:attribute name="mainCheckbox" type="Boolean"/>
+    <aura:attribute name="tablesize" type="boolean"/>
+    
+     <aura:if isTrue="{!v.POList.POLIwrap != null}">
+    <tr style="border-top:1px solid gray;">
+        <td>  
+            <button class="slds-button slds-button_neutral" aura:id="toggle" onclick="{!c.toggle}" value="{!v.checkThis}"  style="padding:0 2px;"> 
+                <lightning:Icon aura:id="chevronright" iconName="utility:chevronright" size="x-small"/>
+                <lightning:Icon  class="slds-hide" aura:id="chevrondown" iconName="utility:chevrondown" size="x-small"/>
+            </button> 
+        </td>
+        <td>
+            <ui:inputCheckbox aura:id="cboxRow" text="{!v.POList.POwrap.Id}" value="{!v.POList.IsSelected}" change ="{!c.changeSelectAll}"/>
+        </td>
+        <td>  
+            <lightning:icon iconName="standard:user" alternativeText="{!$Label.c.Approved}" size="x-small" class="slds-m-right_xx-small"/>
+            <ui:outputText value="{!v.POList.POwrap.Order_Number__c}" class="title"/>
+        </td> 
+        <td>  
+            <ui:outputText value="{!v.POList.POwrap.Revise_Version_Number__c}"/>
+        </td>
+        <!--td>  
+            <ui:outputText value="{!v.POList.POwrap.PO_Status__c}"/>
+        </td-->
+        <td>  
+            <ui:outputText value="{!v.POList.POwrap.Sales_Order_List__c}"/>
+        </td>  
+        <td>  
+            <ui:outputText value="{!v.POList.POwrap.Retailer_Code1__r.Name}"/>
+        </td>
+        <td> 
+            <ui:outputText value="{!v.POList.POwrap.Supplier_Code__c}"/>
+        </td>
+        <!--<td>  
+            <ui:outputText value="{!v.POList.POwrap.Supplier_Country_c__c}"/>
+        </td>-->
+        <td>  
+            <ui:outputText value="{!v.POList.POwrap.Due_Date__c}"/>
+        </td>        
+        <td> 
+            <ui:outputText value="{!v.POList.POwrap.Vertical__c}"/>
+        </td>
+        <td class="slds-text-align_center">  
+            <ui:outputText value="{!v.POList.POwrap.Status__c}" class="{!v.POList.POwrap.Status__c == 'Closed'?'slds-badge slds-badge_success':v.POList.POwrap.Status__c == 'Open'?'slds-badge slds-badge_warning':'slds-badge slds-badge_transparent'}"/>
+        </td>
+        <td>  
+            <lightning:formattedDateTime value="{!v.POList.POwrap.CreatedDate}" year="numeric" month="numeric" day="numeric" />
+        </td>
+        <!--<td> 
+            <lightning:formattedDateTime value="{!v.POList.POwrap.LastModifiedDate}" year="numeric" month="numeric" day="numeric" />
+          </td>
+-->
+        <td style="border-right:1px solid gray;">  
+            <lightning:buttonIcon class ="slds-button_neutral1" iconName="utility:pop_in" value="{!v.POList.POwrap.Id}" variant="bare" onclick="{!c.ViewPO}" alternativeText="{!$Label.c.View}" /> 
+        </td> 
+    </tr>
+    <aura:if isTrue="{!v.expanded}">        
+        <tr class="slds-text-title_caps "> 
+            <th><div class="slds-truncate"> </div></th>
+            <th><div class="slds-truncate"> </div></th>
+            <th><div class="slds-truncate">{!$Label.c.POLI_NO} </div></th>
+            <th><div class="slds-truncate">{!$Label.c.Model} </div></th>
+            <th><div class="slds-truncate">{!$Label.c.Size} </div></th>
+            <th><div class="slds-truncate">{!$Label.c.Color} <span style="visibility:hidden;">{!$Label.c.Color}</span></div></th> 
+            <!--<th class="slds-text-align_right"><div class="slds-truncate">Printed Price </div></th>-->
+            <th class="slds-text-align_right"><div class="slds-truncate">{!$Label.c.Ordered_Qty} </div></th>
+            <th class="slds-text-align_right" style="width:1%;"><div class="slds-truncate">{!$Label.c.Supply_Qty} </div></th>
+            <th><div class="slds-truncate">{!$Label.c.EX_FACTORY_DATE} </div></th>
+            <!--<th><div class="slds-truncate">Exp Delivery Date </div></th>-->
+            <th><div class="slds-truncate">{!$Label.c.COUNTRY_OF_ORIGIN} </div></th>
+            <th><div class="slds-truncate">{!$Label.c.Dept_Desc} </div></th>
+            
+            
+            <th><div class="slds-truncate">{!$Label.c.Barcode} </div></th>
+            <th><div class="slds-truncate">{!$Label.c.Class} </div></th>
+            <th><div class="slds-truncate">{!$Label.c.Department} </div></th>
+            <th><div class="slds-truncate">{!$Label.c.Style_Desc} </div></th>
+            <th><div class="slds-truncate">{!$Label.c.Style_No} </div></th>
+            <th class="slds-text-align_right"><div class="slds-truncate">{!$Label.c.Printed_Price} </div></th>
+            <th class="slds-text-align_right"><div class="slds-truncate">{!$Label.c.Printed_Color} </div></th>
+            <th><div class="slds-truncate">{!$Label.c.Season} </div></th>
+            <th style=""><div class="slds-truncate">{!$Label.c.Location} </div></th>
+            <th><div class="slds-truncate">{!$Label.c.Product_Desc} </div></th>
+            <!--<th><div class="slds-truncate">Created Date </div></th> 
+            <th><div class="slds-truncate">Last Modified Date </div></th> -->
+            <th> </th>
+        </tr>
+        <aura:iteration items="{!v.POList.POLIwrap}" var="POLI">
+           <!-- <c:POConfirmChild2 POLIlist="{!POLI}" PORetailerName="{!v.POList.POwrap.Retailer_Code1__r.Name}"/>-->
+           <c:POConfirmChild2 POLIlist="{!POLI}"  PORetailerColorGreyOutCheck="true" PORetailerSuppltQtyGreyOutCheck="true" />
+        </aura:iteration>
+        
+    </aura:if>
+    
+    <!-- Model Box Start for PO-->    
+    <aura:if isTrue="{!v.isOpen}">
+        
+        <div class="demo-only" style="">
+            <section role="dialog" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeModal}">
+                            <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.Close}"/>
+                            <span class="slds-assistive-text" >{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.POList.POwrap.Name}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <!--<force:recordView recordId="{!v.POList.POwrap.Id}" />-->
+                        <lightning:recordForm
+                                              recordId="{!v.POList.POwrap.Id}"
+                                              objectApiName="PurchaseOrder__c"
+                                              layoutType="Full"
+                                              mode="readonly"
+                                              columns="2"/>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </div>        
+    </aura:if>
+         </aura:if>
+    <!-- Modal Box ends here -->   
+</aura:component>

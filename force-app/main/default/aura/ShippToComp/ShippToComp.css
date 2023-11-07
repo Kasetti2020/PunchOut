@@ -1,0 +1,33 @@
+hr:last-child.THIS {
+    display:none;
+}
+.THIS .uiInput--select a
+{
+    width: 58%;
+    line-height: 20px;
+    font-size: 88%;
+    height: 22px;
+    min-height: 22px;
+}
+.THIS .slds-select_container
+{
+    width: 58%;
+    line-height: 20px;
+    font-size: 88%;
+    height: 22px;
+    min-height: 22px;
+    color:black;
+}
+.THIS .slds-select
+{
+    height: 22px;
+    min-height: 22px;
+}
+.THIS .slds-select_container::before
+{
+    top: 4px;
+}
+.THIS .slds-select_container::after
+{
+    bottom: 4px;
+}

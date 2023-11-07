@@ -1,0 +1,172 @@
+<aura:component controller="CatalogOrderController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" >
+    
+    <aura:attribute name="recordId" type="String" default=''/>
+    
+    <aura:attribute name="AdminReviseSOID" type="String"/>
+    <aura:attribute name="SelectedRetailer" type="String"/>
+    <aura:attribute name="SelectedCompanyVal" type="String"/>
+    <aura:attribute name="SelectedCurrencyVal" type="String" default=''/> 
+    <aura:attribute name="Selectedtitle" type="String"/> 
+    <aura:attribute name="showConfirmDialog" type="boolean" default="false"/>
+    
+    <aura:attribute name="SOID" type="String"/>
+    <aura:attribute name="SelectedPiklistCompany" type="String" default=''/>
+    <aura:attribute name="SelectedPiklistCurrency" type="String" default=''/> 
+    <aura:attribute name="reasonToCancel" type="String"/>
+    <aura:attribute name="isSaved" type="Boolean" default="false" />
+    <aura:attribute name="isPicklist" type="Boolean" default="false" />
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    
+    <aura:attribute name="parentcmp" type="Boolean" default="true"/>
+    <aura:attribute name="careLabelOrder" type="boolean"/>
+    <aura:attribute name="displayPagination" type="Boolean" default="true"/>
+    <aura:attribute name="cartFlag" type="boolean" default="false"/>
+    <aura:attribute name="isSelectAll" type="boolean" default="false"/>
+    <aura:attribute name="isShipcmp" type="boolean" default="false"/>
+    <aura:attribute name="isSearch" type="boolean" default="false" description="to differentiate between search and normal catalog"/>
+    <aura:attribute name="quickView" type="boolean" default="false"/>
+    <!--Order to company and prefererred currency-->
+    <aura:attribute name="selectedCompany" type="string"/>
+    <aura:attribute name="selectedCurrency" type="String"/>
+    <aura:attribute name="searchedCurrency" type="String"/>
+    <aura:attribute name="listOfCompanies" type="List"/>
+    <aura:attribute name="listOfCurrency" type="List"/>
+  
+    <aura:attribute name="reviseReason" type="String"/>
+    <aura:attribute name="reviseReasonText" type="String"/>
+    <aura:attribute name="reviseVersionNum" type="String"/>
+    
+    <aura:registerEvent name="CancelLineAdminReviseCmpEvent" type="c:CancelLineAdminReviseCmpEvent"/>
+    <aura:attribute name="AddressTable" type="boolean" default="false"/>
+    
+    <aura:if isTrue="{!v.AddressTable}">
+        <section class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container" >
+                <div style="border:0px solid black;">
+                 <header class="slds-modal__header" style="background-color:#a41f34;">
+                    <aura:If isTrue="{!v.reasonToCancel == 'Revise Order To Company'}">
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" style="color:white;">{!$Label.c.Admin_Revise_Order_To_Company}</h2>
+                    </aura:If>
+                    <aura:If isTrue="{!v.reasonToCancel == 'Revise Currency'}">
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" style="color:white;">{!$Label.c.Admin_Revise_Preferd_Currency}</h2>
+                    </aura:If>
+                </header>
+               <div class="slds-modal__content slds-p-around_medium" style="border:0px solid grey;">
+                    <div class="slds-table slds-table_bordered1">
+                            <div class="slds-col slds-m-right_medium">
+                        <lightning:select aura:id="selectReason" label="{!$Label.c.Revise_Reason}" required="true" onchange="{!c.handleReviseReason}">
+                            <option value="">{!$Label.c.choose_one}</option>
+                            <option value="Revise Order To Company">{!$Label.c.Revise_Order_To_Company}</option>
+                            <option value="Revise Currency">{!$Label.c.Revise_Currency}</option>
+                        </lightning:select>
+                        </div>
+
+                        <aura:If isTrue="{!v.reasonToCancel == 'Revise Order To Company'}">
+                            
+                                <div class="slds-col slds-m-right_medium">
+                                    <lightning:input type="text" label="{!$Label.c.Order_To_Company}" name="Order To Company" value="{!v.SelectedCompanyVal}"  disabled="{! !isSaved}"/>
+                                    <aura:If isTrue="{!v.cartFlag}">  
+                                        <lightning:input value="{!v.selectedCompany}" disabled="true" label="{!$Label.c.Order_To_Company}"/>
+                                        <aura:set attribute="else"> 
+                                            <lightning:select name="select1"  value="{!v.selectedCompany}" label="{!$Label.c.Order_To_Company}" onchange="{!c.OrderToCompany}" required="true">
+                                                <option value="NULL" text="{!$Label.c.None}"></option>
+                                                <aura:iteration items="{!v.listOfCompanies}" var="fld" >
+                                                    <option value="{!fld}" text="{!fld}"></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </aura:set>
+                                    </aura:If>
+                                </div>
+                                <aura:If isTrue="{!v.isPicklist}">
+                                    <aura:if isTrue="{!not(empty(v.listOfCurrency))}">
+                                        <div class="slds-col slds-m-right_medium">
+                                            <lightning:select name="select1"  value="{!v.selectedCurrency}" label="{!$Label.c.Preferred_Currency}" onchange="{!c.preferredCurrency}" required="true">   
+                                                <option value="NULL" text="{!$Label.c.None}"></option>
+                                                <aura:iteration items="{!v.listOfCurrency}" var="fld" >
+                                                    <option value="{!fld}" text="{!fld}" selected="{!fld==v.selectedCurrency}"></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </div>
+                                        <aura:set attribute="else">
+                                            <lightning:input type="text" label="{!$Label.c.Default_Currency}" name="Default Currency" value="{!v.SelectedCurrencyVal}"  disabled="{! !isSaved}"/>
+                                        </aura:set>
+                                    </aura:if>
+                                    <!--    <div class="slds-col slds-m-right_medium">
+                             <lightning:select name="select1"  value="{!v.selectedCurrency}" label="{!$Label.c.Preferred_Currency}" onchange="{!c.preferredCurrency}" required="true">   
+                                        <option value="NULL" text="{!$Label.c.None}"></option>
+                                        <aura:iteration items="{!v.listOfCurrency}" var="fld" >
+                                            <option value="{!fld}" text="{!fld}" selected="{!fld==v.selectedCurrency}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                               
+                           
+                        </div>-->
+                                </aura:If>
+                            
+                        </aura:If>
+                        <aura:If isTrue="{!v.reasonToCancel == 'Revise Currency'}">
+                            
+                                <div class="slds-col slds-m-right_medium">
+                                    <lightning:input type="text" label="{!$Label.c.Default_Currency}" name="Default Currency" value="{!v.SelectedCurrencyVal}"  disabled="{! !isSaved}"/>
+                                    <aura:If isTrue="{!v.cartFlag}"> 
+                                        <lightning:input value="{!v.selectedCurrency}" disabled="true" label="{!$Label.c.Preferred_Currency}"/>
+                                        <aura:set attribute="else">
+                                            <lightning:select name="select1"  value="{!v.selectedCurrency}" label="{!$Label.c.Preferred_Currency}" onchange="{!c.preferredCurrency}" required="true">   
+                                                <option value="NULL" text="{!$Label.c.None}"></option>
+                                                <aura:iteration items="{!v.listOfCurrency}" var="fld" >
+                                                    <option value="{!fld}" text="{!fld}" selected="{!fld==v.selectedCurrency}"></option>
+                                                </aura:iteration>
+                                            </lightning:select>
+                                        </aura:set>
+                                    </aura:If>
+                                </div>
+                           
+                        </aura:If>
+                    </div>
+                    <lightning:textarea aura:id="mytextarea"  label="{!$Label.c.remarks}" required="true" value="{!v.reviseReasonText}"/>
+                </div>
+            </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button iconName="utility:save" class="slds-button slds-button_brand my-brand" onclick="{!c.SaveTableAddress}" label="{!$Label.c.Submit}"  />
+                    <lightning:button iconName="utility:close" class="slds-button slds-button_brand my-brand" onclick="{!c.closeTableAddress}" label="{!$Label.c.Cancel}"/>
+                </footer>
+            </div>
+        </section>
+      <!--  <div class="slds-backdrop slds-backdrop_open"></div>-->
+    </aura:if>
+    
+    
+    <!--Confirmation PopUp Start-->
+    <div class="slds-m-around_xx-large">
+        <aura:if isTrue="{!v.showConfirmDialog}">
+            <!--Modal Box Start-->
+            <div role="dialog" class="slds-modal slds-fade-in-open " style="border:0px solid black;" >
+                <div class="slds-modal__container">
+                    <div style="max-width: 750px;max-height: 750px;border:0px solid black;">
+                        <!--Modal Box Header Start-->
+                        <header class="slds-modal__header" style="background-color:#a41f34;">
+                            <h1 class="slds-text-heading--medium"><B>{!$Label.c.Confirmation}</B></h1>
+                        </header>
+                        <!--Modal Box Header End-->
+                        
+                        <!--Modal Box Content Start-->
+                        <div class="slds-modal__content slds-p-around--medium">
+                            <center><b>{!$Label.c.Are_you_sure_you_want_to_Submit_this_Changes}</b></center>
+                        </div>
+                        <!--Modal Box Content End-->
+                        
+                        <!--Modal Box Button Start-->
+                        <footer class="slds-modal__footer">
+                            <lightning:button name='No' label='{!$Label.c.No}' onclick='{!c.handleConfirmDialogNo}'/>
+                            <lightning:button variant="brand" name='Yes' label='{!$Label.c.Yes}' onclick='{!c.handleConfirmDialogYes}'/>
+                        </footer>
+                        <!--Modal Box Button End-->
+                    </div>
+                </div>
+            </div>
+            
+        </aura:if>
+    </div>
+    <!--Confirmation PopUp End-->
+    
+</aura:component>

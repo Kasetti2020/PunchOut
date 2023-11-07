@@ -1,0 +1,163 @@
+.THIS .slds-modal__header
+{
+    color:rgb(121, 23, 38);
+}
+.THIS .slds-icon-standard-address {
+    background-color:rgb(121, 23, 38);
+}
+.THIS .user-icon .slds-icon-text-default
+{
+    fill:white !important;
+    background:#8199af;
+    padding:4px;
+    border-radius:16px;
+    margin-right: 6px;
+    position: relative;
+    top: -2px;
+}
+.THIS .slds-button{
+    color:White;
+    text-overflow: ellipsis; 
+    white-space: nowrap;
+}
+.THIS .slds-button_neutral
+{
+    color:rgb(164, 31, 52);
+}
+.THIS .slds-button_brand{
+    color:White;
+}
+.THIS .slds-card__header
+{
+    border: 1px solid #dddbda;
+    border-radius: .25rem;
+    background: #f3f2f2;
+}
+.THIS .uiInput--input.input
+{
+    min-height:calc(1rem + 1px);
+}
+.THIS .hide-label label
+{
+    display:none;
+}
+.THIS .slds-modal__container
+{
+    width:90%;
+}
+.THIS .customIcon
+{
+    white-space:pre;
+}
+.THIS.customIcon
+{
+    white-space:pre;
+}
+.customIcon.THIS 
+{
+    white-space:pre;
+}
+
+.THIS .box-title {
+    display: flex;
+    position: relative;
+    margin-top: -26px;
+    background: white;
+    padding: 0 10px;
+    color: #a90533;
+    margin-left: 10px;
+    font-weight:bold;
+}
+.THIS .slds-box-no-border .slds-button_neutral
+{
+    line-height: 24px;
+}
+.THIS .slds-item_label
+{
+    font-size:90%;
+}
+.THIS .slds-box-no-border .uiInput--input.input
+{
+    width:58%;
+    line-height: 20px;
+    font-size: 88%;
+    height: 22px !important;
+    min-height: 22px !important;
+}
+.THIS .slds-box-no-border .uiInput--select a
+{
+    width: 58%;
+    line-height: 20px;
+    font-size: 88%;
+    height: 22px;
+    min-height: 22px;
+}
+.THIS .slds-box-no-border .slds-select_container
+{
+    width: 58%;
+    line-height: 20px;
+    font-size: 88%;
+    height: 22px;
+    min-height: 22px;
+    color:black;
+}
+.THIS .slds-box-no-border .slds-select
+{
+    height: 22px;
+    min-height: 22px;
+}
+.THIS .slds-box-no-border .slds-select_container::before
+{
+    top: 4px;
+}
+.THIS .slds-box-no-border .slds-select_container::after
+{
+    bottom: 4px;
+}
+.THIS .label-hidden > label {
+    display: none;
+}
+.THIS .slds-box-no-border [lightning-input_input-host] 
+{
+    width:58%;
+    color:black;
+    
+    font-size: 88%;
+}
+.THIS .slds-box-no-border [lightning-input_input-host] input
+{
+    height: 22px;
+    min-height: 22px;
+}
+.THIS .label-hidden label
+{
+    display:none;
+}
+/*.THIS .slds-box-no-border input
+{
+border:0 !important;
+line-height:0 !important;
+padding:0 !important;
+min-height:0 !important;
+
+}
+.THIS .slds-box-no-border .uiInput--select a
+{
+border:0 !important;    
+background: none !important;
+padding:0 !important;
+min-height:0 !important;
+height: 18px;
+line-height: 20px;
+
+}
+.THIS .slds-bo-no-border .uiInput--input.input:focus 
+{
+box-shadow:0 !important;
+border-color:white !important;
+}
+.THIS .slds-bo-no-border .uiInput--input.input:active
+{
+box-shadow:0 !important;
+border-color:white !important;
+}*/

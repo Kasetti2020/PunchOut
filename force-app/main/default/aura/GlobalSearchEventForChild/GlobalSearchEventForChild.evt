@@ -1,0 +1,6 @@
+<aura:event type="COMPONENT" access="GLOBAL">
+    <aura:attribute name="POList" type="Object" access="GLOBAL"/>
+    <aura:attribute name="type" type="String" access="GLOBAL"/>
+    <aura:attribute name="searchtext" type="String" access="GLOBAL"/>
+    <aura:attribute name="flag" type="Boolean" default="false" access="GLOBAL"/>
+</aura:event>

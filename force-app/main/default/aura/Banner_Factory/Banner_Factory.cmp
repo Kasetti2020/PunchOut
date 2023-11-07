@@ -1,0 +1,13 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <div class="banner-bg slds-align_absolute-center">
+        <div class="content-bg">
+            <!--<h2 class="contentTitle" style="color: #FFFFFF; text-shadow: 5px 2px 0px rgba(0, 0, 0, 0.5);font-size: 46px;
+                                            width: 60%;text-align: center;margin: 13.5% auto;text-transform:uppercase;" data-aura-rendered-by="182:0">Providing quality service and value for money</h2>
+
+            <p class="para1">Welcome to MagNET </p>
+                <h3 class="para2">Customer Community</h3>-->
+            <!--<p class="para1">Providing quality service</p>
+            <h3 class="para2">Value for Money</h3>-->
+        </div>
+    </div>
+</aura:component>

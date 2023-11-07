@@ -1,0 +1,144 @@
+<aura:component controller="SOController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="rowIndex" type="integer" /> 
+    <aura:attribute name="ROrder" type="Object"/> 
+    <aura:attribute name="SOdetails" type="object"/>
+    <aura:attribute name="ReviseOrderLineList" type="List"/>
+    <aura:attribute name="ReviseOrderRequest1" type="Object"/>
+    <aura:attribute name="ReviseOrderObj" type="Revise_Order__c"/>
+    <aura:attribute name="ROrderLine" type="List"/> 
+    <aura:attribute name="DisableQuantity" type="boolean" default="false"/>
+    <aura:attribute name="DisablePOLIDetails" type="boolean" default="false"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="viewPOLIID" type="String"/>
+    <aura:attribute name="enablePDF" type="boolean" default="false"/>
+    <!--Singe SO COnversion -->
+    <aura:attribute name="PONameList" type="List"/>
+    <aura:attribute name="multiplePOLIPopup" type="boolean" default="false"/>
+    <!--Singe SO COnversion Ends Here-->
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    <aura:registerEvent name="CancelLineReviseComponentEvent" type="c:CancelLineReviseComponentEvent"/>
+    
+    <tr data-index="{!v.rowIndex}"> 
+        <td class="slds-dl_horizontal" title="{!v.ROrder.Customer_Refe_Model__c}">
+            <aura:if isTrue="{!v.DisablePOLIDetails}">
+                <lightning:buttonIcon name="{!v.ROrder.Purchase_Orders__c}"  class ="slds-button_neutral1" iconName="utility:info" variant="bare" onclick="{!c.ViewPO}" alternativeText="{!$Label.c.View_POLI}" /> 
+            </aura:if>
+           <lightning:input class="slds-size_3-of-4"  variant="label-hidden" readonly="true" label="" value="{!v.ROrder.Customer_Refe_Model__c}"/> 
+        </td>
+         <td scope="row" data-label="Row" title="{!v.ROrder.print__c}">
+                <lightning:input variant="label-hidden" readonly="true" label="" value="{!v.ROrder.print__c}"/>
+        </td>
+        <td scope="row" data-label="Row" title="{!v.ROrder.Color__c}">
+                <lightning:input variant="label-hidden" readonly="true" label="" value="{!v.ROrder.Color__c}"/>
+        </td>
+        <td scope="row" data-label="Row" title="{!v.ROrder.Old_Quantity__c}">
+            <lightning:input type="number" variant="label-hidden" readonly="true" label="" value="{!v.ROrder.Old_Quantity__c}"/>
+        </td>
+        <td scope="row" data-label="Row" title="{!v.ROrder.New_Quantity__c}">
+            <aura:if isTrue="{!v.DisableQuantity}">
+                <lightning:input  type="number" name="" variant="label-hidden" label="" value="{!v.ROrder.New_Quantity__c}" onchange="{!c.changeSOLIQty}"  disabled="true" />
+                <!--<ui:inputText label="" class="field" value="{!v.ROrder.New_Quantity__c}" updateOn="{!c.changeSOLIQty}"/>-->
+                
+                <aura:set attribute="else">
+                    <lightning:input  type="number" name="" variant="label-hidden" label="" value="{!v.ROrder.New_Quantity__c}" onchange="{!c.changeSOLIQty}" />
+                    <!-- <ui:inputText label="" class="field" value="{!v.ROrder.New_Quantity__c}" updateOn="{!c.changeSOLIQty}"/>-->
+                </aura:set>
+            </aura:if>
+        </td> 
+        <td>
+            <lightning:buttonIcon iconName="utility:close" onclick="{!c.cancelLine}" variant="bare" alternativeText="{!$Label.c.Settings}" iconClass="dark"/>
+        </td>
+        <aura:if isTrue="{!v.enablePDF}">
+        <td style="border-right:1px solid rgb(212, 212, 212);">  
+            <lightning:buttonIcon  class ="slds-button_neutral1" iconName="utility:pop_in" variant="bare" onclick="{!c.ViewPDF}" alternativeText="{!$Label.c.View}" /> 
+            </td>
+        </aura:if> 
+    </tr>
+    <!-- Model Box Start for SOLI-->    
+    <aura:if isTrue="{!v.isOpen}">
+        <div class="demo-only" style="">
+            <section role="dialog" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeModal}">
+                            <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.Close}"/>
+                            <span class="slds-assistive-text" >{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.POLI_Details}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <!--<force:recordView recordId="{!v.POList.POwrap.Id}" />-->
+                        <lightning:recordForm
+                                              recordId="{!v.viewPOLIID}"
+                                              objectApiName="Purchase_Order_LineItem__c"
+                                              layoutType="Full"
+                                              mode="readonly"
+                                              columns="2"/>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </div>   
+    </aura:if>
+    <!--Ends Here-->
+    <!-- Model Box Start for select multiple POLI's-->    
+    <aura:if isTrue="{!v.multiplePOLIPopup}">
+        <div class="demo-only" style="">
+            <section role="dialog" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeModalPOLI}">
+                            <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.Close}"/>
+                            <span class="slds-assistive-text" >{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Select_POLI_Details}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <!--<force:recordView recordId="{!v.POList.POwrap.Id}" />-->
+                       
+                            <div class="slds-box slds-grid slds-wrap slds-m-vertical_large slds-p-horizontal_none slds-p-bottom_none">
+                   
+                    <table class="slds-table slds-table--bordered1 slds-table--cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title--caps">
+                                <th class="slds-size_2-of-6"><div class="slds-truncate">View PO</div></th>
+                                <th class="slds-size_1-of-6" style="padding-left:2px;"><div class="slds-truncate">{!$Label.c.Purchase_Order_Line_Item}</div></th>
+                                <th class="slds-size_1-of-6" style="padding-left:2px;"><div class="slds-truncate">{!$Label.c.Retailer_PO_Number}</div></th>
+                                <th class="slds-size_1-of-6" style="padding-left:2px;"><div class="slds-truncate">{!$Label.c.Original_Quantity}</div></th>
+
+                                <th> </th>    
+                            </tr> 
+                        </thead>
+                        <tbody>      
+                            <aura:iteration items="{!v.PONameList}" var="item" indexVar="ind">
+                                 <tr data-index="{!ind}">
+                                     <td class="slds-dl_horizontal" title="{!item.Name}">
+                                         <aura:if isTrue="{!v.DisablePOLIDetails}">
+                                             <lightning:buttonIcon name="{!item.Id}" value="{!item.Name}" class ="slds-button_neutral1" iconName="utility:info" variant="bare" onclick="{!c.ViewPO}" alternativeText="{!$Label.c.View_POLI}" /> 
+                                         </aura:if>
+                                     </td>
+                                     <td scope="row" data-label="Row" title="{!item.Name}">
+                                         <lightning:input variant="label-hidden" readonly="true" label="" value="{!item.Name}"/>
+                                     </td>
+                                     <td scope="row" data-label="Row" title="{!item.Purchase_Order__r.Order_Number__c}">
+                                         <lightning:input variant="label-hidden" readonly="true" label="" value="{!item.Purchase_Order__r.Order_Number__c}"/>
+                                     </td>
+                                     <td scope="row" data-label="Row" title="{!item.Original_Quantity__c}">
+                                         <lightning:input variant="label-hidden" readonly="true" label="" value="{!item.Original_Quantity__c}"/>
+                                     </td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>
+                      
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </div>   
+    </aura:if>
+    <lightning:overlayLibrary aura:id="overlayLib"/>
+    
+    
+</aura:component>

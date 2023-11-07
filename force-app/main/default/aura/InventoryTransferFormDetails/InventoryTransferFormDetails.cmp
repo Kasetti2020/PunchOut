@@ -1,0 +1,200 @@
+<aura:component controller="InventoryTransferFormDetailsController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    
+    <aura:attribute name="rowIndex" type="integer" /> 
+    <aura:attribute name="transferForm" type="Object"/>
+    
+    <aura:attribute name="expanded" type="String" default="false"/>
+    <aura:attribute name="checkThis" type = "Boolean" default ="true" />
+    
+    <aura:attribute name="ArrivalDate" type="Date" />
+    <aura:attribute name="DispatchDate" type="Date" />
+    <aura:attribute name="ContainerNo" type="String" />
+    <aura:attribute name="SealNo" type="String" />
+    <aura:attribute name="ShortNo" type="String" />
+    <aura:attribute name="recordId" type="string"/>
+    <aura:attribute name="openBulkUploadConfirmation" type="Boolean" default="false"/>
+    <aura:attribute name="expandRecordId" type="string"/>
+    <aura:attribute name="setParentObjId" type="string"/>
+    <aura:attribute name="InventoryTransferForms" type="string"/>
+    
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.childInit}"/>
+    <aura:registerEvent name="InventoryAllocationSearchPageListEvent" type="c:InventoryTransferFormEvent" />
+    
+    
+    <tr data-index="{!v.rowIndex}">
+        <td>  
+            <button class="slds-button slds-button_neutral" id="{!v.transferForm.invTransferForm.Id}" onclick="{!c.toggle}" value="{!v.checkThis}"  style="padding:0 2px"> 
+                <lightning:Icon aura:id="chevronright{!v.transferForm.invTransferForm.Id}" iconName="utility:chevronright" size="x-small" />
+                <lightning:Icon class="slds-hide" aura:id="chevrondown{!v.transferForm.invTransferForm.Id}" iconName="utility:chevrondown" size="x-small"/>
+            </button> 
+        </td>
+        
+        <td scope="row"  data-label="Form No" style="text-align: center; vertical-align: middle;">
+            {!v.transferForm.invTransferForm.Name}
+        </td>
+        <td scope="row"  data-label="Retailer" style="text-align: center; vertical-align: middle;">
+            {!v.transferForm.invTransferForm.Retailer_Code__r.Name}
+        </td>
+        <td scope="row"  data-label="RTS Company" style="text-align: center; vertical-align: middle;">
+            {!v.transferForm.invTransferForm.Transfer_From_Company__c}
+        </td>
+        <td scope="row"  data-label="Transfer To Company" style="text-align: center; vertical-align: middle;">
+            {!v.transferForm.invTransferForm.Transfer_To_Company__c}
+        </td>
+                <td scope="row"  data-label="ETD" style="text-align: center; vertical-align: middle;">
+            {!v.transferForm.invTransferForm.ETD__c}
+        </td>
+        <td scope="row"  data-label="ETA" style="text-align: center; vertical-align: middle;">
+            {!v.transferForm.invTransferForm.ETA__c}
+        </td> 
+        <td scope="row"  data-label="PO NO" style="text-align: center; vertical-align: middle;">
+            {!v.transferForm.invTransferForm.Po_No__c}
+        </td>
+        <!--  <td scope="row"  data-label="Seal No" style="text-align: center; vertical-align: middle;">
+            {!v.transferForm.invTransferForm.Seal_No__c}
+        </td> -->
+        <td scope="row"  data-label="Transfer Date" style="text-align: center; vertical-align: middle;">
+            {!v.transferForm.invTransferForm.Transfer_Date__c}
+        </td>
+    </tr>
+    
+    <tr>
+        <td colspan="12" style="padding-left:34px;border-bottom:1.5px solid gray;">
+            <aura:if isTrue="{!v.expanded}">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="padding:0;border-radius:0;width:90%;align:center;border: 2px solid #f2f2f2;" role="grid">
+                    <thead>
+                        <tr class="slds-text-title_caps">  
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>Number Sequence</b></div></th>
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>Model</b></div></th>
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>Color</b></div></th>
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>Size/Print</b></div></th>
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>Transfer Qty</b></div></th>
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>Container No</b></div></th>
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>Seal No</b></div></th>
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>Short No</b></div></th>
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>ETD</b></div></th>
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>ETA</b></div></th>
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>Action</b></div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.transferForm.invTransferFormDetail}" var="itfd" indexVar="row">
+                            <tr class="slds-hint-parent">
+                                <td scope="row" data-label="Number Sequence" title="" style="text-align: left;padding-left:55px">
+                                    <div class="slds-truncate">
+                                        {!row+1}</div>
+                                </td>
+                                <td data-label="Model" title="{!itfd.Model__r.Name}"  style="text-align: left;">
+                                    <div class="slds-truncate">
+                                        <lightning:input name="" variant="label-hidden"  readonly="true" label="" value="{!itfd.Model__r.Name}"/></div>
+                                </td>
+                                <td data-label="Color" title="{!itfd.Color__c}"  style="text-align: left;">
+                                    <div class="slds-truncate">
+                                        <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!itfd.Color__c}"/></div>
+                                </td>
+                                <td data-label="SizerPrint" title="{!itfd.Size_Print__c}"  style="text-align: left;">
+                                    <div class="slds-truncate">
+                                        <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!itfd.Size_Print__c}"/></div>
+                                </td>
+                                <td data-label="Transfer Qty" title="{!itfd.Transfer_Qty__c}"  style="text-align: left;">
+                                    <div class="slds-truncate">
+                                        <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!itfd.Transfer_Qty__c}"/></div>
+                                </td>
+                                <td data-label="Container No" title="{!itfd.Container_No__c}"  style="text-align: left;">
+                                    <div class="slds-truncate">
+                                        <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!itfd.Container_No__c}"/></div>
+                                </td>
+                                <td data-label="Seal No" title="{!itfd.Seal_No__c}"  style="text-align: left;">
+                                    <div class="slds-truncate">
+                                        <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!itfd.Seal_No__c}"/></div>
+                                </td>
+                                <td data-label="Short No" title="{!itfd.Short_No__c}"  style="text-align: left;">
+                                    <div class="slds-truncate">
+                                        <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!itfd.Short_No__c}"/></div>
+                                </td>
+                                <td scope="row"  data-label="ETD" style="text-align: left; vertical-align: middle;">
+                                    {!itfd.ETD__c}
+                                </td>
+                                <td scope="row"  data-label="ETA" style="text-align: left; vertical-align: middle;">
+                                    {!itfd.ETA__c}
+                                </td>                              
+                                
+                                <input  type = "hidden" name="inventoryTransferForm" value="{!itfd.Inventory_Transfer_Form__c}"/>                               
+                                <td scope="row" data-label="Action" title="Action" style="text-align: center; vertical-align: middle;">
+                                    <lightning:buttonIcon 
+                                                          name="{!itfd}"
+                                                          title = "Update"
+                                                          onclick="{!c.editComp}"
+                                                          class ="slds-button_neutral1"
+                                                          iconName="utility:record_update"
+                                                          variant="bare" alternativeText="Edit" />  
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                        
+                    </tbody>
+                </table>
+                <tr style="height:7px">    </tr>   
+            </aura:if>
+        </td>
+    </tr>
+    
+    <!-- Modal PopUp -->
+    <div>
+        <section aura:id="inventoryTransformDetai" role="dialog" tabindex="-1"  aria-labelledby="customerdata" aria-modal="true" aria-describedby="customerBody" class="slds-modal">
+            <div class="slds-modal__container" >
+                <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.closeModal}" variant="bare-inverse" size="large"></lightning:buttonIcon>
+                    <h1 id="customerdata" class="slds-text-heading_medium slds-hyphenate">Shipping Details</h1>
+                </header>
+                <div  align='center' class="errorMissingSelected" id="errorMissingSelected"/>
+                <div class="slds-modal__content slds-p-around_medium" id="customerBody" >
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer">
+                        <tr>
+                            <td  style ="width:250px;">
+                                <div   style="width:220px">
+                                    <b><lightning:input type="text" aura:id="ContainerNo" value="{!v.ContainerNo}" label="Container No" name = "abc" autocomplete="off"/></b>                            
+                                </div> 
+                            </td> 
+                              <td  style ="width:250px;">
+                                <div style="width:220px">
+                                    <b><lightning:input type="text" aura:id="SealNo" value="{!v.SealNo}" label="Seal No"  autocomplete="off"/></b>                            
+                                </div> 
+                            </td>
+                            <td  style ="width:250px;">
+                                <div style="width:220px">
+                                    <b><lightning:input type="text" aura:id="ShortNo" value="{!v.ShortNo}" label="Short No"  autocomplete="off"/></b>                            
+                                </div> 
+                            </td>
+                        </tr>
+                        <tr>  
+                             <td  style ="width:250px;">
+                                <div style="width:220px">
+                                    <b><lightning:input type="date" aura:id="ETD" value="{!v.DispatchDate}" label="Estimated Date For Dispatch" name="date" autocomplete="off" onchange="{!c.DispatchdateController}"  required="false"/></b>                            
+                                </div> 
+                            </td>                           
+                            <td  style ="width:250px;">
+                                <div style="width:220px">
+                                    <b><lightning:input type="date" aura:id="ETA" value="{!v.ArrivalDate}" label="Estimated Date For Arrival" name="date" autocomplete="off"  onchange="{!c.ArrivaldateController}"  required="false"/></b>                            
+                                </div> 
+                            </td>
+                        </tr>
+                        <input  type = "hidden" id = "InventoryTrasferForm" name="inventoryTransferForm" value="{!v.InventoryTransferForms}"/>
+                        
+                        <br/>                                                          
+                    </table>
+                    <br/>                    
+                    
+                    <div class="slds-float_right">
+                        <lightning:button class="slds-button slds-button_brand"  label="Save" aura:id="{!v.recordId}" name="{!v.recordId}" value="{!v.recordId}" onclick="{!c.Save}" />
+                    </div>
+                </div>                
+            </div>
+        </section>
+        <div aura:id="inventoryTransformDetaiBackdrop" class="slds-backdrop"></div>
+    </div>
+    
+</aura:component>

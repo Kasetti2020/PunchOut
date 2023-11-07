@@ -1,0 +1,31 @@
+<aura:component controller="CatalogOrderController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <!--<ltng:require scripts="/resource/1466061468000/jQuerySource,/resource/1466061531000/jqueryDatatableJS" afterScriptsLoaded="{!c.jsLoaded}"/>
+-->	
+<aura:attribute name="dataValues" type="List"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" /> 
+    <lightning:navigation aura:id="navService"/> 
+    <table class="display">
+            <thead>
+                <tr>
+                    <th class="head">{!$Label.c.MG_Order_Number}</th>
+                    <th class="head">{!$Label.c.RO_Name}</th>
+                    <th class="head">{!$Label.c.STATUS}</th>
+                    <th class="head">{!$Label.c.Revise_Order_To_Company}</th>
+                    <th class="head">{!$Label.c.Revise_Currency}</th>
+                    <th class="head">{!$Label.c.Action_URL}</th>
+                </tr>
+            </thead>
+            <tbody>
+                  <aura:iteration items="{!v.dataValues}" var="case">
+                      <tr><td class="body"><a data-soid="{!case.Mainetti_SO__c}" onclick="{!c.navigateToSo}" >{!case.Mainetti_SO__r.Name}</a></td>
+                          <td class="body">{!case.Name}</td>
+                          <td class="body">{!case.Status__c}</td>
+                          <td class="body">{!case.Revise_Order_To_Company__c}</td>
+                          <td class="body">{!case.Revise_Currency__c}</td>
+                          <td class="body" > <lightning:button variant="success" label="{!case.Name}" name="{!case.Id}" title="Success" onclick="{! c.handleClick }"/></td>
+                      </tr>
+                  </aura:iteration>
+            </tbody>
+        </table>      
+</aura:component>

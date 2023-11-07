@@ -1,0 +1,13 @@
+.THIS .hide-label label
+{
+    display:none !important;
+}
+.THIS.hide-label label
+{
+    display:none !important;
+}
+.THIS.slds-border-bottom .slds-col
+{
+    border-top:1px solid #dddbda;
+    border-bottom:1px solid #dddbda;
+}

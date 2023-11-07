@@ -1,0 +1,23 @@
+<aura:component>
+	
+    
+       <table style="width:80%;align:center">
+           <thead><h3 style ="font-size:20px;"><b> Product Recommendations</b></h3>
+              <!-- <p>Similar to your views</p>-->
+           </thead>
+                    <tbody style="width:1200px"><tr>
+                        <td style="width:550px;text-align: center;">
+                        <img src="https://510002439.recs.igodigital.com/rr/v2/5f6c6b036a401c00371b406f/i/1/portal.admin@mainetti.com" border="1"></img>
+                             </td>
+                        <td  style="width:550px;text-align: center;">        
+                        <img src="https://510002439.recs.igodigital.com/rr/v2/5f6c6b036a401c00371b406f/i/2/portal.admin@mainetti.com"></img>   
+                      </td>
+                        <td  style="width:550px;text-align: center;">
+                            <img src="https://510002439.recs.igodigital.com/rr/v2/5f6c6b036a401c00371b406f/i/3/portal.admin@mainetti.com"></img>
+                        </td>
+                        <td  style="width:550px;text-align: center;" align="center">
+                            <img src="https://510002439.recs.igodigital.com/rr/v2/5f6c6b036a401c00371b406f/i/4/portal.admin@mainetti.com"></img>   
+                        </td>
+                        </tr>
+                    </tbody></table>
+</aura:component>

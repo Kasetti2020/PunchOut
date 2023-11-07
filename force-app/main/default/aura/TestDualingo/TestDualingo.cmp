@@ -1,0 +1,4 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+	<h1>{!$Label.c.Multilingual}</h1>
+    <h2>Example</h2>
+</aura:component>

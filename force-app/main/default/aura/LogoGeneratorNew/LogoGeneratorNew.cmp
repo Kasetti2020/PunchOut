@@ -1,0 +1,214 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:attribute name="size" type="String" default="Yellow-casual-shoes"/>
+    <aura:attribute name="code" type="String" default="Y-shoes"/>
+    <aura:attribute name="des" type="String" default="Use Shoe bags to prevent any stains or mildew"/>
+    <aura:attribute name="FontName" type="String" default="calibri"/> 
+    <aura:attribute name="Fsize" type="integer" default="18"/> 
+    <aura:attribute name="align" type="String" default="center"/> 
+    
+    <aura:attribute name="img" type="String" /> 
+    <aura:attribute name="SelectedFabricArray" type="List"/>
+    <aura:attribute name="ShowLogo" type="boolean" default="false"/>
+    <aura:attribute name="Country" type="String" /> 
+    <aura:attribute name="SelectedInstImage" type="List" />
+    <aura:attribute name="ExCareIns" type="List"/>
+    <aura:attribute name="FreeText" type="List"/>
+    
+    <ltng:require scripts="{!$Resource.html2canvas}" />   
+    
+    <aura:attribute name="ImgHeight" type="integer" default="100"/> 
+    <aura:attribute name="ImgWidth" type="integer" default="100"/> 
+    <aura:attribute name="FWidth" type="integer" default="300"/> 
+    <aura:attribute name="Logo" type="String" />
+    
+    
+   <!-- <aura:registerEvent name="loadMyEvent" type="c:LogoEvent"/>-->
+    
+    <aura:attribute name="Temp" type="string" default="Top"/> 
+    <aura:attribute name="Top" type="integer" />
+    <aura:attribute name="Left" type="integer" default=""/>
+    <aura:attribute name="Top1" type="integer" />
+    <aura:attribute name="Left1" type="integer" default=""/>
+    <aura:attribute name="ImgDev" type="boolean" default="true"/>
+    <aura:attribute name="Dev" type="boolean" default="false"/>
+    
+    
+    <aura:attribute name="DevSize" type="boolean" default="false"/>
+    <aura:attribute name="DevFabric" type="boolean" default="false"/>
+    <aura:attribute name="DevCountry" type="boolean" default="false"/>
+    <aura:attribute name="DevCare" type="boolean" default="false"/>
+    <aura:attribute name="DevExcare" type="boolean" default="false"/>
+    <aura:attribute name="DevFree" type="boolean" default="false"/>
+    <aura:attribute name="Devlogo" type="boolean" default="false"/>
+    
+    
+    
+    <aura:registerevent name="componentEventFired" type="c:LogoGeneratedPDF"/>
+    
+    
+    <!-- font-family: 'calibri';
+    font-size: 18px;
+    background-color: White;
+    border: 5px solid white;
+    padding: 20px 110px;
+    text-align: center;  -->
+    
+    
+    <div class="c-container">
+        <lightning:layout verticalAlign="stretch" multipleRows="true" class="x-large"  horizontalAlign="center">
+            <!--  <lightning:layoutItem flexibility="auto" padding="around-small" class="custom-box">
+                1
+                <lightning:select aura:id="Temp" name="select" value="{!v.Temp}" label="Template" onchange="{! c.temp }">
+                    
+                    <option value="1">Move Image</option>
+                    <option value="2">Move Text</option>
+                     <option value="2">Move Text And Image</option>
+                    
+                    
+                </lightning:select>
+                <lightning:select aura:id="select" name="select" value="{!v.FontName}" label="Text-font" onchange="{! c.onChange }">
+                    
+                    <option value="sans-serif">sans-serif</option>
+                    <option value="serif">serif</option>
+                    <option value="cursive">cursive</option>
+                    <option value="system-ui">system-ui</option>
+                    <option value="Georgia, serif">Georgia, serif</option>
+                </lightning:select>
+                
+                <lightning:select aura:id="align" name="select"  value="{!v.align}" label="Text-Align" onchange="{! c.align }">
+                    <option value="center">Center</option>
+                    <option value="right">Right</option>
+                    <option value="left">Left</option>
+                    
+                    
+                </lightning:select> -->
+            
+            
+            <!-- <input type="number" id="quantity" name="quantity"  min="10" max="23" label="Font-Size" value="{!v.Fsize}" step="1" onchange="{! c.size }"/>
+                Font-Width <br/>
+                <input type="number" id="Width" name="quantity"  min="300" max="700" label="Font-Size" value="{!v.FWidth}" step="200" onchange="{! c.Width }"/>
+                
+                <lightning:slider aura:id="Size" label="Font-Size" value="{!v.Fsize}" min="10" max="50" onchange="{! c.size }"/>-->
+            <!-- <lightning:slider aura:id="Width" label="Font-Width" value="{!v.FWidth}" min="300" max="550" onchange="{! c.Width }"/>
+                
+                <aura:if isTrue="{!v.ImgDev}">
+                    <lightning:slider aura:id="top" label="Vertical Alain"  value="{!v.Top}" min="-300" max="550" />
+                    <lightning:slider aura:id="left" label="Horizontal Alain" value="{!v.Left}" min="-500" max="550" />
+                    
+                </aura:if> 
+                <aura:if isTrue="{!v.Dev}">
+                    <lightning:slider aura:id="top" label="Vertical Alain" value="{!v.Top1}" min="-300" max="550" />
+                    <lightning:slider aura:id="left" label="Horizontal Alain" value="{!v.Left1}" min="-500" max="550" />
+                    
+                </aura:if> 
+                
+            </lightning:layoutItem>-->
+            <lightning:layoutItem flexibility="auto" padding="around-small" class="custom-box">
+              
+                <div  id="Print" style="{! 'border: 1px solid grey;text-align:'+ v.align +';background-color: white; width:700px; vertical-align:center;'}">
+                    
+                    <!-- padding: 20px 110px;<img src="https://ae01.alicdn.com/kf/HTB13hOWcSSD3KVjSZFKq6z10VXas.jpg" style="{!'height:'+ v.ImgHeight+'px;'+'width:'+v.ImgWidth +'px;'}"/> -->
+                    <aura:if isTrue="{!v.Devlogo}">
+                        <div style="{! 'position:relative; left:'+v.Left+'px; top:'+ v.Top +'px;'}">
+                            <img src="{!v.img}" style="height: 105px;width:105px;" />
+                        </div>
+                    </aura:if>
+                    <!--   <div style="font-family: 'calibri';font-size: 18px;background-color: white;"> -->
+                    <div style="{!'font-family:'+ v.FontName+';'+'font-size:'+ v.Fsize +'px;'+'font-weight:'+ v.FWidth +';position:relative; left:'+ v.Left1 +'px; top:'+ v.Top1 +'px;'}">
+                        <!--<ui:outputText value="{!v.name}" style="height:60px;font-family: 'calibri';font-size: 18px;background-color: white;"/>-->
+                        
+                        <aura:if isTrue="{!v.DevSize}">
+                            <b>SIZE</b> <br/>
+                            {!v.size} <br/> 
+                        </aura:if>
+                        <aura:if isTrue="{!v.DevFabric}">
+                            <b>  {!$Label.c.FABRIC}</b> <br/>
+                            
+                            <aura:iteration items="{!v.SelectedFabricArray}" var="val" indexVar="index">
+                                
+                                {!val.Component}&nbsp;&nbsp;
+                                {!val.Fabric}&nbsp;&nbsp;
+                                {!val.value} % <br/>
+                                
+                            </aura:iteration>	
+                        </aura:if>
+                        <aura:if isTrue="{!v.DevCountry}">
+                            <b>{!$Label.c.COUNTRY_OF_ORIGIN}</b>  <br/> {!v.Country}<br/> 
+                        </aura:if>
+                        <aura:if isTrue="{!v.DevCare}">
+                            <b>{!$Label.c.CARE_INSTRUCTION_DETAILS}</b>     <br/>
+                            <aura:iteration items="{!v.SelectedInstImage}" var="careInst1">
+                                {!careInst1.group}&nbsp;&nbsp;
+                                {!careInst1.instr} &nbsp;&nbsp;
+                                <img class="icon-image" src="{!careInst1.descr}" alt='image' name="" style="height:30px;width:50px"/> <br/>
+                            </aura:iteration>
+                        </aura:if>
+                        <aura:if isTrue="{!v.DevExcare}">
+                            <b>{!$Label.c.EXCARE_INSTRUCTIONS}</b><br/>
+                            <aura:iteration items="{!v.ExCareIns}" var="Care">
+                                {!Care.exCareInstruction}&nbsp;&nbsp;
+                                {!Care.position}  <br/>  
+                                
+                                
+                            </aura:iteration>
+                        </aura:if>
+                        <aura:if isTrue="{!v.DevFree}">
+                            <b>{!$Label.c.FREE_TEXT}</b><br/>
+                            <aura:iteration items="{!v.FreeText}" var="text">
+                                {!$Label.c.Style_Number} {!text.StyleNumber}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {!$Label.c.RN_Number} {!text.RNNumber}<br/>
+                                {!$Label.c.Lot_Number} {!text.LotNumber}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {!$Label.c.Careinstructions} {!text.Careinstructions}<br/>
+                                {!$Label.c.Supplier_Number} {!text.SupplierNumber}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {!$Label.c.Labelling_Code} {!text.LabellingCode}<br/>
+                                {!$Label.c.Packaging_Code} {!text.PackagingCode}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {!$Label.c.Season_Month} {!text.SeasonMonth}<br/>
+                                {!$Label.c.Season_Year} {!text.SeasonYear}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; {!$Label.c.Item_Number} {!text.ItemNumber}<br/>
+                                
+                                
+                                
+                            </aura:iteration>
+                        </aura:if>
+                    </div>
+                    
+                    
+                </div>
+            </lightning:layoutItem>
+            
+        </lightning:layout>
+    </div>
+   <!-- <lightning:button variant="brand" label="Screenshot" title="Brand action" onclick="{!c.CreateLogo}" />-->
+    
+    
+    
+    <aura:if isTrue="{!v.ShowLogo}">
+        
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeModel }"
+                                          alternativeText="close"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Logo_View}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <!-- inside popup-->
+                    <center>
+                        <img src='{!v.Logo}' />
+                        
+                    </center>
+                    
+                </div>
+                <footer class="slds-modal__footer">
+                    <!--  <lightning:button variant="brand" label="Download" title="Brand action" onclick="{!c.download}" /> 
+                    <lightning:button variant="brand" label="SaveAttachment" title="Brand action" onclick="{!c.attach}" />-->
+                   
+                    <lightning:button variant="brand" label="{!$Label.c.Close}" title="Brand action" onclick="{!c.closeModel}" />
+                    
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+        
+    </aura:if>
+</aura:component>

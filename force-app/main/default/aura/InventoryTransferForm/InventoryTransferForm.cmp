@@ -1,0 +1,152 @@
+<aura:component controller="InventoryTransferFormDetailsController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doint}"/>
+    <aura:attribute name="transferFormDetails" type="Object[]"/>
+    
+    <aura:attribute name="selectedRetailer" type="String"/>
+    <aura:attribute name="selectedFromCompany" type="String"/>
+    <aura:attribute name="selectedToCompany" type="String"/>
+    <aura:attribute name="selectedContainerNo" type="String"/>
+    <aura:attribute name="selectedSealNo" type="String"/>
+    <aura:attribute name="GetInventoryTransferFormId" type="String"/>
+    <aura:attribute name="InventoryFormSearch" type="String"/>
+    
+    <aura:attribute name="retailerList" type="String[]"/>
+    <aura:attribute name="listOfCompanies" type="String[]"/>
+    <aura:attribute name="listOfAllocateToCompanies" type="String[]"/>
+    <aura:handler name="InventoryAllocationSearchPageListEvent" event="c:InventoryTransferFormEvent" action="{!c.doint}"/>
+    
+    <lightning:layout horizontalAlign="center">
+        <lightning:layoutItem class="boxx" padding="around-large" size="10">
+            <table style="width:100%;background-color:white; border: 2px solid gray;">
+                <header class="slds-card__header" style="padding-bottom:-15px;background-color:rgb(164, 31, 52);">
+                    <h5 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" style="color:White;">Inventory Transfer Form</h5>
+                </header>
+                <header class="slds-modal__header">
+                    <h4 class="slds-card__header-title" style ="font-size: 1em">
+                        <tr style ="width:370px;vertical-align:center;text-align: left;">                            
+                            <td>
+                                <div   style="width:150px">
+                                    <b><lightning:input type="text" aura:id="ContainerNo" value="{!v.InventoryFormSearch}" label="Transfer Form No." name = "abc" autocomplete="off"/></b>                            
+                                </div> 
+                            </td> 
+                            <td>
+                                <!-- Select the retailer -->
+                                <div   style="width:200px" > 
+                                    <b>
+                                        <lightning:select value="{!v.selectedRetailer}" onchange="{!c.retailerOnChange}" aura:id="a_opt" label=" Select Retailer">
+                                            <option value="" text="Select Retailer"></option>
+                                            <aura:iteration items="{!v.retailerList}" var="option">
+                                                <option text="{!option}" value="{!option}" />
+                                            </aura:iteration>
+                                        </lightning:select>
+                                    </b>
+                                </div>
+                            </td>
+                            
+                            <!-- Select the Allocation from company -->
+                            <td> 
+                                <div   style="width:200px" > 
+                                    <b>
+                                        <Lightning:select aura:id="selectid1" label="Allocate From Company"  value="{!v.selectedFromCompany}">
+                                            <option value="" text="Select RTS Company"></option>
+                                            <aura:iteration items="{!v.listOfCompanies}" var="fields">
+                                                <option value="{!fields.Default_Order_to_Company__c}" text="{!fields.Default_Order_to_Company__c}"></option>
+                                            </aura:iteration>
+                                        </Lightning:select>
+                                    </b>
+                                </div>
+                            </td>
+                            
+                            <td> 
+                                <div   style="width:200px" >                                        
+                                    <b> <lightning:select name="select1"  value="{!v.selectedToCompany}" label="Allocate To Company" >
+                                        <option value="" text="Select To Company"></option>
+                                        <aura:iteration items="{!v.listOfAllocateToCompanies}" var="fld" >
+                                            <option value="{!fld}" text="{!fld}"></option>
+                                        </aura:iteration>
+                                        </lightning:select>
+                                    </b>
+                                </div>
+                            </td> 
+                            <td>
+                                <div   style="width:150px">
+                                    <lightning:button class="slds-button slds-button_destructive"  label="Search" onclick="{!c.onSearch}" />
+                                </div>
+                                </td>
+                        </tr>                        
+                    </h4>
+                </header>
+            </table>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+    <lightning:layout horizontalAlign="center">
+        <lightning:layoutItem class="boxx" padding="around-large" size="10">    
+            <table style="width:100%;background-color:white; border: 2px solid gray;">
+                <div class="content">
+                    <div class="slds-box1" style="">
+                        <aura:renderIf isTrue="{!v.isError}">
+                            <ui:message title="Error" severity="error" closable="false">
+                                {!v.errorMsg}
+                            </ui:message>
+                            <aura:set attribute="else">  
+                            </aura:set>
+                        </aura:renderIf> 
+                    </div>
+                    
+                    
+                    <div class="slds-modal__content slds-p-around_small" style="height:35vh;min-height:35vh;">
+                        <div class="slds-box slds-p-around_none slds-m-top_small1">
+                            <table class="slds-table" > 
+                                <thead>
+                                    <tr class="slds-text-title_caps slds-gray">
+                                        <th style="width: 2.5%;"><div class="slds-truncate"></div></th>
+                                        <!--<th style="width: 2.5%;"><div class="slds-truncate"></div></th>-->
+                                        <th style="text-align: center; align: center;"><div>Form No</div></th>
+                                        <th style="text-align: center; align: center;"><div>Retailer Name</div></th>
+                                        <th style="text-align: center; align: center;"><div>RTS Company</div></th>
+                                        <th style="text-align: center; align: center;"><div>Transfer To Company</div></th>
+                                        <th style="text-align: center; align: center;"><div>ETD</div></th>
+                                        <th style="text-align: center; align: center;"><div>ETA</div></th> 
+                                        <th style="text-align: center; align: center;"><div>Po No</div></th>
+                                        <th style="text-align: center; align: center;"><div>Transfer Date</div></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <aura:If isTrue="{!greaterthan(v.transferFormDetails.length,0)}">
+                                        <aura:iteration items="{!v.transferFormDetails}" var="transferForm" indexVar="index">
+                                            <c:InventoryTransferFormDetails transferForm="{!transferForm}"  rowIndex="{!index}" InventoryTransferForms = "{!v.GetInventoryTransferFormId}" setParentObjId = "{!transferForm.invTransferFormDetail[0].Inventory_Transfer_Form__c}"/> 
+                                        </aura:iteration>
+                                        <aura:set attribute="else">
+                                            <tr><td></td>
+                                                <td class="slds-float_right">
+                                                    <tr align="center">
+                                                        <div style="width:200px">
+                                                            <p>No Records Found...</p></div></tr>
+                                                    <tr style ="height:5px"></tr>
+                                                </td>
+                                            </tr>
+                                            <tr style="height:20px;"></tr>
+                                        </aura:set>
+                                        
+                                    </aura:If>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <footer class="slds-card__footer footer" style="height:20px;">
+                        <div class="slds-text-align_center">                            
+                        </div>                   
+                    </footer>               
+                </div>
+                
+            </table>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position: fixed" alternativeText="Loading" size="large" />
+    </div>
+    
+</aura:component>

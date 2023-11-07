@@ -1,0 +1,143 @@
+.THIS .add-icon .slds-button__icon{
+    fill: white;
+    background: rgb(164, 31, 52);
+    border-radius: 20px;
+    padding: 2px;
+}
+.THIS .add-icon .slds-button__icon:hover{
+    fill: white;
+}
+.THIS .slds-card__header
+{
+    background:#f2f2f2;
+    border-radius:0;
+    border-bottom:1.5px solid rgb(212, 212, 212);
+}
+.THIS .slds-card__footer
+{
+    background:#f2f2f2;
+    border-top:1.5px solid rgb(212, 212, 212);
+}
+.THIS .slds-button_neutral
+{
+    color:rgb(164, 31, 52);
+}
+.THIS .slds-button_neutral:hover
+{
+    color:rgb(164, 31, 52);
+}
+.THIS .slds-button_brand
+{
+    background:rgb(164, 31, 52);
+    border-color:rgb(164, 31, 52);
+    color:white;
+}
+.THIS .slds-button_brand:hover
+{
+    background:rgb(164, 31, 52);
+    border-color:rgb(164, 31, 52);
+    color:white;
+}
+.THIS h2
+{
+    color:rgb(164, 31, 52);
+}
+.THIS th
+{
+    background:#f4f4f4 !important;
+}
+.THIS .slds-form-element label
+{
+    text-align:left !important;
+}
+.THIS .slds-tabs_scoped{
+    display: block;
+    width: 100%;
+    
+}
+.THIS  .slds-tabs_scoped__nav
+{
+    background-color: rgb(243, 238, 238);
+}
+
+.THIS .slds-tabs_scoped__item
+{
+    text-transform:uppercase;
+}
+.THIS .slds-table-1 th
+{
+    font-weight:normal;    
+}
+.THIS .selected
+{
+    background:green !important;
+    color:white !important;
+}
+.THIS .tab-success
+{
+    border-bottom:2px solid green !important;
+    color:green !important
+}
+.THIS .BrandIconTab .slds-tabs_scoped__link
+{
+    border-bottom:2px solid green !important;
+    color:green !important;
+}
+.THIS.BrandIconTab.slds-tabs_scoped__link
+{
+    border-bottom:2px solid green !important;
+    color:green !important;
+}
+.BrandIconTab.slds-tabs_scoped__link.THIS
+{
+    border-bottom:2px solid green !important;
+    color:green !important;
+}
+.THIS .success-border
+{
+    color: green;
+    border-bottom: 2px solid green;
+}
+
+.THIS .img-zoom-container-inner
+{
+    padding:2px 0;
+}
+.THIS .img-zoom-container-inner
+{
+    width:50%;    
+    display:block;
+}
+.THIS .img-zoom-container-inner img
+{
+    display:block;    
+}
+.THIS .img-zoom-container-inner .myimage
+{
+    border: 0px solid #d4d4d4;
+}
+.THIS .img-zoom-container {
+    display: -webkit-box;
+}
+
+.THIS .img-zoom-lens {
+    position: absolute;
+    /*set the size of the lens:*/
+    width: 50px;
+    height: 50px;
+    cursor: crosshair;
+}
+
+.THIS .img-zoom-result {
+    box-shadow: 0 0 7px 2px rgba(23,84,116,0.18);
+    border: 1px solid #d4d4d4;
+    /*set the size of the result div:*/
+    width: 250px;
+    height: 250px;
+    position:absolute;
+    z-index:4;
+    margin:0 1rem;
+    margin-left: 140px;
+    margin-top:-120px;
+    background-repeat:no-repeat;
+}

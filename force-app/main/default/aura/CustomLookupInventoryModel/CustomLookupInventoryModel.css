@@ -1,0 +1,12 @@
+.THIS .leftPaddingClass {
+    padding-left: 2rem !important;
+}
+ 
+.THIS .pillSize{
+ width:100%;
+}
+
+.THIS .disable{
+ 	background:#dddddd;
+    width:100%;
+}

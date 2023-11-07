@@ -1,0 +1,143 @@
+<aura:component controller="MagnetUploadRetailerController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"  access="global">
+    <!-- Content-Security-Policy-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src	'self' 'unsafe-inline' *; img-src 'self' data: *"/>
+    <!-- 'parentId' Aura Attribute for store the Id for Parent Record where we are attach our file -->  
+    <aura:attribute name="parentId" type="Id" default=" " />
+    <aura:attribute name="selectedDocumentId" type="string"/>
+    <aura:attribute name="lstContentDoc" type="List"/>
+    <aura:attribute name="hasModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="ListNotesAttachment" type="Object[]" />
+    <aura:attribute name="Baseurl" type="String" />
+    <aura:attribute name="ListofFiles" type="Object[]" />
+    <aura:attribute name="ListofFilesRetailer" type="Object[]" />
+    <aura:attribute name="fileDrop" type="boolean" default="false"/>
+    <div class="slds-m-around_medium">
+        <lightning:spinner aura:id="mySpinner" alternativeText="{!$Label.c.Processing}" title="{!$Label.c.Processing}" variant="brand" size="large" class="slds-hide"/>
+    </div>
+    <div >
+        <img class ="Banner" src="{!$Resource.McareBannerImage}"/>
+    </div>
+    
+    <!--Content-Security-Policy-->
+    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src	'self' 'unsafe-inline' *; img-src 'self' data: *"/>
+    
+    <!-- 'showLoadingSpinner' attribute for show/hide the uploading image and msg in aura:if-->
+    <aura:attribute name="showLoadingSpinner" type="boolean" default="false" />
+    <!-- 'fileName' attribute for display the selected file name -->  
+    <aura:attribute name="fileName" type="String" default="{!$Label.c.No_File_Selected}" />
+    <!-- Lightning Input with file type and on file change call the 'handleFilesChange' controller -->  
+    
+    <div class="slds-grid">
+        <div class="slds-col slds-size_1-of-2 slds-p-around_large ">
+            <div class="slds-box slds-p-around_none slds-m-bottom_large">
+                <header class="slds-modal__header" style="background-color:Gray;color:#fff;">      
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                        <div class="McareDoc2"></div> {!$Label.c.MainettiCare_Documents}</h2>   
+                </header>
+                <div class="slds-modal__content slds-p-around_medium slds-scrollable" style="height:calc(370px + 12vh); margin-top: 2px;">
+                    <aura:iteration items="{!v.ListofFilesRetailer}" var="item1"  indexVar="index1">
+                        <div class="slds-grid slds-wrap" style="padding:2px;"> 
+                            <div class="slds-col slds-size_1-of-12">
+                                <lightning:icon iconName="doctype:attachment" alternativeText="" title="{!$Label.c.attachment}" />   
+                            </div>
+                            <div class="slds-col slds-size_7-of-12">
+                                <p>{!item1.ContentDocument.Title}</p>
+                            </div>
+                            <div class="slds-col slds-size_4-of-12">
+                			
+                                <a  class="slds-button slds-button_brand button-custom" href="{!'../sfc/servlet.shepherd/version/download/'+item1.ContentDocument.LatestPublishedVersionId}"  target="_blank" >{!$Label.c.Download}</a> 
+                                 
+                            </div>
+                        </div>
+                        
+                    </aura:iteration>
+                </div>
+            </div>  
+          
+           <!--<div class="slds-box slds-p-around_none slds-m-bottom_large ">
+                <header class="slds-modal__header">      
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                        <lightning:icon iconName="standard:file" size="small"/> Retailer Documents</h2>   
+                </header>
+                <div class="slds-modal__content slds-p-around_medium slds-scrollable" style="height:155px;">
+                    <aura:iteration items="{!v.ListofFilesRetailer}" var="item1"  indexVar="index1">
+                        <div class="slds-grid slds-wrap" style="padding:2px;"> 
+                            <div class="slds-col slds-size_1-of-12">
+                                <lightning:icon iconName="doctype:attachment" alternativeText="" title="attachment" />   
+                            </div>
+                            <div class="slds-col slds-size_7-of-12">
+                                <p>{!item1.ContentDocument.Title}</p>
+                            </div>
+                            <div class="slds-col slds-size_4-of-12">
+                			
+                                <a  class="slds-button slds-button_brand button-custom" href="{!'../sfc/servlet.shepherd/version/download/'+item1.ContentDocument.LatestPublishedVersionId}"  target="_blank" >Download</a> 
+
+                            </div>
+                        </div>
+                        
+                    </aura:iteration>
+                </div>
+            </div>-->  
+        </div>
+        <div class="slds-col slds-size_1-of-2 slds-p-around_large">
+            <div class="slds-box slds-p-around_none" id="fileBox">
+               	<div class="slds-modal__content slds-p-around_medium" id="fileButton">
+                      <div class="fileZone"></div>
+        	      	<lightning:input aura:id="fileId" onchange="{!c.handleFilesChange}" type="file" name="file" label="" multiple="false"/>
+               	</div>
+            </div>
+            <br></br>
+            <div class="slds-box slds-p-around_none">
+                <header class="slds-modal__header" style="background-color:Gray;color:#fff;">      
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                        <div class="McareDoc"></div> {!$Label.c.User_Uploaded_Documents}</h2>
+                    
+                </header>
+                <div class="slds-modal__content slds-p-around_medium slds-scrollable"  style="height:160px;  margin-top: 2px;">  
+                    
+                    <aura:iteration items="{!v.ListNotesAttachment}" var="item"  indexVar="index">
+                        <div class="slds-grid slds-wrap slds-m-bottom_xx-small">
+                            
+                            <div class="slds-col slds-size_1-of-12">
+                                <lightning:icon iconName="doctype:attachment" alternativeText="" title="{!$Label.c.attachment}" />  <br></br> 
+                            </div>  
+                            <div class="slds-col slds-size_7-of-12">
+                                <p>{!item.Name}</p>
+                            </div>
+                            <div class="slds-col slds-size_4-of-12">
+                                <a class="slds-button slds-button_brand button-custom download" href="{!'../servlet/servlet.FileDownload?file='+item.Id}" target="_blank"  > 
+                                    {!$Label.c.Download}</a>
+                                <a class="slds-button slds-button_brand button-custom delete"  onclick="{!c.deleteRecord}" id="{!item.Id}">{!$Label.c.DELETE}</a>
+                                
+                            </div>
+                        </div>
+                    </aura:iteration>
+                </div>      
+            </div>
+        </div>
+        
+       
+    </div>	
+    <!-- Modal for confirming file upload// By Maaz (11/06/21)-->
+    <aura:if isTrue="{!v.fileDrop}">
+            <section role="dialog" class="slds-modal slds-fade-in-open slds-modal_medium" style="background: rgba(0,0,0,0.8);" id="confirmBox">
+                <div class="slds-modal__container" style="width: 50%;font-size:11px;">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeFileUploadBox}">
+                            <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.Close}"/>
+                            <span class="slds-assistive-text" >{!$Label.c.Close}</span>
+                        </button>
+                        <h2 class="slds-text-heading_medium slds-hyphenate" style="color: #a90533;font-size:17px;">{!$Label.c.Confirm}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <div class="slds-text-body_small slds-text-color_error">{!v.fileName} </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button class="slds-button slds-button_brand" iconName="utility:close" onclick="{!c.closeFileUploadBox}" label="{!$Label.c.Cancel}"/>
+                        <button class="slds-button slds-button_brand"  onclick="{!c.doSave}">{!$Label.c.Upload}</button>
+                    </footer>
+                 </div>
+            </section>
+    </aura:if>
+</aura:component>

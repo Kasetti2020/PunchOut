@@ -1,0 +1,12 @@
+.THIS .slds-file-selector__text{
+    display:none;
+}
+.THIS .symbol-image img
+{
+    width: auto!important;
+    height: 60px !important;
+}
+.THIS .slds-card
+{
+    overflow: scroll;
+}

@@ -1,0 +1,77 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <!--currentStep attribute will control the steps of progress indicator-->
+    <aura:attribute name="currentStep" type="string" default="1"/>
+    <!--Use "slds-m-around_xx-large" class to add standard Large padding to the component--> 
+    
+   <!-- <div class="slds-m-around_xx-large"> -->
+        <div class="bg slds-p-around_small">
+            
+            <!--###### MODAL BOX Start From Here ######--> 
+            <div role="dialog" tabindex="-1" aria-labelledby="header99" class="">
+                <div class="">
+                    <!-- ###### MODAL BOX HEADER Part Start From Here ######-->
+                    <div class="slds-modal__header">
+                        <h2 id="header99" class="slds-text-heading--medium">Inventory Allocation</h2>
+                        <br/>
+                        
+                        <!--lightning progressIndicator start-->
+                        <lightning:progressIndicator currentStep="{!v.currentStep}" type="path">
+                            <lightning:progressStep label="Upload" value="1" onclick="{!c.selectFromHeaderStep1}"/>
+                            <lightning:progressStep label="Inventory Allocation" value="2" onclick="{!c.selectFromHeaderStep2}"/>
+                             <lightning:progressStep label="Allocation Search" value="3" onclick="{!c.selectFromHeaderStep3}"/>
+                           <!-- <lightning:progressStep label="Allocation Manager" value="4" onclick="{!c.selectFromHeaderStep4}"/> -->
+                        </lightning:progressIndicator>
+                    </div>
+                    
+                    <!--###### MODAL BOX BODY Part Start From Here ######-->
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <!--showing 3 screens based on progress indicator steps-->
+                        <div class="{!v.currentStep == '1' ? 'slds-show' : 'slds-hide'}"  >                         
+                            <div class="slds-modal__content slds-p-around_medium slds-scrollable" style="height:52vh;"> 
+                                <c:InventoryAllocationUpload /> 
+                            </div>
+                        </div>
+                        <div class="{!v.currentStep == '2' ? 'slds-show' : 'slds-hide'}" style="color:green">
+                          <!--  Hello i am the Step 2
+                            <c:InventoryModelAllocationForm />-->
+                             <c:AllocateModelOrder />
+                        </div>
+                        <div class="{!v.currentStep == '3' ? 'slds-show' : 'slds-hide'}" style="color:blue" >
+                             <c:InventoryTransferForm />
+                        </div>
+                      <!--  <div class="{!v.currentStep == '4' ? 'slds-show' : 'slds-hide'}" style="color:blue" >
+                             <c:InventoryAllocationManager />
+                        </div> -->
+                    </div>
+                    
+                    <!--###### MODAL BOX FOOTER Part Start From Here ######-->
+                    <div class="slds-modal__footer slds-modal__footer_directional">
+                        <lightning:button disabled="{!v.currentStep != '1' ? '' : 'disabled'}"
+                                          variant="neutral" 
+                                          label="Back"
+                                          title="Back"
+                                          onclick="{! c.moveBack }"/>
+                        <aura:if isTrue="{!v.currentStep != '4'}">
+                            <lightning:button variant="brand" 
+                                              label="Next"
+                                              title="Next"
+                                              onclick="{! c.moveNext }"/>
+                        </aura:if>
+                      <!--  <aura:if isTrue="{!v.currentStep != '3'}">
+                            <lightning:button variant="brand" 
+                                              label="Next"
+                                              title="Next"
+                                              onclick="{! c.moveNext }"/>
+                        </aura:if>-->
+                        <aura:if isTrue="{!v.currentStep == '4'}"> 
+                            <lightning:button variant="brand" 
+                                              label="Finish"
+                                              title="Finish"
+                                              onclick="{! c.finish }"/>  
+                        </aura:if>
+                    </div>
+                </div>
+            </div>
+    </div>
+</aura:component>

@@ -1,0 +1,195 @@
+<aura:component controller="CareLabelMaintenanceService" implements="force:appHostable" >
+    <aura:attribute name="retailerID" type="String"/>
+    <aura:attribute name="retailerName" type="String"/>
+    <aura:attribute name="listOfFabComp" type="List"/>
+    <aura:attribute name="listOfMaterial" type="List"/>
+    <aura:attribute name="productID" type="String"/>
+    <aura:attribute name="productName" type="String"/>
+    <aura:attribute name="fabType" type="String"/>
+    <aura:attribute name="ListOfLanguages" type="String[]"/>
+    <aura:attribute name="Listfabric" type="Fabric_Component__c" />
+    <aura:attribute name="retailerLang" type="Retailer_Code__c" />
+    <aura:attribute name="selectedCount" type="integer" default="0"/>
+    <aura:attribute name="SetupFlag" type="boolean" default="false"/>
+    <aura:attribute name="CompTypeFlag" type="boolean" default="false"/>
+    <aura:attribute name="MatTypeFlag" type="boolean" default="false"/>
+    <aura:attribute name="disableSave" type="boolean" default="true"/>
+    
+    <aura:attribute name="FabricSetup" type="Fabric_Component__c" default="{ 'sobjectType': 'Fabric_Component__c'}"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.retailerID}" action="{!c.retailerChangeEvent}" />
+    <aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordEvent" action="{!c.handleLookupEvent}"/>
+    
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position:fixed" alternativeText="{!$Label.c.Loading}" size="large" />
+    </div>
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="standard:quotes" alternativeText="" size="medium"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>{!$Label.c.Care_Label_Fabric_Component_Setup}</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-3">
+                    <c:CustomLookup recordID="{!v.retailerID}" recordName="{!v.retailerName}"  whereCondition ="AND Online_Enquiry__c=true" objectAPIName="Retailer_Code__c" IconName="standard:account" label="{!$Label.c.Retailer_Code}" />
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                    <label  class="slds-form-element__label slds-no-flex">{!$Label.c.Select_Type}</label>
+                    <ui:inputSelect class="slds-input" aura:id="selectedType" value="{!v.fabType}" disabled="" change="{!c.onTypeChange}">
+                        <ui:inputSelectOption text="{!$Label.c.None}" label="{!$Label.c.None}" />
+                        <ui:inputSelectOption text="{!$Label.c.Component_Name}" label="{!$Label.c.Component_Name}" />
+                        <ui:inputSelectOption text="{!$Label.c.Material_Name}" label="{!$Label.c.Material_Name}" />
+                    </ui:inputSelect>
+                </div>
+                
+                <aura:if isTrue="{!v.SetupFlag}">
+            <aura:if isTrue="{!v.CompTypeFlag}">
+                <div class="slds-col slds-size_1-of-3">
+                      <label  class="slds-form-element__label slds-no-flex">{!$Label.c.Component_Name}</label>
+                                <ui:inputSelect class="slds-input" aura:id="selectedComp" value="{!v.FabricSetup.Component_Name__c}" disabled="" change="{!c.onComponentChange}">
+                                    <aura:iteration items="{!v.listOfFabComp}" var="faC" indexVar="ind">
+                                        <ui:inputSelectOption text="{!faC}" label="{!faC}" />
+                                    </aura:iteration>
+                                </ui:inputSelect>
+                </div>
+                    </aura:if>
+                </aura:if>
+                <aura:if isTrue="{!v.MatTypeFlag}">
+                    <div class="slds-col slds-size_1-of-3">
+                    <label class="slds-form-element__label slds-no-flex">{!$Label.c.Material_Name}</label>
+                                <ui:inputSelect class="slds-input" value="{!v.FabricSetup.Material__c}" aura:id="Materialid" disabled=""  change="{!c.onMaterialChange}">
+                                    <aura:iteration items="{!v.listOfMaterial}" var="mat" indexVar="ind">
+                                        <ui:inputSelectOption text="{!mat}" label="{!mat}" />
+                                    </aura:iteration>
+                                </ui:inputSelect>
+                    </div>
+                </aura:if>
+            </div>                       
+        </div>
+        
+        <aura:if isTrue="{!v.SetupFlag}">
+            <aura:if isTrue="{!v.CompTypeFlag}">
+                <div class="slds-box slds-box slds-p-around_none slds-m-around_medium">                   
+                        <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_resizable-cols1">
+                            <thead>
+                                <tr class="slds-text-title--caps">
+                                    <aura:iteration items="{!v.ListOfLanguages}" var="lan">
+                                        <th >
+                                            
+                                            <div class="slds-truncate" title="{!lan}" >{!lan}
+                                                  <span style="color:red;font-size: 130%;">*</span> 
+                                                 </div>    
+                                        </th>
+                                    </aura:iteration>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    
+                                        <td scope="row">
+                                            <aura:if isTrue="{!v.retailerLang.Lang_1__c!=null}">
+                                            <ui:inputText  class="field slds-input" value="{!v.FabricSetup.Component_Lang_1__c}" required="true" />
+                                        </aura:if>
+                                            </td>
+                                    
+                                    
+                                        <td scope="row">
+                                            <aura:if isTrue="{!v.retailerLang.Lang_2__c!=null}">
+                                            <ui:inputText class="field slds-input" value="{!v.FabricSetup.Component_Lang_2__c}" required="true" />
+                                         </aura:if>
+                                            </td>
+                                   
+                                   
+                                        <td scope="row">
+                                             <aura:if isTrue="{!v.retailerLang.Lang_3__c!=null}">
+                                            <ui:inputText class="field slds-input" value="{!v.FabricSetup.Component_Lang_3__c}" required="true" />
+                                        </aura:if>
+                                            </td>
+                                    
+                                   
+                                        <td scope="row">
+                                            <aura:if isTrue="{!v.retailerLang.Lang_4__c!=null}">
+                                            <ui:inputText class="field slds-input" value="{!v.FabricSetup.Component_Lang_4__c}" required="true" />
+                                      </aura:if>
+                                            </td>
+                                    
+                                    
+                                        <td scope="row">
+                                            <aura:if isTrue="{!v.retailerLang.Lang_5__c!=null}">
+                                            <ui:inputText class="field slds-input" value="{!v.FabricSetup.Component_Lang_5__c}" required="true" />
+                                        </aura:if>
+                                            </td>
+                                   
+                                </tr>
+                            </tbody>
+                        </table>
+                    
+                </div>
+            </aura:if>
+            <aura:if isTrue="{!v.MatTypeFlag}">
+                <div class="slds-box slds-box slds-p-around_none slds-m-around_medium">    
+                        <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_resizable-cols1">
+                            <thead>
+                                <tr class="slds-text-title--caps">
+                                    <aura:iteration items="{!v.ListOfLanguages}" var="lan">
+                                      
+                                        <th>
+                                     <div class="slds-truncate" title="{!lan}">{!lan}<span style="color:red;font-size: 130%;">*</span></div>     
+                                        </th>
+                                    </aura:iteration>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                        <td scope="row">
+                                             <aura:if isTrue="{!v.retailerLang.Lang_1__c!=null}">
+                                            <ui:inputText class="field slds-input" value="{!v.FabricSetup.Material_Lang_1__c}" required="true" />
+                                         </aura:if>
+                                            </td>
+                                   
+                                    
+                                        <td scope="row">
+                                            <aura:if isTrue="{!v.retailerLang.Lang_2__c!=null}">
+                                            <ui:inputText class="field slds-input" value="{!v.FabricSetup.Material_Lang_2__c}" required="true" />
+                                     </aura:if>
+                                            </td>
+                                    
+                                   
+                                        <td scope="row">
+                                             <aura:if isTrue="{!v.retailerLang.Lang_3__c!=null}">
+                                            <ui:inputText class="field slds-input" value="{!v.FabricSetup.Material_Lang_3__c}" required="true" />
+                                     </aura:if>
+                                            </td>
+                                   
+                                 
+                                        <td scope="row">
+                                               <aura:if isTrue="{!v.retailerLang.Lang_4__c!=null}">
+                                            <ui:inputText class="field slds-input" value="{!v.FabricSetup.Material_Lang_4__c}" required="true" />
+                                       </aura:if>
+                                            </td>
+                                        <td scope="row">
+                                            <aura:if isTrue="{!v.retailerLang.Lang_5__c!=null}">
+                                            <ui:inputText class="field slds-input" value="{!v.FabricSetup.Material_Lang_5__c}" required="true" />
+                                          </aura:if>
+                                            </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                   
+                </div>
+            </aura:if>
+            <footer class="slds-card__footer slds-text-align_right">
+                <lightning:button iconName="utility:check" variant="brand" label="{!$Label.c.save}" title="{!$Label.c.save}" onclick="{!c.submitSetup}" disabled="{!v.disableSave}"/>
+            </footer>
+        </aura:if>
+    </article>
+</aura:component>

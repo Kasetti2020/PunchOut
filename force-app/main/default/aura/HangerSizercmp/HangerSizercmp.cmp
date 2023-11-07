@@ -1,0 +1,287 @@
+<aura:component controller="CatalogOrderController"  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <!--Handler -->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!--Attributes -->
+    <aura:attribute name="completeWrap" type="list" />   
+    <aura:attribute name="sizerIndex" type="Integer"/>
+    <aura:attribute name="displayPagination" type="Boolean" />
+    <aura:attribute name="disaplaySizerTxt" type="Boolean" default="false"/>
+    <aura:attribute name="disaplayGloveTxt" type="Boolean" default="false"/>
+    <aura:attribute name="selectedCompany" type="string"/>
+    <aura:attribute name="selectedCurrency" type="string"/>
+    <aura:attribute name="searchedCurrency" type="String"/>
+    <aura:attribute name="selectedColor" type="string"/>
+    <aura:attribute name="selectedSize" type="string"/>
+    <aura:attribute name="colorlist" type="list"/>
+    <aura:attribute name="sizelist" type="list"/>
+    <aura:attribute name="colorSizeDependentList" type="map"/>
+    <aura:attribute name="hangersizer" type="Boolean"/>
+    <aura:attribute name="hangerListDetail" type="Boolean" default="false"/>
+    <aura:attribute name="catalogVertical" type="Boolean"/>
+    <aura:attribute name="selectedSizer"  type="List"/> 
+    <aura:attribute name="selectedSizer1" type="List"/>
+    <aura:attribute name="selectedProduct"  type="map"/> 
+    <aura:attribute name="sizerList"  type="List"/> 
+    <aura:attribute name="deletedRowList" type="List"/>
+    <aura:attribute name="retailerID" type="string"/>
+    <aura:attribute name="onselectcustomeid" type="string"/>
+    <aura:attribute name="flagFamily" type="Boolean" default="true"/>
+    <aura:attribute name="deletedSOLIList" type="List"/>
+    <aura:registerEvent name="CatalogEvent" type="c:CatalogEvent"/>
+    <aura:attribute name="selectedTab" type="string"/>
+    <aura:attribute name="cartDataList" type="List"/>
+    <aura:attribute name="isActive" type="Boolean" default="false" />
+    <aura:attribute name="isSizerQuickview" type="Boolean"/>
+    <aura:attribute name="quickviewSizer" type="Boolean"/>
+    <aura:attribute name="colorChartPriority" type="Boolean"/>
+    <aura:attribute name="customerInfoMagnetPrice" type="string"/>
+    
+
+    <!-- SHOW LOADING SPINNER--> 
+    <lightning:spinner variant="brand" size="large" aura:id="Id_spinner" class="slds-hide" />
+    <aura:if isTrue="{!v.isSizerQuickview}">                
+        <section class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container" style="width:65%;max-width:65%;">
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}">
+                        <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                    </button>
+                    <h2 class="slds-modal__title slds-hyphenate">{!v.selectedProduct.Name}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-grid slds-gutters slds-p-horizontal_medium">
+                        <div class="slds-col slds-size_1-of-2">     
+                            <aura:iteration items="{!v.sizerList}" var="size" indexVar="key">
+                                <aura:if isTrue="{!and(size.Color__c == v.selectedColor, size.Sizer_Print__c == v.selectedSize)}">
+                                    
+                                    <div class="img-zoom-container">
+                                        <div class="img-zoom-container-inner" onmouseenter="{!c.magnify}" onmouseleave="{!c.magnifyleave}">
+                                            <img id="myimage" class="myimage" src="{!size.Product_image_url__c}"/>
+                                        </div>
+                                        <div id="myresult" class="img-zoom-result" aura:id="myresult" style="display:none;"></div>
+                                    </div> 
+                                </aura:if>
+                            </aura:iteration>
+                        </div>
+                        <div class="slds-col slds-size_2-of-3">
+                            <aura:iteration items="{!v.sizerList}" var="size" indexVar="key">
+                        <aura:if isTrue="{!and(size.Color__c == v.selectedColor, size.Sizer_Print__c == v.selectedSize)}">
+                            <div class="slds-tile__detail">
+                                <dl class="slds-list_horizontal slds-wrap">
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small" title="First Label">{!$Label.c.Mainetti_Model_Code}</dt>
+                                    <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small" title="{!size.Name}">{!size.Name}</dd>
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small" title="Second Label">{!$Label.c.Prod_Description}</dt>
+                                    <dd class="slds-item_detail slds-truncate1 slds-m-bottom_x-small" title="Description for second label">{!size.Description__c}</dd>
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small" title="Second Label">{!$Label.c.Customer_Ref_Model}</dt>
+                                    <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small" title="Description for second label">{!size.Customer_Ref_Model__c}</dd>
+                                </dl>
+                            </div>
+                        </aura:if> 
+                    </aura:iteration>                 
+                            <div class="slds-tile__detail">
+                                <dl class="slds-list_horizontal slds-wrap">
+                    <!--If colorChartPriority is true set color chart 1st and size chart 2nd added by raghu on 17/11/2021 starts-->
+                        <aura:if isTrue="{!v.colorChartPriority}">
+                            <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small">{!$Label.c.Color_List} </dt>
+                            <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small" title="Description for first label">
+                                <lightning:select class="label-hidden slds-size_1-of-2" variant="label-hidden" aura:id="colorlist1"  onchange="{! c.onSelectColor }">
+                                    
+                                    <aura:iteration items="{!v.colorlist}" var="value">
+                                        <option value="{!value}" selected="{!value==v.selectedColor}"> {!value}</option>
+                                    </aura:iteration>
+                                </lightning:select></dd>
+                            <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small">{!$Label.c.Size_List}</dt>
+                            <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small">
+                                <lightning:select class="label-hidden slds-size_1-of-2" variant="label-hidden" aura:id="sizelist1" onchange="{!c.onSelectSize}">
+                                    <!--option value="">-NONE-</option-->
+                                    <aura:iteration items="{!v.sizelist}" var="value">
+                                        <option value="{!value}" selected="{!value==v.selectedSize}"> {!value}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </dd>
+                        
+                            <aura:set attribute="else">
+                                <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small">{!$Label.c.Size_List}</dt>
+                            <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small">
+                                <lightning:select class="label-hidden slds-size_1-of-2" variant="label-hidden" aura:id="sizelist" onchange="{!c.onSelectSizeForSizeDepend}">
+                                    <!--option value="">-NONE-</option-->
+                                    <aura:iteration items="{!v.sizelist}" var="value">
+                                        <option value="{!value}" selected="{!value==v.selectedSize}"> {!value}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </dd>
+                            <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small">{!$Label.c.Color_List} </dt>
+                            <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small" title="Description for first label">
+                                <lightning:select class="label-hidden slds-size_1-of-2" variant="label-hidden" aura:id="colorlist" value="RED" onchange="{! c.onSelectColorForSizeDepend }">
+                                    
+                                    <aura:iteration items="{!v.colorlist}" var="value">
+                                        <option value="{!value}" selected="{!value==v.selectedColor}"> {!value}</option>
+                                    </aura:iteration>
+                                </lightning:select></dd>
+                            </aura:set>
+                        </aura:if>
+                        <!--added by raghu on 17/11/2021 ends-->
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_brand" onclick="{!c.close}">{!$Label.c.Cancel}</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+        <aura:set attribute="else">
+            <div class="slds-grid slds-gutters slds-p-horizontal_medium slds-box slds-size_3-of-5" style="margin:1% auto;width:70%;">
+                <div class="slds-col slds-size_1-of-2">
+                    
+                    <aura:iteration items="{!v.sizerList}" var="size" indexVar="key">
+                        <aura:if isTrue="{!and(size.Color__c == v.selectedColor, size.Sizer_Print__c == v.selectedSize)}">
+                            <a class="product-item-photo" style="{!'background:url('+size.Product_image_url__c+')'}" name="{!size.Id}"> 
+                                <!--<img class="product-image-photo" src="{!size.Product_image_url__c}" alt='image' name="{!ind}" onclick="{!c.quickviewcmp}"/>-->
+                            </a>  
+                        </aura:if>
+                    </aura:iteration>
+                </div>
+                <div class="slds-col slds-size_1-of-2">    
+                    <aura:iteration items="{!v.sizerList}" var="size" indexVar="key">
+                        <aura:if isTrue="{!and(size.Color__c == v.selectedColor, size.Sizer_Print__c == v.selectedSize)}">
+                            <div class="slds-tile__detail">
+                                <dl class="slds-list_horizontal slds-wrap">
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small" title="First Label">{!$Label.c.Mainetti_Model_Code}</dt>
+                                    <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small" title="{!size.Name}">{!size.Name}</dd>
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small" title="Second Label">{!$Label.c.Prod_Description}</dt>
+                                    <dd class="slds-item_detail slds-truncate1 slds-m-bottom_x-small" title="Description for second label">{!size.Description__c}</dd>
+                                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small" title="Second Label">{!$Label.c.Customer_Ref_Model}</dt>
+                                    <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small" title="Description for second label">{!size.Customer_Ref_Model__c}</dd>
+                                </dl>
+                            </div>
+                        </aura:if> 
+                    </aura:iteration>
+                    <div class="slds-tile__detail">
+                        <dl class="slds-list_horizontal slds-wrap">
+                    <!--If colorChartPriority is true set color chart 1st and size chart 2nd added by raghu on 17/11/2021 starts-->        
+                            <aura:if isTrue="{!v.colorChartPriority}">
+                            <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small">{!$Label.c.Color_List} </dt>
+                            <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small" title="Description for first label">
+                                <lightning:select class="label-hidden slds-size_1-of-2" variant="label-hidden" aura:id="colorlist1"  onchange="{! c.onSelectColor }">
+                                    
+                                    <aura:iteration items="{!v.colorlist}" var="value">
+                                        <option value="{!value}" selected="{!value==v.selectedColor}"> {!value}</option>
+                                    </aura:iteration>
+                                </lightning:select></dd>
+                            <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small">{!$Label.c.Size_List}</dt>
+                            <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small">
+                                <lightning:select class="label-hidden slds-size_1-of-2" variant="label-hidden" aura:id="sizelist1" onchange="{!c.onSelectSize}">
+                                    <!--option value="">-NONE-</option-->
+                                    <aura:iteration items="{!v.sizelist}" var="value">
+                                        <option value="{!value}" selected="{!value==v.selectedSize}"> {!value}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </dd>
+                        
+                            <aura:set attribute="else">
+                                <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small">{!$Label.c.Size_List}</dt>
+                            <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small">
+                                <lightning:select class="label-hidden slds-size_1-of-2" variant="label-hidden" aura:id="sizelist" onchange="{!c.onSelectSizeForSizeDepend}">
+                                    <!--option value="">-NONE-</option-->
+                                    <aura:iteration items="{!v.sizelist}" var="value">
+                                        <option value="{!value}" selected="{!value==v.selectedSize}"> {!value}</option>
+                                    </aura:iteration>
+                                </lightning:select>
+                            </dd>
+                            <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small">{!$Label.c.Color_List} </dt>
+                            <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small" title="Description for first label">
+                                <lightning:select class="label-hidden slds-size_1-of-2" variant="label-hidden" aura:id="colorlist" value="RED" onchange="{! c.onSelectColorForSizeDepend }">
+                                    
+                                    <aura:iteration items="{!v.colorlist}" var="value">
+                                        <option value="{!value}" selected="{!value==v.selectedColor}"> {!value}</option>
+                                    </aura:iteration>
+                                </lightning:select></dd>
+                            </aura:set>
+                        </aura:if>
+                        <!--added by raghu on 17/11/2021 ends-->
+                            <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small" >{!$Label.c.Enter_a_Quantity}</dt>
+                            <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small" >
+                                <lightning:input type="number"  class="slds-size_1-of-2" variant="label-hidden" aura:id="quantity" placeholder="" name="input1" label="" disabled="{!v.isActive}"/>
+                            </dd>
+                            
+                            <!--<aura:iteration items="{!v.selectedProduct.tempMap}" var="tempValue" indexVar="key">
+                                <aura:if isTrue="{!tempValue.key == v.selectedProduct.selectedColor}">
+                                    <aura:if isTrue="{!tempValue.value.fullboxQty}">
+                                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small">Box Quantity :</dt>
+                                        <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small">{!tempValue.value.boxquantity}</dd>
+                                    </aura:if>
+                                </aura:if>
+                            </aura:iteration>-->
+                            <aura:iteration items="{!v.sizerList}" var="size" indexVar="key">
+                                <aura:if isTrue="{!and(size.Color__c == v.selectedColor, size.Sizer_Print__c == v.selectedSize)}">
+                                    <aura:if isTrue="{!size.Retailer_Code__r.Full_Box_Order__c}">
+                                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small">{!$Label.c.Box_Quantity}</dt>
+                                        <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small">{!size.BOX_QTY__c}</dd>
+                                    </aura:if>
+                                </aura:if>
+                            </aura:iteration>
+                            <aura:if isTrue="{!v.isActive}">
+                                <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small"> <h2 style="color:rgb(164, 31, 52);"><b>{!$Label.c.Note} </b></h2></dt> 
+                                <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small"> <h2 style="color:rgb(164, 31, 52);">{!$Label.c.Selected_Color} + {!$Label.c.Size_combination_already_added} <br></br>{!$Label.c.in_Cart_Go_to_View_Cart_to_update_quantity}</h2></dd>
+                            </aura:if>  
+                            
+                            <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom_x-small slds-m-top_x-small "><aura:if isTrue="{!v.hangersizer}">               
+                                <lightning:button variant="brand" iconName="utility:back"  label="{!$Label.c.Back}" title="{!$Label.c.Back}" onclick="{!c.changeProd}"/>                
+                                </aura:if> </dt>
+                            <dd class="slds-item_detail slds-truncate slds-m-bottom_x-small slds-m-top_x-small"><lightning:button variant="brand" iconName="utility:add" label="{!$Label.c.Add}" class="" onclick="{!c.addToList}" /></dd>
+                        </dl>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+            
+            <aura:if isTrue="{!v.hangerListDetail}">
+                <div class="slds-box slds-p-around_none slds-m-around_medium">
+                    <lightning:card variant="Narrow" title="{!$Label.c.Product_List}">       
+                        <table class="slds-table slds-table_bordered"> 
+                            <tr>
+                                <th>{!$Label.c.Mainetti_Model}</th>
+								<th>{!$Label.c.Customer_Ref_Model}</th>
+                                <th>{!$Label.c.Color}</th>
+                                <th>{!$Label.c.Size}</th>
+                                <th>{!$Label.c.Quantity}</th>
+                                <th style="width:5%;">{!$Label.c.Action}</th>
+                            </tr>
+                            <aura:iteration items="{!v.selectedSizer}" var="val" indexVar="index">
+                                <tr> 
+                                    <td>{!val.prodname}</td>
+									<td>{!val.custRefModel}</td>
+                                    <td>{!val.color}</td>
+                                    <td>{!val.size}</td>
+                                    <td>{!val.quantity}</td>
+                                    <td> 
+                                        <lightning:buttonIcon iconName="utility:close" size="medium" onclick="{!c.removeRow}" name="{!index}" variant="bare" alternativeText="{!$Label.c.Remove}" title="{!$Label.c.Remove}" iconClass="dark"/>
+                                    </td>
+                                </tr>
+                            </aura:iteration>				
+                        </table>
+                        <aura:set attribute="footer">
+                            <div class="slds-grid">
+                                <div class="slds-col slds-size_2-of-4 slds-text-align_left">
+                                     <aura:if isTrue="{!v.disaplaySizerTxt}">
+                                    <h1><b style="color:rgb(164, 31, 52);">{!$Label.c.Please_click_Add_to_Cart_to_add_all_the_selected_Sizers_to_CART} </b></h1>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.disaplayGloveTxt}">
+                                    <h1><b style="color:rgb(164, 31, 52);">{!$Label.c.Please_click_Add_to_Cart_to_add_all_the_selected_Glove_to_CART} </b></h1>
+                                    </aura:if>
+                                </div>
+                                <div class="slds-col slds-size_2-of-4 slds-text-align_right">
+                                    <lightning:button variant="brand" iconName="utility:insert_template"  label="{!$Label.c.ADD_TO_CART}" title="{!$Label.c.ADD_TO_CART}" onclick="{!c.addTocart}"/>
+                                </div>
+                            </div>
+                        </aura:set>
+                    </lightning:card>
+                </div>   
+            </aura:if>
+        </aura:set>
+    </aura:if> 
+</aura:component>

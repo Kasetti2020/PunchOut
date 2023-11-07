@@ -1,0 +1,13 @@
+.THIS .slds-icon-text-default {
+	fill:#29a4ff;
+}
+.THIS input::-webkit-outer-spin-button {
+    display:none;
+}
+
+.THIS input::-webkit-inner-spin-button {
+    display:none;
+}
+.THIS .label-hidden > label {
+    display: none;
+}

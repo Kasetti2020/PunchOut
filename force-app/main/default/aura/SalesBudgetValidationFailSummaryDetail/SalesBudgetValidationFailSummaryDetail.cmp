@@ -1,0 +1,135 @@
+<aura:component controller="SalesBudgetValidationFailSummary" >
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+	<aura:attribute name="rowIndex" type="integer" /> 
+    <aura:attribute name="accordianHeader" type="Object"/>
+    <aura:attribute name="batchNo" type="String"/>
+    <aura:attribute name="batchNumber" type="String"/>
+    
+    <aura:attribute name="expanded" type="String" default="true"/>
+    <aura:attribute name="checkThis" type = "Boolean" default ="true" />
+    
+    <aura:registerEvent name="salesBudgetValidationSummaryEvent" type="c:SalesBudgetValidationFailSummaryEvent" />
+    
+    <!-- Set Accordian header -->
+    <table>
+    <!--<col width="10px"></col>
+    <col width="250px"></col>
+    <col width="20px"></col>
+    <col width="50px"></col>
+    <col width="250px"></col>-->
+    <tr data-index="{!v.rowIndex}" style="background-color:#c6d8f5;">
+        <td>  
+            <button class="slds-button slds-button_neutral" aura:id="toggle" onclick="{!c.toggle}"
+                    value="{!v.checkThis}"  style="padding:0 2px" name="{!v.accordianHeader.picklistValue}"> 
+                <lightning:Icon aura:id="chevronright" iconName="utility:chevronright" size="x-small" />
+                <lightning:Icon class="slds-hide" aura:id="chevrondown" iconName="utility:chevrondown" size="x-small"/>
+            </button> 
+        </td>
+        
+        <th scope="col" style="text-align: center; align: center;padding-right:200px;">
+            <div>
+                <b>{!v.accordianHeader.picklistValue}</b>
+            </div>
+        </th>
+        
+        <!--<td scope="row"  data-label="picklistValue" style="text-align: center; vertical-align: middle;">
+            {!v.accordianHeader.picklistValue}
+        </td>
+        <td scope="row"  data-label="headerNo" style="text-align: center; vertical-align: middle;">
+            {!v.accordianHeader.headerNo}
+        </td>
+        <td scope="row"  data-label="headerErrMessage" style="text-align: center; vertical-align: middle;">
+            {!v.accordianHeader.headerErrMessage}
+        </td>
+        <td scope="row"  data-label="headerErrRecords" style="text-align: center; vertical-align: middle;">
+            {!v.accordianHeader.headerErrRecords}
+        </td>
+        <td scope="row"  data-label="headerErrDetailReport" style="text-align: center; vertical-align: middle;">
+            {!v.accordianHeader.headerErrDetailReport}
+        </td>
+        <td scope="row"  data-label="headerErrDescription" style="text-align: center; vertical-align: middle;">
+            {!v.accordianHeader.headerErrDescription}
+        </td>-->
+    </tr>
+        </table>
+    
+    <tr>
+        <td colspan="12" style="padding-left:34px;border-bottom:1.5px solid gray;">
+            <aura:if isTrue="{!v.expanded}">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="padding:0;border-radius:0;width:100%;align:center;border: 2px solid #f2f2f2;" role="grid">
+                    <thead>
+                        <tr class="slds-text-title_caps">
+                             <th scope="col" class="slds-size_1-of-12" style="text-align: center; align: center;"><div class="slds-truncate"><b>No</b></div></th>
+                            <th scope="col" class="slds-size_3-of-12" style="text-align: center; align: center;padding-left:0px;"><div class="slds-truncate"><b>Error Message</b></div></th>
+                            <th scope="col" class="slds-size_1-of-12" style="text-align: center; align: center;padding-left:0px;"><div class="slds-truncate"><b>Error Records</b></div></th>
+                            <th scope="col" class="slds-size_1-of-12" style="text-align: center; align: center;padding-left:0px;"><div class="slds-truncate"><b>View Error Detail</b></div></th>
+                            <th scope="col" class="slds-size_6-of-12" style="text-align: center; align: center;padding-left:0px;"><div class="slds-truncate"><b>Error Description</b></div></th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody>
+                        <aura:if isTrue="{!not(empty(v.accordianHeader.validationErrorCodeList))}">
+                            <aura:iteration items="{!v.accordianHeader.validationErrorCodeList}" var="errCodeDet" indexVar="row">
+                                <tr class="slds-hint-parent">
+                                    <th scope="col" style="text-align: center; align: center;padding-left:20px;">
+                                        <div>
+                                            <b>{!row+1}</b>
+                                        </div>
+                                    </th>
+                                    
+                                    <th scope="col" style="text-align: left; align: center;padding-left:50px;">
+                                        <div class="wrapword" style="width:260px;">
+                                            <b>{!errCodeDet.errorMessage}</b>
+                                        </div>
+                                    </th>
+                                    <!--<td scope="col"  data-label="errorCode" style="text-align: center; vertical-align: middle;">
+                                    <lightning:textarea name="input4" readonly="true" value="{!errCodeDet.errorMessage}"/>
+                                </td>-->
+                                    
+                                    <aura:if isTrue="{!errCodeDet.errorCount == null}">
+                                        <th scope="col" style="text-align: center; align: center;padding-left:0px;">
+                                            <div>
+                                                <lightning:icon iconName="action:approval" alternativeText="Approved" title="Approved" size="x-small" />
+                                            </div>
+                                        </th>
+                                        <aura:set attribute="else">
+                                            <th scope="col" style="text-align: center; align: center;padding-left:0px;">
+                                                <div>
+                                                    <b>{!errCodeDet.errorCount}</b>
+                                                </div>
+                                            </th>
+                                        </aura:set>
+                                    </aura:if>
+                                    
+                                    <th scope="col" style="text-align: center; align: center;padding-left:0px;">
+                                        <div >
+                                            <b><a href = "{!errCodeDet.errorReportLink}" target="_blank">View Error Detail</a></b>
+                                        </div>
+                                    </th>
+                                    
+                                    <th scope="col" style="text-align: left; align: center;padding-left:50px;">
+                                        <div class="wrapword" style="width:265px;">
+                                            <b>{!errCodeDet.errorDescription}</b>
+                                        </div>
+                                    </th>
+                                    
+                                </tr>
+                            </aura:iteration>
+                            <aura:set attribute="else">
+                                <!--<tr>-->
+                                    <tr>
+                                        <td colspan="5" >
+                                        <div class="slds-text-heading_small slds-text-color_error" align="center" >
+                                            <p>No Errors...</p>
+                                        </div>
+                                        </td>
+                                    </tr>
+                                <!--</tr>-->
+                            </aura:set>
+                        </aura:if>
+                    </tbody>
+                </table>
+            </aura:if>
+        </td>
+    </tr>
+</aura:component>

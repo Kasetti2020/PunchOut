@@ -1,0 +1,332 @@
+<aura:component controller = "POViewPageHandler" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="POLI" type="object"/>
+    <aura:attribute name="itemIndex" type="String" />
+    <aura:attribute name="IsPOLI" type="Boolean" default="false"/>
+    <aura:attribute name="POLIQuantity" type="Integer"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doint}"/>
+    
+    <aura:attribute name="POLIVar" type="Purchase_Order_LineItem__c" default="{'sobjectType':'Purchase_Order_LineItem__c','Id':'','Quantity__c':'','Supply_Quantity__c':''}"/>
+    
+    <div class="exampleHolder">
+        <lightning:spinner aura:id="mySpinner" class="slds-hide"/>
+    </div>
+    
+    <tr class="slds-box"> 
+        <td>
+        </td>
+        <td><div>{!v.POLI.Name}</div> </td>
+        <td><div> {!v.POLI.Customer_Ref_Model__c}</div></td>
+        <td class="slds-text-align_right"><div><ui:outputNumber value="{!v.POLI.Quantity__c}"/></div></td>
+        <td><div> {!v.POLI.Due_Date_TXT__c}</div></td>
+        <td class="slds-text-align_right"><div>{!v.POLI.Selling_Price__c}</div></td>
+        <td><div>{!v.POLI.DEPT_DESC__c} </div></td>
+        <td><div> {!v.POLI.Colour__c}</div></td>
+        <td class="slds-text-align_right"><div>{!v.POLI.Size__c}</div></td>
+        <td class="slds-text-align_right"><div> {!v.POLI.Season__c} </div></td>
+        <td><div>{!v.POLI.LOCN_TXT__c} </div></td>
+        <td><div>{!v.POLI.PLU__c} </div></td>
+        <td><div>{!v.POLI.APN__c} </div></td>
+        <td><div>{!v.POLI.Class__c}</div></td>
+        <td><div>{!v.POLI.Colour__c} </div></td>
+        <td><div> {!v.POLI.Dept__c}</div></td>
+        <td><div> {!v.POLI.STYLE_DESC__c}</div></td>
+        <td><div>{!v.POLI.Style_No__c} </div></td>
+        <td><div> <lightning:formattedDateTime value="{!v.POLI.CreatedDate}" year="numeric" month="numeric" day="numeric" /></div></td>
+        <td><div> <lightning:formattedDateTime value="{!v.POLI.LastModifiedDate}" year="numeric" month="numeric" day="numeric" /></div></td>
+        <td><aura:if isTrue="{!v.POLI.Purchase_Order__r.Status__c == 'Open'}">
+            <lightning:buttonIcon class ="slds-button_neutral1" iconName="utility:edit" variant="bare" value="{!v.POLI.Id}" onclick="{!c.EditPOli}" alternativeText="{!$Label.c.Edit}" />
+            </aura:if></td>
+    </tr>
+    
+    
+    <!-- Model Box Start for POLI-->    
+    <aura:if isTrue="{!v.IsPOLI}">
+        <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <div class="slds-modal__header">
+                    <button class="slds-button slds-modal__close slds-button--icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeModal1}">
+                        X<span class="slds-assistive-text">{!$Label.c.Cancel}</span>
+                    </button>
+                    <h2 id="header43" class="slds-text-heading--medium" style="color:#A41F34">{!$Label.c.Edit}  {!v.POLI.Name}</h2>
+                </div>
+                <!--Force:RecordEditForm -->
+                <div class="c-container slds-media" style="background-color:white">
+                    <div class="slds-media__body slds-box" style="border:0;height:304px;overflow-y:scroll;">
+                        <fieldset class="slds-form-element slds-form-element_compound">
+                            <div class="slds-form-element__control">
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.POLi_Number}" value="{!v.POLI.Name}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Customer_Reference_Model}" value="{!v.POLI.Customer_Ref_Model__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input name="input1" onchange="{!c.validateQty}" label="{!$Label.c.Quantity}" value="{!v.POLI.Quantity__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Original_Quantity}" value="{!v.POLI.Original_Quantity__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Size}" value="{!v.POLI.Size__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Selling_Price}" value="{!v.POLI.Selling_Price__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Colour}" value="{!v.POLI.Colour__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Dept_Desc}" value="{!v.POLI.DEPT_DESC__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Department}" value="{!v.POLI.Dept__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Tag_Job}" value="{!v.POLI.Tag_Job__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Family}" value="{!v.POLI.Family__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Key_Code}" value="{!v.POLI.KD__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Minor_Dept}" value="{!v.POLI.MINOR_DEPT__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.No_of_Pieces_Pack}" value="{!v.POLI.Pieces__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Season}" value="{!v.POLI.Season__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Retailer_Vendor_Phone_Number}" value="{!v.POLI.SUP_PH__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.STATUS}" value="{!v.POLI.Status__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Item_Description}" value="{!v.POLI.PLU__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Location}" value="{!v.POLI.LOCN_TXT__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Style_No}" value="{!v.POLI.Style_No__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Class}" value="{!v.POLI.Class__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Bar_Code}" value="{!v.POLI.APN__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                 
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Priority}" value="{!v.POLI.Priority__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Minor_Dept}" value="{!v.POLI.MINOR_DEPT__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Minor_Dept_Description}" value="{!v.POLI.MINOR_DEPT_DESC__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Private_Label_Description}" value="{!v.POLI.PRIV_LBL_DESC__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Retailer_Vendor_Location_Number}" value="{!v.POLI.SUP_LOCN_IND__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Private_Label_Description}" value="{!v.POLI.Charge_Type__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.Retailer_Vendor_Town}" value="{!v.POLI.Supplier_Town__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Retailer_Vendor_Country}" value="{!v.POLI.Supplier_Country__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element__row">
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">   
+                                                <lightning:input disabled="true" name="input1"  label="{!$Label.c.COUNTRY_OF_ORIGIN}" value="{!v.POLI.Country_Of_Origin_Text__c}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-size_1-of-2">
+                                        <div class="slds-form-element">
+                                            <div class="slds-form-element__control">
+                                                <lightning:input disabled="true" name="input1" label="{!$Label.c.Retailer_Vendor_Street}" value="{!v.POLI.Supplier_Street__c}"/>   
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <lightning:button variant="neutral" label="{!$Label.c.Cancel}" title="{!$Label.c.Cancel}" type="text" onclick="{!c.closeModal1}"/>
+                    <lightning:button variant="brand" label="{!$Label.c.Update}" title="{!$Label.c.Update}" type="submit" onclick="{!c.UpdatePOLI}" />
+                </div>
+                
+                
+                <!-- Ends here -->
+                
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>
+    </aura:if>
+    <!-- Modal Box ends here -->
+</aura:component>

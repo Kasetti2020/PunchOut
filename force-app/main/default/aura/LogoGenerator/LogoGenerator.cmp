@@ -1,0 +1,204 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    <aura:attribute name="size" type="String" default="Yellow-casual-shoes"/>
+    <aura:attribute name="code" type="String" default="Y-shoes"/>
+    <aura:attribute name="des" type="String" default="Use Shoe bags to prevent any stains or mildew"/>
+    <aura:attribute name="FontName" type="String" default="calibri"/> 
+    <aura:attribute name="Fsize" type="integer" default="18"/> 
+    <aura:attribute name="align" type="String" default="center"/> 
+    
+    <aura:attribute name="img" type="String" /> 
+    <aura:attribute name="SelectedFabricArray" type="List"/>
+    <aura:attribute name="ShowLogo" type="boolean" default="false"/>
+    <aura:attribute name="Country" type="String" /> 
+    <aura:attribute name="SelectedInstImage" type="List" />
+    <aura:attribute name="SelectedInstImageClone" type="List" />
+    <aura:attribute name="ExCareIns" type="List"/>
+    <aura:attribute name="FreeText" type="List"/>
+     <aura:attribute name="FreeTextclone" type="List"/>
+    
+    <ltng:require scripts="{!$Resource.html2canvas}" />   
+    
+    <aura:attribute name="ImgHeight" type="integer" default="100"/> 
+    <aura:attribute name="ImgWidth" type="integer" default="100"/> 
+    <aura:attribute name="FWidth" type="integer" default="300"/> 
+    <aura:attribute name="Logo" type="String" />
+    
+    
+   <!-- <aura:registerEvent name="loadMyEvent" type="c:LogoEvent"/>-->
+    
+    <aura:attribute name="Temp" type="string" default="Top"/> 
+    <aura:attribute name="Top" type="integer" />
+    <aura:attribute name="Left" type="integer" default=""/>
+    <aura:attribute name="Top1" type="integer" />
+    <aura:attribute name="Left1" type="integer" default=""/>
+    <aura:attribute name="ImgDev" type="boolean" default="true"/>
+    <aura:attribute name="Dev" type="boolean" default="false"/>
+    
+    
+    <aura:attribute name="DevSize" type="boolean" default="false"/>
+    <aura:attribute name="DevFabric" type="boolean" default="false"/>
+    <aura:attribute name="DevCountry" type="boolean" default="false"/>
+    <aura:attribute name="DevCare" type="boolean" default="false"/>
+     <aura:attribute name="DevCareclone" type="boolean" default="false"/>
+    <aura:attribute name="DevExcare" type="boolean" default="false"/>
+    <aura:attribute name="DevFree" type="boolean" default="false"/> 
+     <aura:attribute name="DevFreeclone" type="boolean" default="false"/>
+    <aura:attribute name="Devlogo" type="boolean" default="false"/>
+     <aura:attribute name="DevViewEdit" type="boolean" default="false"/> 
+    
+    
+      
+    
+    <div class="c-container">
+        <lightning:layout verticalAlign="stretch" multipleRows="true" class="x-large"  horizontalAlign="center">
+           
+            <lightning:layoutItem flexibility="auto" padding="around-small" class="custom-box">
+      
+                <div  id="Print" style="{! 'border: 1px solid grey;text-align:'+ v.align +';background-color: white; width:700px; vertical-align:center;'}">
+                    
+                    
+                    <div class="slds-text-align_left slds-m-left_small slds-text-body_small">
+                        *{!$Label.c.Below_Information} <br/>{!$Label.c.Below_Information_02}
+                    </div>
+                    
+                    
+                    <!-- padding: 20px 110px;<img src="https://ae01.alicdn.com/kf/HTB13hOWcSSD3KVjSZFKq6z10VXas.jpg" style="{!'height:'+ v.ImgHeight+'px;'+'width:'+v.ImgWidth +'px;'}"/> -->
+                    <aura:if isTrue="{!v.Devlogo}">
+                        <div style="{! 'position:relative; left:'+v.Left+'px; top:'+ v.Top +'px;'}">
+                            <img src="{!v.img}" style="max-height: 100px;max-width:100px;" />
+                        </div>
+                    </aura:if>
+                    <!--   <div style="font-family: 'calibri';font-size: 18px;background-color: white;"> -->
+                    <div style="{!'font-family:'+ v.FontName+';'+'font-size:'+ v.Fsize +'px;'+'font-weight:'+ v.FWidth +';position:relative; left:'+ v.Left1 +'px; top:'+ v.Top1 +'px;'}">
+                        <!--<ui:outputText value="{!v.name}" style="height:60px;font-family: 'calibri';font-size: 18px;background-color: white;"/>-->
+                        
+                        <aura:if isTrue="{!v.DevSize}">
+                            <b>{!$Label.c.Size}</b> <br/>
+                            {!v.size} <br/> 
+                        </aura:if>
+                        <aura:if isTrue="{!v.DevFabric}">
+                            <b>  {!$Label.c.FABRIC}</b> <br/>
+                            
+                            <aura:iteration items="{!v.SelectedFabricArray}" var="val" indexVar="index">
+                                
+                                {!val.Component}&nbsp;&nbsp;
+                                {!val.Fabric}&nbsp;&nbsp;
+                                {!val.value} % <br/>
+                                
+                            </aura:iteration>	
+                        </aura:if>
+                        <aura:if isTrue="{!v.DevCountry}">
+                            <b>{!$Label.c.COUNTRY_OF_ORIGIN}</b>  <br/> {!v.Country}<br/> 
+                        </aura:if>
+                        <aura:if isTrue="{!v.DevCare}">
+                            <b>{!$Label.c.CARE_INSTRUCTION_DETAILS}</b>     <br/>
+                            <aura:iteration items="{!v.SelectedInstImage}" var="careInst1">
+                                {!careInst1.group}&nbsp;&nbsp;
+                                {!careInst1.instr} &nbsp;&nbsp;
+                                 <aura:if isTrue="{!careInst1.descr != null}">
+                                <img class="icon-image" src="{!careInst1.descr}" alt='image' name="" style="height:30px;width:50px"/> <br/>
+                                     <aura:set  attribute="else">
+                                        <p></p> &nbsp; &nbsp; &nbsp;
+                                     </aura:set>
+                                </aura:if> 
+                            </aura:iteration>
+                        </aura:if>
+                         <aura:if isTrue="{!v.DevCareclone}">
+                            <b>{!$Label.c.CARE_INSTRUCTION_DETAILS}</b>     <br/>
+                            <aura:iteration items="{!v.SelectedInstImageClone}" var="careInst1">
+                                {!careInst1.group}&nbsp;&nbsp;
+                                {!careInst1.instr} &nbsp;&nbsp;
+                                 <aura:if isTrue="{!careInst1.descr != null}">
+                                <img class="icon-image" src="{!careInst1.descr}" alt='image' name="" style="height:30px;width:50px"/> <br/>
+                                     <aura:set  attribute="else">
+                                        <p></p> &nbsp; &nbsp; &nbsp;
+                                     </aura:set>
+                                </aura:if> 
+                            </aura:iteration>
+                        </aura:if>
+                        <aura:if isTrue="{!v.DevExcare}">
+                            <b>{!$Label.c.EXCARE_INSTRUCTIONS}</b><br/>
+                            <aura:iteration items="{!v.ExCareIns}" var="Care">
+                                {!Care.exCareInstruction}&nbsp;&nbsp;
+                                {!Care.position}  <br/>  
+                                
+                                
+                            </aura:iteration>
+                        </aura:if>
+                        <aura:if isTrue="{!v.DevFree}">
+                            <b>{!$Label.c.FREE_TEXT}</b><br/>
+                            <aura:iteration items="{!v.FreeText}" var="text">
+                                <div style="white-space: pre">  <aura:if isTrue="{!text.StyleNumber != null}"> {!$Label.c.Style_Number} {!text.StyleNumber} </aura:if> </div>
+                                <div style="white-space: pre">   <aura:if isTrue="{!text.RNNumber != null}"> {!$Label.c.RN_Number} {!text.RNNumber}</aura:if></div>
+                                <div style="white-space: pre"> <aura:if isTrue="{!text.LotNumber != null}"> {!$Label.c.Lot_Number} {!text.LotNumber} </aura:if>    </div>           
+                                <div style="white-space: pre"> <aura:if isTrue="{!text.SupplierNumber != null}"> {!$Label.c.Supplier_Number} {!text.SupplierNumber}  </aura:if></div>
+                                <div style="white-space: pre">  <aura:if isTrue="{!text.LabellingCode != null}"> {!$Label.c.Labelling_Code} {!text.LabellingCode}</aura:if></div>
+                                <div style="white-space: pre">  <aura:if isTrue="{!text.PackagingCode != null}"> {!$Label.c.Packaging_Code} {!text.PackagingCode}  </aura:if>  </div>
+                                <div style="white-space: pre"> <aura:if isTrue="{!text.SeasonMonth != null}"> {!$Label.c.Season_Month} {!text.SeasonMonth} </aura:if></div>
+                                <div style="white-space: pre">   <aura:if isTrue="{!text.SeasonYear != null}">   {!$Label.c.Season_Year} {!text.SeasonYear} </aura:if></div>
+                                <div style="white-space: pre"> <aura:if isTrue="{!text.ItemNumber != null}"> {!$Label.c.Item_Number} {!text.ItemNumber} </aura:if></div>
+                                <div style="white-space: pre">   <aura:if isTrue="{!text.Careinstructions != null}"> {!$Label.c.Careinstructions} {!text.Careinstructions}</aura:if></div>
+                            </aura:iteration>
+                        </aura:if>
+                         <aura:if isTrue="{!v.DevFreeclone}">
+                            <b>{!$Label.c.FREE_TEXT}</b><br/>
+                            <aura:iteration items="{!v.FreeTextclone}" var="text">
+                                <div style="white-space: pre">  <aura:if isTrue="{!text.StyleNumber != null}"> {!$Label.c.Style_Number} {!text.StyleNumber} </aura:if> </div>
+                                <div style="white-space: pre">   <aura:if isTrue="{!text.RNNumber != null}"> {!$Label.c.RN_Number} {!text.RNNumber}</aura:if></div>
+                                <div style="white-space: pre"> <aura:if isTrue="{!text.LotNumber != null}"> {!$Label.c.Lot_Number} {!text.LotNumber} </aura:if>    </div>           
+                                <div style="white-space: pre"> <aura:if isTrue="{!text.SupplierNumber != null}"> {!$Label.c.Supplier_Number} {!text.SupplierNumber}  </aura:if></div>
+                                <div style="white-space: pre">  <aura:if isTrue="{!text.LabellingCode != null}"> {!$Label.c.Labelling_Code} {!text.LabellingCode}</aura:if></div>
+                                <div style="white-space: pre">  <aura:if isTrue="{!text.PackagingCode != null}"> {!$Label.c.Packaging_Code} {!text.PackagingCode}  </aura:if>  </div>
+                                <div style="white-space: pre"> <aura:if isTrue="{!text.SeasonMonth != null}"> {!$Label.c.Season_Month} {!text.SeasonMonth} </aura:if></div>
+                                <div style="white-space: pre">   <aura:if isTrue="{!text.SeasonYear != null}">   {!$Label.c.Season_Year} {!text.SeasonYear} </aura:if></div>
+                                <div style="white-space: pre"> <aura:if isTrue="{!text.ItemNumber != null}"> {!$Label.c.Item_Number} {!text.ItemNumber} </aura:if></div>
+                                <div style="white-space: pre">   <aura:if isTrue="{!text.careinstruct != null}"> {!$Label.c.Careinstructions} {!text.careinstruct}</aura:if></div>
+                            </aura:iteration>
+                        </aura:if>
+                    </div>
+                    
+                    
+                </div>
+            </lightning:layoutItem>
+            
+        </lightning:layout>
+    </div>
+   <!-- <lightning:button variant="brand" label="Screenshot" title="Brand action" onclick="{!c.CreateLogo}" />-->
+    
+    
+    
+    <aura:if isTrue="{!v.ShowLogo}">
+        
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeModel }"
+                                          alternativeText="{!$Label.c.Close}"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Logo_View}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <!-- inside popup-->
+                    <center>
+                        <img src='{!v.Logo}' />
+                        
+                    </center>
+                    
+                </div>
+                <footer class="slds-modal__footer">
+                    <!--  <lightning:button variant="brand" label="Download" title="Brand action" onclick="{!c.download}" /> 
+                    <lightning:button variant="brand" label="SaveAttachment" title="Brand action" onclick="{!c.attach}" />-->
+                   
+                    <lightning:button variant="brand" label="{!$Label.c.Close}" title="Brand action" onclick="{!c.closeModel}" />
+                    
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+        
+    </aura:if>
+</aura:component>

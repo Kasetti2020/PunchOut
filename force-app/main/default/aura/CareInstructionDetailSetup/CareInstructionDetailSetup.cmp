@@ -1,0 +1,322 @@
+<aura:component controller="CareLabelMaintenanceService">
+    <aura:attribute name="retailerID" type="String"/>
+    <aura:attribute name="retailerName" type="String"/>
+    <aura:attribute name="productID" type="String"/>
+    <aura:attribute name="parentId" type="Id"/>
+    <aura:attribute name="productName" type="String"/>
+    <aura:attribute name="selctedimages" type="List" />
+    <aura:attribute name="listOfcareinstructComp" type="Care_Instruction_Detail__c[]"/>
+    <aura:attribute name="CareList" type="Care_Instruction_Detail__c[]" default="{ 'sobjectType': 'Care_Instruction_Detail__c',
+                                                                                 'Name': '',
+                                                                                 'Description__c': '',
+                                                                                 'Retailer_Code__c':'',
+                                                                                 'CareInstructLang1__c':'',
+                                                                                 'CareInstructLang2__c':'',
+                                                                                 'CareInstructLang3__c':'',
+                                                                                 'CareInstructLang4__c':'',
+                                                                                 'CareInstructLang5__c':'',
+                                                                                 'Carecode__c':'',
+                                                                                 'Care_Symbol__c':'',                            
+                                                                                 'Symbol_Image__c':'' ,
+                                                                                 'Wash_Instruction_Group__c':''
+                                                                                 }"/>
+    <aura:attribute name="CareInstructionDetail" type="Care_Instruction_Detail__c" default="{ 'sobjectType': 'Care_Instruction_Detail__c',
+                                                                                            'Name': '',
+                                                                                            'Description__c': '',
+                                                                                            'Retailer_Code__c':'',
+                                                                                            'CareInstructLang1__c':'',
+                                                                                            'CareInstructLang2__c':'',
+                                                                                            'CareInstructLang3__c':'',
+                                                                                            'CareInstructLang4__c':'',
+                                                                                            'CareInstructLang5__c':'',
+                                                                                            'Carecode__c':'',
+                                                                                            'Care_Symbol__c':'',                            
+                                                                                            'Symbol_Image__c':'' ,
+                                                                                            'Wash_Instruction_Group__c':''
+                                                                                            }"/>
+    
+    <aura:attribute name="SetupFlag" type="boolean" default="false"/>
+    <aura:attribute name="DataFlag" type="boolean" default="false"/>
+    <aura:attribute name="listOfWashInstruct" type="List"/>
+    <aura:attribute name="fileName" type="String" default="No File Selected.." />
+    <aura:attribute name="ImagefileName" type="String" default="No File Selected.." />
+    <aura:attribute name="Imageid" type="Id"/>
+    
+    <aura:attribute name="lang1Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang2Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang3Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang4Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang5Flag" type="boolean" default="false"/>
+    
+    <aura:attribute name="instruct1" type="String"/>
+    <aura:attribute name="instruct2" type="String"/>
+    <aura:attribute name="instruct3" type="String"/>
+    <aura:attribute name="instruct4" type="String"/>
+    <aura:attribute name="instruct5" type="String"/>
+    <aura:attribute name="isEditOpenModal" type="boolean" default="false"/>
+    <aura:attribute name="isEditImageModal" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="selectedCount" type="integer" default="0"/>
+    <aura:handler name="change" value="{!v.productID}" action="{!c.productChangeEvent}" />
+    <aura:handler name="change" value="{!v.retailerID}" action="{!c.retailerChangeEvent}" />
+    <aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordEvent" action="{!c.handleLookupEvent}"/>
+    <aura:attribute name="spinner" type="boolean" default="false"/>
+    
+    <aura:if isTrue="{!v.spinner}">
+        <lightning:spinner variant="brand" alternativeText="{!$Label.c.Loading}" size="large" />
+    </aura:if>
+    
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="standard:quotes" alternativeText="" size="medium"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>{!$Label.c.Care_Instruction_Detail_setup}</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-3">
+                    <c:CustomLookup recordID="{!v.retailerID}" recordName="{!v.retailerName}" objectAPIName="Retailer_Code__c"  whereCondition ="AND Online_Enquiry__c=true" IconName="standard:account" label="{!$Label.c.Retailer_Code}" />
+                </div>
+                <aura:if isTrue="{!v.retailerID}">
+                    <div class="slds-col slds-size_1-of-3">                    
+                        <!--<c:CustomLookup recordID="{!v.productID}" recordName="{!v.productName}" objectAPIName="Product__c" whereCondition ="{!v.retailerID != null ? 'AND Business_Vertical__c =\'Labels &amp; Tickets\'  AND Id IN (select Product_Unique_ID__c  from Price_Specification_Book_Product__c  where Retailer_Code__c =\''+v.retailerID+'\')':''}" IconName="standard:account" label="Label" /-->
+                        <c:CustomLookup recordID="{!v.productID}" recordName="{!v.productName}" objectAPIName="Product__c" whereCondition ="{!v.retailerID != null ? 'AND Business_Vertical__c =\'Labels &amp; Tickets\' AND Status__c=\'Active\' AND Variable_Data_Product__c=\'Yes\'  AND Id IN (select Product_Unique_ID__c  from Price_Specification_Book_Product__c  where Retailer_Code__c =\''+v.retailerID+'\')':''}" IconName="standard:account" label="{!$Label.c.Label}" />
+                        <!--<c:CustomLookup recordID="{!v.productID}" recordName="{!v.productName}" objectAPIName="Price_Specification_Book_Product__c " whereCondition ="{!v.retailerID!=null ? ' AND Product_Unique_ID__r.Business_Vertical__c =\'Labels &amp; Tickets\' AND Retailer_Code__c =\''+v.retailerID+'\'':''}" IconName="standard:account"  label="Label" /-->
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.productID}">
+                    <div class="slds-col slds-size_1-of-3">
+                        <label class="slds-form-element__label slds-no-flex">{!$Label.c.Wash_Instruction_Group}</label>
+                        <ui:inputSelect class="slds-input" value="{!v.CareInstructionDetail.Wash_Instruction_Group__c}" aura:id="instructid" disabled="" change="{!c.selectingval}" >
+                            <ui:inputSelectOption text="{!$Label.c.None}" label="{!$Label.c.None}" />
+                            <aura:iteration items="{!v.listOfWashInstruct}" var="mat" indexVar="ind">
+                                <ui:inputSelectOption text="{!mat}" label="{!mat}" />
+                            </aura:iteration>
+                        </ui:inputSelect>
+                    </div>
+                </aura:if>
+                
+            </div> 
+            <aura:if isTrue="{!v.DataFlag}">
+                <div class="slds-grid slds-gutters slds-m-top_medium">
+                    <div class="slds-col slds-size_1-of-8" >
+                        <lightning:input label="{!$Label.c.Care_Code}" name="Care Code" value="{!v.CareInstructionDetail.Carecode__c}" aura:id="carecodeid" />
+                    </div>
+                    <div class="slds-col slds-size_5-of-8" >
+                        <lightning:textarea  label="{!$Label.c.Care_Instruction_Description}" name="CareInstructDescription" value="{!v.CareInstructionDetail.Description__c}" aura:id="DesEnid"  required="true" />
+                    </div>
+                    
+                    <div class="slds-col slds-size_1-of-5">
+                        <lightning:input aura:id="fileId" onchange="{!c.handleFilesChange}" type="file" name="file" label="{!$Label.c.Symbol_Image}" multiple="false"/>
+                        <div class="slds-text-body_small slds-text-color_error">{!v.fileName} </div>
+                        <!--use aura:if for show-hide the loading spinner image--> 
+                        <aura:if isTrue="{!v.showLoadingSpinner}">
+                            <div class="slds-text-body_small slds-text-color_error">{!$Label.c.Uploading} 
+                                <img src="/auraFW/resources/aura/images/spinner.gif" class="spinner-img" alt="{!$Label.c.Loading}"/>'
+                            </div>
+                        </aura:if>
+                    </div>
+                </div>	
+                <!-- <div class="slds-col slds-size_1-of-3">
+                            <lightning:input name="CareInstructDescription" value="{!v.CareInstructionDetail.Description__c}"/>
+                        </div-->
+                    <div class="slds-grid slds-gutters slds-wrap slds-m-horizontal_xxx-small">
+                   
+                        <aura:if isTrue="{!v.lang1Flag}">
+                            <div class="slds-col slds-size_1-of-4">                                    
+                               <lightning:textarea name="CareInstructLang1" value="{!v.CareInstructionDetail.CareInstructLang1__c}" required="true"  label="{!v.instruct1}"/>
+                            </div>
+                            
+                        </aura:if>
+                        <aura:if isTrue="{!v.lang2Flag}">
+                            <div class="slds-col slds-size_1-of-4">                                    
+                                <lightning:textarea name="CareInstructLang2" value="{!v.CareInstructionDetail.CareInstructLang2__c}" required="true" label="{!v.instruct2}"/>
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.lang3Flag}">
+                            <div class="slds-col slds-size_1-of-4">                                    
+                                <lightning:textarea name="CareInstructLang3" value="{!v.CareInstructionDetail.CareInstructLang3__c}" required="true" label="{!v.instruct3}" />
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.lang4Flag}">
+                            <div class="slds-col slds-size_1-of-4">                                    
+                                <lightning:textarea name="CareInstructLang4" value="{!v.CareInstructionDetail.CareInstructLang4__c}" required="true" label="{!v.instruct4}" />
+                            </div>
+                        </aura:if>
+                        <aura:if isTrue="{!v.lang5Flag}">
+                            <div class="slds-col slds-size_1-of-4">                                    
+                                <lightning:textarea name="CareInstructLang5" value="{!v.CareInstructionDetail.CareInstructLang5__c}" required="true" label="{!v.instruct5}" />
+                            </div>
+                        </aura:if>
+                    </div>
+                
+                <footer class="slds-card__footer slds-text-align_right">
+                    <aura:if isTrue="{!v.productID}">                    
+                        <lightning:button iconName="utility:edit" variant="brand" label="{!$Label.c.View_and_Edit}" title="Neutral action" onclick="{! c.checkingExist }"/>  
+                     </aura:if>
+                    <lightning:button iconName="utility:check" variant="brand" label="{!$Label.c.save}" title="{!$Label.c.save}" onclick="{!c.submitSetup}" />
+                    <lightning:button iconName="utility:close" variant="brand" label="{!$Label.c.Cancel}" title="{!$Label.c.Cancel}" onclick="{!c.cancelmethod }" />
+                </footer>
+            </aura:if>
+        </div> 
+    </article>
+    <aura:if isTrue="{!v.isEditOpenModal}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{! c.closeBrandModel }"
+                                          alternativeText="{!$Label.c.Close}"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.CARE_INSTRUCTION_DETAILS}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium1" id="modal-content-id-1">
+                    <div class="slds-table slds-table_bordered slds-table_cell-buffer" style="opacity:0.9;">
+                        <table style="">
+                            <thead>
+                                <tr style="text-transform:uppercase;">
+                                     <th scope="col" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;"></div></th>
+                                    <th scope="col" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;">{!$Label.c.Care_Autonumber}</div></th>
+                                    <th scope="col" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;">{!$Label.c.Care_Code}</div></th>
+                                    <th scope="col" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;">{!$Label.c.English} </div></th>
+                                    <aura:if isTrue="{!v.lang1Flag}">
+                                        <th scope="col" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;"><span>{!v.instruct1}</span></div></th> 
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.lang2Flag}">
+                                        <th scope="col" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;"><span>{!v.instruct2}</span></div></th> 
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.lang3Flag}">
+                                        <th scope="col" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;"><span>{!v.instruct3}</span></div></th> 
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.lang4Flag}">
+                                        <th scope="col" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;"><span>{!v.instruct4}</span></div></th> 
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.lang5Flag}">
+                                        <th scope="col" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;"><span>{!v.instruct5}</span></div></th> 
+                                    </aura:if>
+                                    <th scope="col" style=""><div class="slds-truncate" style="color:#16325c;font-weight:bold;">{!$Label.c.Symbol_Image} </div></th>
+                                </tr>
+                            </thead>
+                            <aura:iteration items="{!v.CareList}" var="care" >
+                                <tr>
+                                    <td scope="row">
+                                        <ui:inputRadio aura:id="checkimageNames" value="{!care.selctedimages}" text="{!care.Id}" change="{!c.onchangedSelected}"/>   
+                                    </td> 
+                                      
+                                     <td scope="row">
+                                        <div class="slds-truncate" title="{!care.Care_Code_Id__c}"><ui:inputText value="{!care.Care_Code_Id__c}"  disabled="true" /></div>
+                                      </td>
+                                     <td scope="row">
+                                        <div class="slds-truncate" title="{!care.Carecode__c}"><ui:inputText value="{!care.Carecode__c}"  disabled="true" /></div>
+                                      </td>
+                                    <td scope="row">
+                                        <div class="slds-truncate" title="{!care.Description__c}"><lightning:textarea value="{!care.Description__c}"  /></div>
+                                    </td>
+                                    <aura:if isTrue="{!v.lang1Flag}">
+                                        <td scope="row">
+                                            <div class="slds-truncate" title="{!care.CareInstructLang1__c}"><lightning:textarea value="{!care.CareInstructLang1__c}" /></div>
+                                        </td>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.lang2Flag}">
+                                        <td scope="row">
+                                            <div class="slds-truncate" title="{!care.CareInstructLang2__c}"><lightning:textarea value="{!care.CareInstructLang2__c}" /></div>
+                                        </td>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.lang3Flag}">
+                                        <td scope="row">
+                                            <div class="slds-truncate" title="{!care.CareInstructLang3__c}"><lightning:textarea value="{!care.CareInstructLang3__c}" /></div>
+                                        </td>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.lang4Flag}">
+                                        <td scope="row">
+                                            <div class="slds-truncate" title="{!care.CareInstructLang4__c}"><lightning:textarea value="{!care.CareInstructLang4__c}" /></div>
+                                        </td>
+                                    </aura:if>
+                                    <aura:if isTrue="{!v.lang5Flag}">
+                                        <td scope="row">
+                                            <div class="slds-truncate" title="{!care.CareInstructLang5__c}"><lightning:textarea value="{!care.CareInstructLang5__c}" /></div>
+                                        </td>
+                                    </aura:if>
+                                    <td scope="row">
+                                        <div class="symbol-image">
+                                            <ui:outputRichText value="{!care.Symbol_Image__c}" />
+                                        </div>
+                                    </td>
+                                </tr>
+                            </aura:iteration>
+                        </table>
+                        
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    
+                      <lightning:button variant="brand"
+                                      label="{!$Label.c.DELETE}"
+                                      title="{!$Label.c.DELETE}"
+                                      onclick="{!c.Deleterecord}"/> 
+                    
+                   <lightning:button variant="brand"
+                                      label="{!$Label.c.Delete_Image}"
+                                      title="{!$Label.c.Delete_Image}"
+                                      onclick="{!c.Deleteimagemodel}"/> 
+                    <lightning:button variant="brand"
+                                      label="{!$Label.c.Edit_Image}"
+                                      title="{!$Label.c.Edit_Image}"
+                                      onclick="{!c.Editimagemodel}"/>
+                    <lightning:button variant="brand"
+                                      label="{!$Label.c.Cancel}"
+                                      title="{!$Label.c.Cancel}"
+                                      onclick="{!c.closeBrandModel }"/>
+                    <lightning:button variant="brand"
+                                      label="{!$Label.c.Update}"
+                                      title="{!$Label.c.Update}"
+                                      onclick="{!c.updatingrecord}"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isEditImageModal}">
+        <section class="slds-modal slds-fade-in-open" style="z-index:10001">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{!c.closeimageModel }"
+                                          alternativeText="{!$Label.c.Close}"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Edit_Image}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning:input name="file1" aura:id="fileId1" type="file" label="{!$Label.c.Symbol_Image}" multiple="false" onchange="{! c.handleFilesChange1 }"/>
+                    <!--<lightning:input aura:id="fileId1" onchange="{!c.handleFilesChange1}" type="file" name="file" label="Symbol Image" multiple="false"/>-->
+                    <div class="slds-text-body_small slds-text-color_error">{!v.ImagefileName} </div>
+                    <aura:if isTrue="{!v.showLoadingSpinner1}">
+                        <div class="slds-text-body_small slds-text-color_error">{!$Label.c.Uploading} 
+                            <img src="/auraFW/resources/aura/images/spinner.gif" class="spinner-img" alt="{!$Label.c.Loading}"/>'
+                        </div>
+                    </aura:if>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="brand"
+                                      label="{!$Label.c.save}"
+                                      title="{!$Label.c.save}"
+                                      onclick="{!c.submitSetup1}"/>
+                    <lightning:button variant="brand"
+                                      label="{!$Label.c.Cancel}"
+                                      title="{!$Label.c.Cancel}"
+                                      onclick="{!c.closeimageModel}"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open" style="z-index:10000"></div>    
+    </aura:if>
+</aura:component>

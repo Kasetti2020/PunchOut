@@ -1,0 +1,139 @@
+.THIS .button-custom{
+    background: url(/MagNETFactory/resource/LoginNewIcons_Mcare/Asset1.svg) !important;
+    line-height: 20px;
+	padding: 2px 8px;
+	color: rgba(0,0,0,0);
+	background: rgba(0,0,0,0);
+	border: none;
+	background-repeat: no-repeat !important;
+	margin-left: 110px;
+    background-size: 20px !important;
+    width: 20px;
+}
+.THIS .button-custom.delete{
+    background: url(/MagNETFactory/resource/LoginNewIcons_Mcare/Asset2.svg) !important;
+    line-height: 20px;
+	padding: 2px 8px;
+	color: rgba(0,0,0,0);
+	background: rgba(0,0,0,0);
+	border: none;
+	background-repeat: no-repeat !important;
+	margin-top: -45px;
+    background-size: 20px !important;
+}
+.THIS .button-custom.download{
+    background: url(/MagNETFactory/resource/LoginNewIcons_Mcare/Asset1.svg) !important;
+    line-height: 20px;
+	padding: 2px 8px;
+	color: rgba(0,0,0,0);
+	background: rgba(0,0,0,0);
+	border: none;
+	background-repeat: no-repeat !important;
+	margin-left: 70px;
+    background-size: 20px !important;
+}
+.THIS #modal-heading-01{
+    font-size: 1.5rem;
+}
+.THIS .Banner{
+     width: 100%; 
+     height:300px; 
+}
+.THIS .McareDoc{
+    background: url(/MagNETFactory/resource/McareDocLogov2) !important;
+   	background-repeat: no-repeat !important;
+    background-size: 100% !important;
+	width: calc(30px + 1.2vw);
+	height: calc(30px + 1.2vw);
+	position: absolute;
+	top: 40%;
+}
+
+.THIS .McareDoc2{
+    background: url(/MagNETFactory/resource/McareDocLogo) !important;
+   	background-repeat: no-repeat !important;
+    background-size: 100% !important;
+	width: calc(30px + 1.2vw);
+	height: calc(30px + 1.2vw);
+	position: absolute;
+	top: 40%;
+}
+.THIS .slds-form-element{
+    text-align: center;
+}
+.THIS .upload{
+    display: flex;
+	justify-content: space-between;
+}
+.THIS .slds-file-selector_files .slds-file-selector__text,.THIS .slds-file-selector--files .slds-file-selector__text{
+    color: rgba(0,0,0,0);
+    padding: 80px 20vw;
+}
+.THIS .slds-file-selector__dropzone{
+    width: 600px;
+	position: relative;
+    border: none;
+    margin: -19px 0 0 0;
+}
+.THIS .slds-file-selector__button{
+   	top: calc(5vh - 9em);
+	left: calc(21vw - 10%);
+    color: #20B1E7;
+	border: 2px solid #20b1e7;
+	font-weight: bold;
+	font-size: calc(0.5em + 1vw);
+    width: 16vw;
+}
+.THIS #fileButton lightning-primitive-icon{ 
+    display:none;
+}
+.THIS #fileButton{
+    position: relative;
+    overflow: hidden;
+}
+.THIS #fileBox .slds-modal__content:last-child{
+    padding: 0;
+    height: calc(200px + 10vh);
+}
+.THIS .fileZone{
+    background: url(/MagNETFactory/resource/LoginNewIcons_Mcare/UploadIconv2.jpg) !important;
+    background-repeat: no-repeat !important;
+    background-size: 100% !important;
+	width: 240px;
+	height: 240px;
+    margin: 0 auto;
+}
+@media (min-width: 1483px) and (max-width: 1800px){
+    .THIS .slds-file-selector__button{
+    	left: calc(18vw - 19%);
+        top: -3vw;
+        position: absolute;
+    }
+}
+@media (max-width: 900px){
+    .THIS .slds-file-selector__button{
+    	left: calc(22vw - 10%);
+		position: absolute;
+		margin-top: 62px;
+    }
+}
+@media (min-width: 1800px) and (max-width: 1900px){
+    .THIS .slds-file-selector__button{
+    	left: calc(18vw - 27%);
+        top: -3vw;
+        position: absolute;
+    }
+}
+@media (min-width: 1900px) and (max-width: 2000px){
+    .THIS .slds-file-selector__button{
+    	left: calc(18vw - 33%);
+        top: -3vw;
+        position: absolute;
+    }
+}
+@media (min-width: 1483px){
+    .THIS .button-custom.delete{
+     	margin-top: 0px;  
+        margin-left: 30px;
+    }
+}

@@ -1,0 +1,173 @@
+<aura:component controller="CareLabelMaintenanceService" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+                access="global" >
+    <aura:attribute name="listControllingValues" type="list" default="[]" description="to store controller field values"/>
+    <aura:attribute name="listDependingValues" type="list" default="['--- None ---']" description="to store dependent field values"/>
+    <aura:attribute name="depnedentFieldMap" type="map" description="map to store dependent values with controlling value"/>
+    <aura:attribute name="bDisabledDependentFld" type="boolean" default="true"/> 
+    <aura:attribute name="newflag" type="boolean" default="false"/> 
+    <aura:attribute name="oldflag" type="boolean" default="false"/> 
+      <aura:attribute name="updateflag" type="boolean" default="false"/> 
+     <aura:attribute name="insertflag" type="boolean" default="false"/> 
+    <aura:attribute name="ExCarenewInstructionDetail" type="Excare__c" default="{'sobjectType' : 'Excare__c',
+                                                                                'Name':'',
+                                                                                'Language_1__c':'',
+                                                                                'Language_2__c':'',
+                                                                                'Language_3__c':'',
+                                                                                'Language_4__c':'',
+                                                                                'Language_5__c':''
+                                                                                }"/>
+    
+    <aura:attribute name="ExCareInstructionDetail" type="Excare__c" default="{'sobjectType' : 'Excare__c',
+                                                                             'Name':'',
+                                                                             'Language_1__c':'',
+                                                                             'Language_2__c':'',
+                                                                             'Language_3__c':'',
+                                                                             'Language_4__c':'',
+                                                                             'Language_5__c':''
+                                                                             }"/>
+    <aura:attribute name="controllingFieldAPI" type="string" default="Retailer_Code__c" description="store field API name of Controller field"/>
+    <aura:attribute name="dependingFieldAPI" type="string" default="Description__c" description="store field API name of dependent field"/>
+    <aura:attribute name="retailerID" type="String"/>
+    <aura:attribute name="retailerName" type="String"/>
+    <aura:attribute name="lang1" type="String"/>
+    <aura:attribute name="lang2" type="String"/>
+    <aura:attribute name="lang3" type="String"/>
+    <aura:attribute name="lang4" type="String"/>
+    <aura:attribute name="lang5" type="String"/>
+    <aura:attribute name="lang1Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang2Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang3Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang4Flag" type="boolean" default="false"/>
+    <aura:attribute name="lang5Flag" type="boolean" default="false"/>
+    <aura:attribute name="langnew1" type="String"/>
+    <aura:attribute name="langnew2" type="String"/>
+    <aura:attribute name="langnew3" type="String"/>
+    <aura:attribute name="langnew4" type="String"/>
+    <aura:attribute name="langnew5" type="String"/>
+    <aura:attribute name="lang1newFlag" type="boolean" default="false"/>
+    <aura:attribute name="lang2newFlag" type="boolean" default="false"/>
+    <aura:attribute name="lang3newFlag" type="boolean" default="false"/>
+    <aura:attribute name="lang4newFlag" type="boolean" default="false"/>
+    <aura:attribute name="lang5newFlag" type="boolean" default="false"/>
+    <aura:handler name="change" value="{!v.retailerID}" action="{!c.retailerChangeEvent}" />
+    <aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordEvent" action="{!c.handleLookupEvent}"/>
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="standard:quotes" alternativeText="" size="medium"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>{!$Label.c.Excare_Instruction} </span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-box1 slds-p-around_none1 slds-m-around_medium1">
+            <lightning:layoutItem size="12" padding="around-small">    
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_1-of-3">
+                        <c:CustomLookup recordID="{!v.retailerID}" recordName="{!v.retailerName}" objectAPIName="Retailer_Code__c" whereCondition ="AND Online_Enquiry__c=true" IconName="standard:account" label="{!$Label.c.Retailer_Code}" />
+                    </div>
+                    <!--Dependent Field-->
+                    <div class="slds-col slds-size_1-of-3">
+                         <aura:if isTrue="{!v.retailerID}">
+                        <lightning:select name="dependentFld"
+                                          value="{!v.ExCareInstructionDetail.Description__c}"
+                                          label="{!$Label.c.EXCARE_INSTRUCTIONS}"
+                                          disabled="{!v.bDisabledDependentFld}" aura:id="selectedid" onchange="{!c.selectInstruction}">
+                              <option value="--NONE--">{!$Label.c.None}</option>
+                            <aura:iteration items="{!v.listDependingValues}" var="val" >
+                                <option value="{!val}">{!val}</option>
+                            </aura:iteration>
+                            
+                        </lightning:select>
+                        </aura:if>
+                    </div>
+                    <!-- <div class="slds-col slds-size_1-of-3">
+                         <ui:inputSelect  
+                                          value="{!v.ExCareInstructionDetail.Description__c}"
+                                          label="Excare Instruction"
+                                          disabled="{!v.bDisabledDependentFld}" aura:id="selectedid"           
+                                        onselect="{!c.selectInstruction}">
+                             <aura:iteration items="{!v.listDependingValues}" var="level">
+                                 <ui:inputSelectOption text="{!level}" label="{!level}"/>
+                             </aura:iteration>
+                         </ui:inputSelect>
+                    </div>-->
+                    
+                </div>
+            </lightning:layoutItem>
+            <!--Edit flow-->
+            <aura:if isTrue="{!v.oldflag}">
+                <div class="slds-grid slds-wrap slds-gutters1">
+                    <aura:if isTrue="{!v.lang1Flag}">
+                        <div class="slds-size_1-of-4 slds-p-around_small">
+                            <lightning:input type="text" label="{!v.lang1}"  value="{!v.ExCareInstructionDetail.Language_1__c}"  required="true" />
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.lang2Flag}">
+                        <div class="slds-size_1-of-4 slds-p-around_small">
+                            <lightning:input type="text" label="{!v.lang2}"  value="{!v.ExCareInstructionDetail.Language_2__c}"  required="true" />
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.lang3Flag}">
+                        <div class="slds-size_1-of-4 slds-p-around_small">
+                            <lightning:input type="text" label="{!v.lang3}"  value="{!v.ExCareInstructionDetail.Language_3__c}"  required="true" />
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.lang4Flag}">
+                        <div class="slds-size_1-of-4 slds-p-around_small">
+                            <lightning:input type="text" label="{!v.lang4}"  value="{!v.ExCareInstructionDetail.Language_4__c}"  required="true" />
+                        </div>
+                    </aura:if>
+                    <aura:if isTrue="{!v.lang5Flag}">
+                        <div class="slds-size_1-of-4 slds-p-around_small">
+                            <lightning:input type="text" label="{!v.lang5}"  value="{!v.ExCareInstructionDetail.Language_5__c}"   required="true" />
+                        </div>
+                    </aura:if>
+                </div>
+                 <aura:if isTrue="{!v.updateflag}">
+                <footer class="slds-card__footer slds-text-align_right">
+                    <lightning:button iconName="utility:record_update" variant="brand" label="{!$Label.c.Update}" title="{!$Label.c.Update}" onclick="{!c.submitConfigurations }" />
+                </footer> 
+                </aura:if>
+            </aura:if>
+        </div>
+        <aura:if isTrue="{!v.newflag}">    
+            <div class="slds-grid slds-wrap slds-gutters1">
+                <aura:if isTrue="{!v.lang1newFlag}">
+                    <div class="slds-size_1-of-4 slds-p-around_small">
+                        <lightning:input type="text" label="{!v.langnew1}"  value="{!v.ExCarenewInstructionDetail.Language_1__c}" required="true" />
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.lang2newFlag}">
+                    <div class="slds-size_1-of-4 slds-p-around_small">
+                        <lightning:input type="text" label="{!v.langnew2}"  value="{!v.ExCarenewInstructionDetail.Language_2__c}" required="true" />
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.lang3newFlag}">
+                    <div class="slds-size_1-of-4 slds-p-around_small">
+                        <lightning:input type="text" label="{!v.langnew3}"  value="{!v.ExCarenewInstructionDetail.Language_3__c}" required="true" />
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.lang4newFlag}">
+                    <div class="slds-size_1-of-4 slds-p-around_small">
+                        <lightning:input type="text" label="{!v.langnew4}"  value="{!v.ExCarenewInstructionDetail.Language_4__c}" required="true" />
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.lang5newFlag}">
+                    <div class="slds-size_1-of-4 slds-p-around_small">
+                        <lightning:input type="text" label="{!v.langnew5}"  value="{!v.ExCarenewInstructionDetail.Language_5__c}" required="true" />
+                    </div>
+                </aura:if>
+            </div>
+              <aura:if isTrue="{!v.insertflag}">
+            <footer class="slds-card__footer slds-text-align_right">
+                <lightning:button iconName="utility:check" variant="brand" label="{!$Label.c.save}" title="{!$Label.c.save}" onclick="{!c.submitnewConfigurations }" />
+            </footer>
+            </aura:if>
+        </aura:if>
+    </article>
+</aura:component>

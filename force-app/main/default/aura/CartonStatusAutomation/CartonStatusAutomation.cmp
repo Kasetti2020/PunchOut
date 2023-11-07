@@ -1,0 +1,27 @@
+<aura:component controller="AddRemoveCartonfromTransferNote" implements="flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" >
+   <!-- <aura:attribute name="cartonDetails" type="Carton_Details__c" default="{ 'sobjectType': 'Carton_Details__c','Name': '','Store_User__c':'','Status__c':''}"/>
+   --> <aura:attribute name="profileName" type="String" />
+    <aura:handler name="init" value="{!this}" action="{!c.checkCartonStatus}"/>
+    <aura:attribute name="ShowEditForm" type="Boolean" default = "false" />
+    
+    <h1 class="slds-hide">  {!v.cartonDetails.Status__c} </h1>
+   <aura:if isTrue="{!v.ShowEditForm}">
+        <lightning:recordEditForm recordId="{!v.recordId}" objectApiName="Carton_Details__c" onsuccess="{!c.handleSuccess}">
+            <div class="slds-box">
+               <b> <lightning:outputField fieldName="Name" style="width:600px"/>
+                <lightning:inputField fieldName="Store_User__c" style="width:600px"/>
+                 <lightning:outputField fieldName="Customer_Warehouse_Name__c" style="width:600px"/></b>
+                <lightning:button class="slds-m-top_small" variant="brand" type="submit" name="update Store Id" label="Update Store Id" />
+            </div>
+        </lightning:recordEditForm>
+        <aura:set attribute="else">
+            <lightning:recordViewForm recordId="{!v.recordId}" objectApiName="Carton_Details__c">
+                <div class="slds-box">
+                   <b> <lightning:outputField fieldName="Name" style="width:600px;font-weight:bold"/>
+                    <lightning:outputField fieldName="Store_User__c" style="width:600px;font-weight:bold"/>
+                    <lightning:outputField fieldName="Customer_Warehouse_Name__c" style="width:600px;font-weight:bold"/></b>
+                </div>
+            </lightning:recordViewForm>
+        </aura:set>
+    </aura:if>
+</aura:component>

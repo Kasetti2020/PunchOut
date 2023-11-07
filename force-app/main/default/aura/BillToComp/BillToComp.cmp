@@ -1,0 +1,71 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="billAddress" type="Ship_Bill_Address__c"/>
+    <aura:attribute name="rowIndex" type="Integer"/>
+    <aura:attribute name="errorMessage" type="String"/>
+    <aura:attribute name="billtovalidationflag" type="boolean" />
+    <aura:attribute name="CountryList" type="List"/>
+    <aura:method name="callChild" action="{!c.validatingfeilds}" />
+    <aura:method name="sampleMethod" action="{!c.doAction}" description="Sample method with parameters">
+        <aura:attribute name="param1" type="String" /> 
+        <aura:attribute name="param2" type="String" /> 
+        <aura:attribute name="param3" type="String" /> 
+        <aura:attribute name="param4" type="String" /> 
+        
+    </aura:method>
+    <aura:registerEvent name="appEvent" type="c:DataTransferEvent"/>
+    <ltng:require scripts="{!$Resource.MyJquery}" afterScriptsLoaded="{!c.loadJquery}" />
+    
+    
+    
+    <article class="slds-tile slds-media">
+        <div class="slds-media__figure">
+            <force:inputField value="{!v.billAddress.Is_Default__c}"  change="{! c.selectDefailtBillingAddress }"/>
+            
+        </div>
+        <div class="slds-media__body">
+            
+            <div class="slds-tile__detail">
+                <dl class="slds-list_horizontal slds-wrap">
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Factory_Name}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" variant="label-hidden" value="{!v.billAddress.Factory_Name__c}" required="true"/></dd>
+                    
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Street}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" variant="label-hidden" value="{!v.billAddress.Address_1__c}" required="true"/></dd>
+                    
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.City}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" variant="label-hidden"  value="{!v.billAddress.City__c}" required="true"/></dd>
+                    
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.State}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" variant="label-hidden" value="{!v.billAddress.State__c}" required="true"/></dd>
+                    
+                   	<dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Country}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title="">
+                    <lightning:select name="select" value="{!v.billAddress.Country__c}" variant="label-hidden" class="label-hidden" label="" aura:id="field" required="true" >
+                        <option value=""> {!$Label.c.None_02} </option>
+                        <aura:iteration items="{!v.CountryList}" var="country">
+                            <option value="{!country}" text="{!country}"></option>
+                        </aura:iteration>
+                    </lightning:select>
+                    </dd>
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title="">&nbsp;&nbsp; {!$Label.c.Postal_Code}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" variant="label-hidden" value="{!v.billAddress.Postcode__c}"/></dd>
+                    
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Contact_Name}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" variant="label-hidden" value="{!v.billAddress.Contact__c}" required="true"/></dd>
+                    
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Contact_Number}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" type="tel" variant="label-hidden" maxlength="14" value="{!v.billAddress.Tel_No__c}" required="true"/></dd>
+                    
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Contact_Email}</dt>
+                    <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" variant="label-hidden" type="email" value="{!v.billAddress.Email_Address__c}" required="true"/></dd>
+                    
+                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">&nbsp;&nbsp; {!$Label.c.Action}</dt>
+                    <dd class="slds-item_detail slds-truncate" title=""><a style="color:red;font-size:90%;" onclick="{! c.DeleteIndividualBillAddress }">{!$Label.c.DELETE}</a></dd>
+                    
+                    <!--<lightning:buttonIcon iconName="utility:close" variant="bare"  alternativeText="Settings" />-->
+                </dl>
+            </div>
+        </div>
+    </article>
+    <hr/>
+</aura:component>

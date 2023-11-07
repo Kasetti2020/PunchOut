@@ -1,0 +1,19 @@
+<aura:component access="global" >
+    <aura:attribute name="SOLIlist" type="Object"/>
+    
+    <tr>         
+        <td><div class="slds-truncate">{!v.SOLIlist.Name}</div></td>
+        <td><div class="slds-truncate"> {!v.SOLIlist.Products__r.Name}</div></td>
+        <td class="slds-text-align_right"><div class="slds-truncate"> {!v.SOLIlist.Supply_Quantity__c} </div></td>
+        <td class="slds-text-align_right"><div class="slds-truncate"> {!v.SOLIlist.APN__c}</div></td>
+        <td><div class="slds-truncate"> {!v.SOLIlist.Colour__c}</div></td>
+        <td class="slds-text-align_right"><div class="slds-truncate"> {!v.SOLIlist.Style_No__c}</div></td>
+        <td><div class="slds-truncate"> {!v.SOLIlist.Size__c}</div></td>
+        <!--<td><div class="slds-truncate"> {!v.SOLIlist.Status__c}</div></td>-->
+        <td><div class="slds-truncate"> {!v.SOLIlist.Online_Detail_Status__c}</div></td>
+        <td><div class="slds-truncate"> {!v.SOLIlist.Production_Status__c}</div></td>
+        
+        <td><div class="slds-truncate"> <lightning:formattedDateTime value="{!v.SOLIlist.CreatedDate}" year="numeric" month="numeric" day="numeric" /></div></td> 
+         <td><div class="slds-truncate"> <lightning:formattedDateTime value="{!v.SOLIlist.Expected_Completion_Date__c}" year="numeric" month="numeric" day="numeric" /></div></td> 
+    </tr>    
+</aura:component>

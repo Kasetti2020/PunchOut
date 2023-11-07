@@ -1,0 +1,157 @@
+<aura:component controller="BulkApprovalController" >
+    <aura:attribute name="List" type="Revise_Order__c"/>
+    <aura:attribute name="ReviseLineList" type="object"/>
+     <aura:attribute name="SelectedList" type="List"/>
+     <aura:attribute name="rejectedList" type="List"/>
+    <aura:attribute name="serialCount" type="Integer"/>
+    <aura:attribute name="ApprovalForm" type="Boolean" default="false"/>
+    <aura:attribute name="isconfirmModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="checkClassicOrLightning" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    
+     <aura:attribute name="AdminReviseSOID" type="String"/>
+     <aura:attribute name="SelectedRetailer" type="String"/>
+    <aura:attribute name="SelectedCompanyVal" type="String"/>
+     <aura:attribute name="SelectedCurrencyVal" type="String"/> 
+     <aura:attribute name="Selectedtitle" type="String"/> 
+     <aura:attribute name="toViewReviseReq" type="Boolean" default="false"/>
+    
+      <aura:handler name="CancelLineAdminReviseCmpEvent" event="c:CancelLineAdminReviseCmpEvent" action="{!c.CancelLineAdminReviseCmpEvent}"/>
+    
+    <tr>
+         <td>      
+                <lightning:buttonIcon onclick="{!c.changerequest}" class ="slds-button_neutral1" iconName="utility:record_update" variant="bare" alternativeText="{!$Label.c.Revise_Order}" value ="{!v.List.Id}" name ="{!v.List.Retailer_Code1__r.Name}" title ="{!v.List.Company__c}"   />  
+        </td>
+        <td >
+            <div class="slds-truncate" title="{!$Label.c.SO_Name}"><a onclick="{!c.ApproveForm}">{!v.List.Name}</a></div>
+        </td>
+        <td>
+            <div class="slds-truncate" title="{!$Label.c.MSO}">{!v.List.Mainetti_SO_SC__c}</div>
+        </td>
+        <td>
+            <div class="slds-truncate" title="{!$Label.c.Bill_To_Address_Factory_Name}">{!v.List.Bill_to_Factory__c}</div>
+        </td>
+        <td>
+            <div class="slds-truncate" title="{!$Label.c.Contact_Email}">{!v.List.Supplier_Email__c}</div>
+        </td>
+        <td>
+            <div class="slds-truncate" title="{!$Label.c.Order_to_Company_02}">{!v.List.Company__c}</div>
+        </td>
+        <td>
+            <div class="slds-truncate" title="{!$Label.c.STATUS}">{!v.List.Status__c}</div>
+        </td>
+        <td>
+            <div class="slds-truncate" title="{!$Label.c.Retailer_Code}">{!v.List.Retailer_Code1__r.Name}</div>
+        </td>
+        <td>
+            <div class="slds-truncate" title="{!$Label.c.Revise_Version}">{!v.List.Revise_Version__c}</div>
+        </td>
+        <td>
+            <div class="slds-truncate" title="{!$Label.c.Revise_Order_Created_Date}">{!v.List.Revise_Order_Created_Date__c}</div>
+        </td>
+    </tr>
+    <aura:if isTrue="{!v.ApprovalForm}">
+        <section class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container" style="max-width:90%;min-width:90%;">
+                <header class="slds-modal__header">
+                    <lightning:buttonIcon class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" iconName="utility:close" variant="neutral" onclick="{!c.closeModal }" alternativeText="{!$Label.c.Settings}" />
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate" style="color:rgb(164, 31, 52)">{!$Label.c.Revise_Order_Bulk_Approval}</h2>                
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <div class="slds-box">
+                        <h2 class="box-title" style="width:62px">{!$Label.c.Details}</h2>
+                        <div class="slds-grid">
+                            <div class="slds-col ">
+                                <lightning:input type="text" name="input" label="{!$Label.c.MG_Number}" value="{!v.List.Name}" disabled="true"/>
+                            </div>
+                            <div class="slds-col">
+                                <lightning:input type="text" name="input" label="{!$Label.c.MSO_Number}" value="{!v.List.Mainetti_SO_SC__c}" disabled="true"/>
+                            </div>
+                            <div class="slds-col">
+                                <lightning:input type="text" name="input" label="{!$Label.c.STATUS}" value="{!v.List.Status__c}" disabled="true" />
+                            </div>
+                             <div class="slds-col">
+                                <lightning:input type="text" name="input" label="{!$Label.c.Revision_Number}" value="{!v.List.Revise_Version__c}" disabled="true" />
+                            </div>
+                            <div class="slds-col">
+                                <lightning:input type="text" name="input" label="{!$Label.c.Factory_Internal_No}" value="{!v.List.Factory_Internal_PO__c}" disabled="true" />
+                            </div>
+                            <div class="slds-col">
+                                <lightning:input type="text" name="input" label="{!$Label.c.RETAILER_PO_NO}" value="{!v.List.Order_Number__c}" disabled="true" />
+                            </div>
+                        </div>
+                    </div> 
+                    <div class="slds-box slds-m-top_medium" style="padding:0;">
+                    <div class="slds-grid">
+                        <div class="slds-col slds-size_1-of-8 bg-gray" style="padding-top:5px;">
+                            {!$Label.c.RO}
+                        </div>
+                        <div class="slds-col slds-size_1-of-8 bg-gray" style="padding-top:5px;">
+                            {!$Label.c.WHAT_TO_REVISE}
+                        </div>
+                         <div class="slds-col slds-size_1-of-8 bg-gray" style="padding-top:5px;">
+                           {!$Label.c.Mainetti_Model}
+                        </div>
+                         <div class="slds-col slds-size_1-of-8 bg-gray" style="padding-top:5px;">
+                           {!$Label.c.Color}
+                        </div>
+                        <div class="slds-col slds-size_1-of-8 bg-gray" style="padding-top:5px;">
+                            {!$Label.c.STATUS}
+                        </div>
+                        <div class="slds-col slds-size_1-of-8 bg-gray" style="padding-top:5px;">
+                            {!$Label.c.OLD_VALUES}
+                        </div>
+                        <div class="slds-col slds-size_1-of-8 bg-gray" style="padding-top:5px;">
+                            {!$Label.c.NEW_VALUES}
+                        </div>
+                        <div class="slds-col slds-size_1-of-8 bg-gray" style="padding-top:5px;">
+                            {!$Label.c.APPROVE} <span style="position: relative;top: -2px;left: 4px;"> 
+                            <lightning:helptext content="Please check to approve the Revise Order" class="customIcon"/> </span>
+                        </div>
+                    </div>
+                    <aura:iteration items="{!v.ReviseLineList}" var="option" indexVar="ind">
+                        <c:BulkApprovalForm RORecords="{!option}" rowIndex="{!ind}" SelectedList="{!v.SelectedList}"/>
+                    </aura:iteration>
+                </div>
+                    </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_brand button_brand" onclick="{!c.confirmReviseOrder}">{!$Label.c.Confirm}</button>
+                    <button class="slds-button slds-button_brand button_brand" onclick="{!c.closeModal }">{!$Label.c.Cancel}</button>
+                    
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <aura:if isTrue="{!v.isconfirmModalOpen}">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModel }" alternativeText="{!$Label.c.Close}" variant="bare-inverse" class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Confirm_Approval}</h2>
+                    </header>
+                   	<div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <p><b>{!$Label.c.Approve_RO_s}</b><br/>
+                            <aura:iteration items="{!v.SelectedList}" var="option" indexVar="ind">
+                                {!option}<br/>
+                            </aura:iteration><br/>
+                            <b>{!$Label.c.Rejected_RO_s}</b><br/>
+                            <aura:iteration items="{!v.rejectedList}" var="option" indexVar="ind">
+                                {!option}<br/>
+                            </aura:iteration>
+                        </p>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_brand button_brand" onclick="{!c.SaveReviseOrder}">{!$Label.c.OK}</button>
+                    	<button class="slds-button slds-button_brand button_brand" onclick="{!c.closeModel}">{!$Label.c.Cancel}</button>
+                   	</footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
+    <!-- Modal Box to View revise orders are here -->
+    <aura:if isTrue="{!v.toViewReviseReq}" >
+        <c:ViewAdminReviseRequests AdminReviseSOID="{!v.AdminReviseSOID}" SelectedRetailer="{!v.SelectedRetailer}" SelectedCompanyVal ="{!v.SelectedCompanyVal}" SelectedCurrencyVal ="{!v.SelectedCurrencyVal}"  reasonToCancel ="Revise Order To Company"/>
+    </aura:if>
+</aura:component>

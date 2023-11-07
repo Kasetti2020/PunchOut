@@ -1,0 +1,338 @@
+<aura:component controller="SOController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+     <aura:registerEvent name="CloseLogoEvent" type="c:CloseLogo"/>
+    
+    <aura:attribute name="SelectedRetailerName" type="String" /> 
+    <aura:attribute name="SelectedRetailer" type="String" />  
+    <aura:attribute name="parentcmp" type="Boolean" default="false"/>
+    <aura:attribute name="GetAddress" type="Boolean" default="false"/>
+    <aura:attribute name="HideButtons" type="Boolean" default="true"/>
+    <aura:attribute name="Shipcmp" type="Boolean" default="true"/>
+    <aura:attribute name="DisplayCustDetail" type="String"/>
+    <aura:attribute name="DisplayCartDetail" type="list"/>
+    <aura:attribute name="ImgIndex" type="Integer" />
+    <aura:attribute name="ImgSrc" type="Integer" />
+    <aura:attribute name="QuantCount" type="Integer" default="1"/>
+    <aura:attribute name="CartValue" type="Integer" default="0"/>
+    <aura:attribute name="isOpen" type="boolean" default="false"/>
+    <aura:attribute name="showremarks" type="boolean" default="false"/>
+    
+    <!--Added by Raghu on 12/11/2021-->
+    <aura:attribute name="TotalOrderAmmount" type="Decimal"/>
+    <aura:attribute name="renderTotalAmmount" type="Boolean" default="true"/>
+    <aura:attribute name="CurrencyIso" type="String" />
+    <aura:attribute name="loaded" type="Boolean" default="true"/>
+    <aura:attribute name="ShowPriceInOrder" type="Boolean"/>
+
+    <!--Added by seema -->
+    <aura:attribute name="AddandCone" type="Integer" default="0"/>
+    <aura:attribute name="PlaceorderBtn" type="boolean" default="false"/>
+    <aura:attribute name="confirmdataSection" type="boolean" default="false"/>
+  
+     <!--Attributes for view And edit-->
+     <aura:attribute name="viewCarelabelFlag" type="boolean" default="false"/>
+     <aura:attribute name="itemMasterForView" type="Item_Master__c"/>
+     <aura:attribute name="picvalueForView" type="String[]"/>
+     <aura:attribute name="BrandlistForView" type="List" default="[]"/>
+     <aura:attribute name="sizelistForView" type="List"/>
+     <aura:attribute name="lstcmpnameForView" type="List" default="[]"/>
+     <aura:attribute name="lstfabnameForView" type="List" default="[]"/>
+     <aura:attribute name="lstcountrynameForView" type="List" default="[]"/>
+     <aura:attribute name="selectedcountryForView" type="String" />
+     <aura:attribute name="CareinstructionForView" type="List"/>
+     <aura:attribute name="ExcareinstructionForView" type="List"/>
+     <aura:attribute name="ExcarecmpnameForView" type="List" default="[]"/>
+     <aura:attribute name="viewedCarelabelData" type="Map"/>
+     <aura:attribute name="careLabelSelectedDataList" type="List"/>
+     <aura:attribute name="picvalue" type="String[]"/>
+     <aura:attribute name="selectedBrand" type="string"/>
+     <aura:attribute name="Quantity" type="Integer"/>
+     <aura:attribute name="uomOrder" type="string" default="" />
+     <aura:attribute name="finalviewedCarelabelData" type="Map" default="{}"/>
+     <aura:attribute name="selectedSize" type="string"/>
+     <aura:attribute name="Careinstruction" type="List"/>
+     <aura:attribute name="viewedIndex" type="Integer"/>
+     <aura:attribute name="completeWrap" type="object" />
+     <aura:attribute name="quickviewedProduct" type="Object" />
+     
+     <aura:attribute name="DevSize" type="boolean" default="false"/>
+     <aura:attribute name="DevFabric" type="boolean" default="false"/>
+     <aura:attribute name="DevCountry" type="boolean" default="false"/>
+     <aura:attribute name="DevCare" type="boolean" default="false"/>
+     <aura:attribute name="DevExcare" type="boolean" default="false"/>
+     <aura:attribute name="DevFree" type="boolean" default="false"/>
+     <aura:attribute name="Devlogo" type="boolean" default="false"/> 
+     <aura:attribute name="DevViewEdit" type="boolean" default="true"/> 
+     <aura:attribute name="LogoGeneratorURL" type="String" />
+
+    <aura:attribute name="selectedCurrency" type="String"/>
+    <aura:attribute name="searchedCurrency" type="String"/>
+    <aura:attribute name="selectedTab" type="String"/>
+    <aura:attribute name="saveAs" type="boolean" default="false"/>
+    <aura:attribute name="deletedCLLIIdList" type="List" default="[]"/>
+    
+    <aura:attribute name="MOQ" type="Integer" default="" />
+    <aura:attribute name="fullboxQty" type="boolean" default="false" />
+
+    <aura:attribute name="salesOrderId" type="string"/>
+
+    <aura:if isTrue="{!v.loaded}">
+    <lightning:spinner style="position: fixed" alternativeText="{!$Label.c.Loading}" size="large" />
+    </aura:if>
+    
+    
+    <aura:if isTrue="{!v.confirmdataSection}">
+        <div class="confirmdataSection">
+            <div class="slds-backdrop slds-backdrop_open"></div>
+            <div class="slds-notify_container slds-is-fixed">
+                <div class="slds-notify slds-notify_toast" style="background:white;color:black;padding:1%;">
+                    <!--<span class="slds-icon_container slds-icon-utility-success slds-m-right_small slds-no-flex slds-align-top slds-m-top_xx-small" title="Description of icon when needed">
+                        <lightning:icon iconName="utility:warning" alternativeText="Warning!" title="Warning" />
+                    </span>-->
+                    <div class="slds-notify__content" style="width:100%">
+                        <h2 class="slds-text-heading_x-small" style="font-family:sans-serif;">{!$Label.c.Some_products_are_selected_but_not_added_into_Cart}<br/>
+                            {!$Label.c.Click_OK_to_add_pending_products_to_Cart}<br/>
+                            {!$Label.c.Click_Cancel_to} <span class="slds-text-color_destructive">{!$Label.c.DELETE}</span> {!$Label.c.selected_products_and_proceed_to_create_Order}
+                        </h2>
+                        <div class="slds-m-top_medium slds-text-align_right" style="font-size:86%;">
+                            <lightning:button variant="brand" label="{!$Label.c.OK}" class="slds-m-right_x-small" title="{!$Label.c.OK}" onclick="{!c.confirmdata}"/>
+                            <lightning:button variant="brand" label="{!$Label.c.Cancel}" title="{!$Label.c.Cancel}" onclick="{!c.deleteData}"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </aura:if>
+    
+    <aura:If isTrue="{!v.Shipcmp}">
+        <div class="slds-grid slds-p-around_medium">
+            <div class="slds-col slds-box" style="font-size:11px;">
+                <h2 class="slds-card__header-title slds-p-vertical_small"><b>{!$Label.c.Shopping_Cart}</b></h2>
+                
+                <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_col-bordered1 slds-table_resizable-cols " style="font-size:11px;">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="" scope="col" style="width:15%;">
+                                <div class="slds-truncate" title="Product">{!$Label.c.Product}</div>
+                            </th>
+                            <!--<th class="" scope="col">
+                                <div class="slds-truncate" title="Product">Price Specification Book Product Name</div>
+                            </th>-->
+                            <th class="" scope="col" style="width:5%;"></th>
+
+                            <th class="" scope="col" style="width:38%;">
+                                <div class="slds-truncate" title="Description">{!$Label.c.Description}</div>
+                            </th>
+                            <th class="" scope="col" style="width:12%;">
+                                <div class="slds-truncate" title="Quantity">{!$Label.c.Quantity}</div>
+                            </th>
+                            <!--Added By Bharath on 08/11/2021 starts -->
+                            <aura:if isTrue="{!v.ShowPriceInOrder}">
+                                <th class="" scope="col" style="width:12%;">
+                                    <div class="slds-truncate" title="OrderAmmount">{!$Label.c.Order_Amount}</div>
+                                </th>
+                            </aura:if>
+                             <!--Added By Bharath on 08/11/2021 Ends -->
+                            <aura:if isTrue="{!v.showremarks}">
+                                <th class="" scope="col">
+                                    
+                                    <div class="slds-truncate" title="Quantity">{!$Label.c.remarks}</div>
+                                    
+                                </th> </aura:if>
+                            <th class="slds-text-align_center" scope="col" style="width:5%;">
+                                <div class="slds-truncate" title="Action">{!$Label.c.Action}</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.DisplayCartDetail}" var="cartDetail" indexVar="ind">
+                            <tr class="slds-hint-parent">
+                                <td data-label="Opportunity Name" scope="row">
+                                    <img src="{!cartDetail.Productimage}" alt="Product" width="110"/>
+                                </td>
+                                <td data-label="QuickView">
+                                    <aura:if isTrue="{!v.selectedTab=='Labels &amp; Tickets'}">
+                                        <aura:if isTrue="{!cartDetail.variableDataProduct == 'Yes'}">
+                                            <lightning:buttonIcon iconName="utility:preview" size="large" onclick="{!c.viewCareLabel}" value="{!cartDetail.Id}" name="{!ind}" variant="bare" alternativeText="{!$Label.c.View}" title="{!$Label.c.View}" iconClass="dark"/>
+                                        </aura:if>
+                                    </aura:if>
+                                </td>
+                                <td data-label="Account Name">
+                                    <p><b style="width:140px;display:inline-block;">{!$Label.c.Mainetti_Model_Code} </b><span style="color:#a41f34;">: {!cartDetail.PSBP}</span></p>
+                                    <p class="slds-truncate"><b style="width:140px;display:inline-block;">{!$Label.c.Description} </b>: {!cartDetail.Description} from {!cartDetail.retailerName}</p>
+                                    <!--<aura:if isTrue="{!cartDetail.fullboxQty}">-->
+                                    <p><b style="width:140px;display:inline-block;">{!$Label.c.Color} </b>: {!cartDetail.Color}</p>
+                                    <p><b style="width:140px;display:inline-block;">{!$Label.c.Size} </b>: {!cartDetail.Size}</p>
+                                    <aura:if isTrue="{!cartDetail.fullboxQty}">
+                                        <p><b style="width:140px;display:inline-block;">{!$Label.c.Box_Quantity} </b>: {!cartDetail.boxquantity}</p>
+                                    </aura:if>
+                                    <!--</aura:if>-->
+                                </td>
+                                <td data-label="Close Date" >
+                                    <aura:if isTrue="{!cartDetail.fullboxQty}">
+                                        <lightning:input type="number" name="{!ind}" value="{!cartDetail.Quantity}" onchange="{!c.CalculateBoxQty}"	/>
+                                        <aura:set attribute="else">
+                                            <lightning:input type="number" aura:id="myInput" name="{!ind}" value="{!cartDetail.Quantity}"  onchange="{!c.CalculateBoxQty}"/>
+                                        </aura:set>
+                                    </aura:if>
+                                </td>
+                                <aura:if isTrue="{!v.ShowPriceInOrder}">
+                                    <td>
+                                        <lightning:input type="text" name="{!ind}" value="{!cartDetail.CurrencyIsoCode + cartDetail.BlankString +   cartDetail.TotalPriceByCurrency}"  disabled="true"	/>
+                                    </td>
+                                </aura:if>
+                                <aura:if isTrue="{!v.showremarks}">
+                                    <td data-label="Close Date" >
+                                        <lightning:textarea name="{!ind}" class="text-area" value="{!cartDetail.Remarks}" onchange="{!c.updateRemarks}"/>
+                                    </td>
+                                </aura:if>
+                                 <td data-label="Amount" style="text-align:center;">
+                                    <lightning:buttonIcon name="{!ind}" iconName="utility:delete" size="large" variant="bare" onclick="{!c.deleteProduct}" alternativeText="{!$Label.c.Remove}" />
+                                    
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                        <!--Added By Raghu On 12/11/2021 starts-->
+                    <aura:if isTrue="{!v.ShowPriceInOrder}">
+                        <aura:if isTrue="{!and(v.renderTotalAmmount,v.CartValue)}">
+                        <td class="" scope="col" style="width:15%;"></td>
+                        <th class="" scope="col" style="width:5%;"></th>
+                        <td class="" scope="col" style="width:38%;"></td>
+                        <td class="" scope="col" style="width:12%;"></td>
+                        <td class="" scope="col" style="width:12%;" >
+                             <h1 >{!$Label.c.Total_Order_Ammount}{!v.CurrencyIso}&nbsp;{!v.TotalOrderAmmount}</h1>
+                        </td>
+                        </aura:if>
+                    </aura:if>
+                        <!--Added By Raghu On 12/11/2021 Ends-->
+                    </tbody>
+                </table>
+                <div class="slds-grid">
+                    <div class="slds-col">
+                        <lightning:button class="slds-button slds-button_brand slds-m-top_medium" iconName="utility:shopping_bag" variant="CONTINUE SHOPPING" label="{!$Label.c.CONTINUE_SHOPPING}" title="{!$Label.c.CONTINUE_SHOPPING}" onclick="{! c.BacktoCatalog}"/>
+                    </div>
+                    <div class="slds-col">                        
+                        <aura:if isTrue="{!v.PlaceorderBtn}">
+                            <h3 class="slds-p-top_large"><b style="color:rgb(164, 31, 52);">{!$Label.c.Please_click_Update_Cart_to_proceed}</b></h3>
+                        </aura:if>                        
+                    </div>
+                    <div class="slds-col slds-text-align_right">
+                       <!-- <lightning:button class="slds-button slds-button_brand slds-m-top_medium" iconName="utility:clear" variant="base" label="{!$Label.c.CLEAR_CART}" title="{!$Label.c.CLEAR_CART}" disabled="{! !v.HideButtons}" onclick="{! c.ClearItems }"/> -->
+                        <aura:If isTrue="{!v.DisplayCartDetail.length>0}">
+                            <aura:If isTrue="{!v.HideButtons}">
+                                <lightning:button class="slds-button slds-button_brand slds-m-top_medium" iconName="utility:record_update" variant="UPDATE CART" label="{!$Label.c.UPDATE_CART}" title="{!$Label.c.UPDATE_CART}" onclick="{! c.UpdateCart}"/>
+                                <lightning:button class="{!v.PlaceorderBtn==true?'slds-button slds-button_brand slds-m-top_medium slds-button_disabled':'slds-button slds-button_brand slds-m-top_medium '}" aura:id="placeorder" disabled="{!v.PlaceorderBtn}" iconName="utility:cart" variant="PLACE ORDER" label="{!$Label.c.PLACE_ORDER}" title="{!$Label.c.PLACE_ORDER}" onclick="{! c.placeOrders }" />
+                            </aura:If>   
+                        </aura:If>
+                    </div>
+                    
+                </div>
+                <div>
+                    
+                    
+                </div>
+            </div>
+        </div>        
+        <div class="slds-p-around_small"> 
+            <section class="main-container col1-layout">    
+                <div class="actions"> 
+                </div>
+            </section> 
+        </div>
+    </aura:If>
+    <aura:If isTrue="{!v.GetAddress}">
+        <c:SalesOrderAddressForCatalogOrder AddressPopUpFlag="{!v.GetAddress}" CustomerInfoID="{!v.DisplayCustDetail}" OrderSource="CATALOG" retailerName="{!v.SelectedRetailerName}" retailerCodeId="{!v.SelectedRetailer}"/>
+    </aura:If>
+    <aura:If isTrue="{!v.parentcmp}">
+        <c:CatalogOrder parentcmp="{!v.parentcmp}" SelectedRetailercode="{!v.SelectedRetailer}" SelectedRetailer="{!v.SelectedRetailerName}"/>
+    </aura:If>
+
+     <!--Care Label View/Edit Start -->
+     <aura:if isTrue="{!v.viewCarelabelFlag}">
+        <section role="dialog" class="slds-modal slds-fade-in-open" style="top:50px;">
+            <div class="slds-modal__container" style="height: 100%;width: 90%;max-width: 100%;">
+                <header class="slds-modal__header">
+                    <button onclick="{!c.closeViewCareLabel}" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}">
+                        <lightning:icon iconName="utility:close" size="small" alternativeText="{!$Label.c.Close}" />
+                    </button>
+                    <h2 class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Care_Label_View_Edit}</h2>
+                </header>
+                <div class="slds-modal__content">
+                    <div class="slds-p-left_medium slds-col slds-size_1-of-3">
+                        <div class="slds-grid">
+                            <div class="slds-col slds-size_2-of-5">
+                                <lightning:select aura:id="viewedpicList" value="" label="{!$Label.c.Language}" >      
+                                    <option value="">{!$Label.c.Select_Language}</option>
+                                    <!--option value="">English</option--> 
+                                    <aura:iteration items="{!v.picvalue}" var="s">
+                                        <option value="{!s}">{!s}</option>
+                                    </aura:iteration> 
+                                </lightning:select>
+                            </div>
+                            <div class="slds-col slds-m-horizontal_medium slds-size_2-of-5">
+                                <aura:if isTrue="{!v.fullboxQty}">
+                                    <lightning:input aura:id="viewedQuant" label="{!$Label.c.Box_Quantity +v.viewedCarelabelData.boxquantity}" class="input-qty" placeholder="{!$Label.c.Quantity}"  type="number"  name="" id="Quant" value="{!v.Quantity}"/>
+                                    <aura:set attribute="else"> 
+                                        <lightning:input aura:id="viewedQuant" label="{!$Label.c.Quantity}" class="input-qty" placeholder="{!$Label.c.Quantity}"  type="number"  name="" id="Quant" value="{!v.Quantity}"/>
+                                    </aura:set>
+                                </aura:if>                                 
+                            </div>
+                            <div class="slds-col slds-size_1-of-5">
+                                <lightning:input label="{!$Label.c.UOM}" class="input-qty"  type="string" placeholder="" name="" id="uom" value="{!v.uomOrder}" readonly="true"/>
+                            </div>
+                        </div>				
+                    </div>
+                    <div class="slds-m-around_medium">
+                        <lightning:tabset variant="scoped">
+                            <aura:If isTrue="{!v.itemMasterForView.Brand_Icon__c}">
+                                <lightning:tab label="{!$Label.c.Brand_Icon}" id="1"> 
+                                    <c:CareLabelOrderBrandIcon aura:id="viewCareLabel" Brandlist="{!v.BrandlistForView}"  selectedBrand="{!v.selectedBrand}" viewBrandIcondata="{!v.finalviewedCarelabelData.brandIcondata}" brandIcondata="{!v.viewedCarelabelData.brandIcondata}" attributeVar="sub"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMasterForView.Fabric_Component__c}">
+                                <lightning:tab label="{!$Label.c.Fabric_Component}" id="2">
+                                    <c:CareLabelOrderFabricComponent aura:id="viewCareLabel" lstcmpname="{#v.lstcmpnameForView}" lstfabname="{#v.lstfabnameForView}" selectedArray1="{#v.viewedCarelabelData.FabricSelectedData}" viewedSelectedArray="{!v.finalviewedCarelabelData.FabricSelectedData}" deletedCLLIIdList="{!v.deletedCLLIIdList}" Displayfabval="true"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMasterForView.Size_Chart__c}">
+                                <lightning:tab label="{!$Label.c.Size_Chart}" id="3">
+                                    <c:CareLabelOrderSizeChart aura:id="viewCareLabel" sizelist="{!v.sizelistForView}" selectedSize="{!v.selectedSize}" sizeChartData="{!v.viewedCarelabelData.sizeChartData}" viewSizeChartData="{!v.finalviewedCarelabelData.sizeChartData}"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMasterForView.Country_Of_Origin__c}">
+                                <lightning:tab label="{!$Label.c.COUNTRY_OF_ORIGIN}" id="4">
+                                    <c:CareLabelCountryComponent aura:id="viewCareLabel" lstcountryname="{!v.lstcountrynameForView}" LangCountryList="{!v.LangCountryListForView}" retailerID="{!v.retailerID}" selectedcountry="{#v.viewedCarelabelData.countryOriginData.selectedcountry}" countryOriginData="{!v.viewedCarelabelData.countryOriginData}" viewCountryOriginData="{!v.finalviewedCarelabelData.countryOriginData}"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.Careinstruction.length>0}">
+                                <lightning:tab label="{!$Label.c.CARE_INSTRUCTION_DETAILS}" id="5">
+                                    <c:CareLabelCareInstructionComponent aura:id="viewCareLabel" Careinstruction="{!v.CareinstructionForView}" CareSelectedData="{!v.viewedCarelabelData.CareSelectedData}" vaiwCareSelectedData="{!v.finalviewedCarelabelData.CareSelectedData}"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMasterForView.Excare_Instruction__c}">
+                                <lightning:tab label="{!$Label.c.EXCARE_INSTRUCTIONS}" id="6">
+                                    <c:CareLabelExCareInstructionComponent aura:id="viewCareLabel" Excareinstruction="{!v.ExcareinstructionForView}" exCareSelectedData="{!v.viewedCarelabelData.exCareSelectedDataList}" viewExCareSelectedData="{!v.finalviewedCarelabelData.exCareSelectedDataList}"  deletedCLLIIdList="{!v.deletedCLLIIdList}" Excarecmpname="{!v.ExcarecmpnameForView}"/>
+                                </lightning:tab>
+                            </aura:If>
+                            <aura:If isTrue="{!v.itemMasterForView.Free_Text__c}">
+                                <lightning:tab label="{!$Label.c.FREE_TEXT}" id="7">
+                                    <c:CareLabelOrderFreeText aura:id="viewCareLabel" viewisFreetextmodal="{!v.isFreetextmodal}" freeTextId="{!v.viewedCarelabelData.freetextData.freeTextId}" StyleNumber="{#v.viewedCarelabelData.freetextData.StyleNumber}" RNNumber="{#v.viewedCarelabelData.freetextData.RNNumber}" LotNumber="{#v.viewedCarelabelData.freetextData.LotNumber}" careinstruct="{#v.viewedCarelabelData.freetextData.careinstruct}" freetextData="{!v.viewedCarelabelData.freetextData}" viewFreetextData="{!v.finalviewedCarelabelData.freetextData}" SupplierNumber="{#v.viewedCarelabelData.freetextData.SupplierNumber}" LabellingCode="{#v.viewedCarelabelData.freetextData.LabellingCode}" PackagingCode="{#v.viewedCarelabelData.freetextData.PackagingCode}"  SeasonMonth="{#v.viewedCarelabelData.freetextData.SeasonMonth}" SeasonYear="{#v.viewedCarelabelData.freetextData.SeasonYear}" ItemNumber="{#v.viewedCarelabelData.freetextData.ItemNumber}" itemMaster="{!v.itemMasterForView}"/>
+                                </lightning:tab>
+                            </aura:If>
+                        </lightning:tabset>
+                    </div>
+                    <c:LogoGenerator  img="{!v.viewedCarelabelData.brandIcondata.Image__c}" size="{!v.viewedCarelabelData.sizeChartData.EngSize1__c}" SelectedFabricArray="{!v.viewedCarelabelData.FabricSelectedData}" Country="{!v.viewedCarelabelData.countryOriginData.selectedcountry}" SelectedInstImage="{!v.viewedCarelabelData.CareSelectedData}" ExCareIns="{!v.viewedCarelabelData.exCareSelectedDataList}" FreeText="{!v.viewedCarelabelData.freetextData}" DevCountry="{!v.DevCountry}" DevSize="{!v.DevSize}" DevFabric="{!v.DevFabric}" DevCare="{!v.DevCare}" DevExcare="{!v.DevExcare}" Devlogo="{!v.Devlogo}" DevFree ="{!v.DevFree}" DevViewEdit ="{!v.DevViewEdit}" /> 
+    
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="{!c.newAddAndClone}">{!$Label.c.Save_as}</button>
+                    <button class="slds-button slds-button_neutral" onclick="{!c.closeViewCareLabel}">{!$Label.c.Cancel}</button>
+                    <button class="slds-button slds-button_neutral" onclick="{!c.SubmitViewedCareLabl}">{!$Label.c.OK}</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    <!--Care Label View/Edit End -->
+</aura:component>

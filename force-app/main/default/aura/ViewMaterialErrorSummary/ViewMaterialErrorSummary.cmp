@@ -1,0 +1,189 @@
+<aura:component controller="ViewMaterialErrorSummary"
+    implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global">
+
+
+    <aura:attribute name="accept" type="List" default="['.csv']" />
+    <aura:attribute name="multiple" type="Boolean" default="true" />
+    <aura:attribute name="disabled" type="Boolean" default="false" />
+    <aura:attribute name="train" type="Boolean" default="false" />
+    <aura:attribute name="CreateCheck" type="Boolean" default="true" />
+
+    <aura:attribute name="DataSetId" type="String" default="" />
+    <aura:attribute name="userId" type="String" default="" />
+    <aura:attribute name="fileUrl" type="String" default="" />
+    <aura:attribute name="documentName" type="String" default="" />
+    <aura:attribute name="Message" type="String" default="" />
+    <aura:attribute name="JSONData" type="String[]" default="" />
+    <aura:attribute name="JSONInteger" type="integer[]" default="" />
+
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+    <aura:attribute name="batchId" type="ID" />
+    <aura:attribute name="listOfRecords" type="List" />
+    <aura:attribute name="BatchRecords" type="object" />
+
+
+
+    <lightning:spinner variant="brand" size="large" aura:id="Id_spinner" class="slds-hide" />
+    <aura:attribute name="data" type="Object" />
+    <aura:attribute name="columns" type="List" />
+    <aura:attribute name="data1" type="list" />
+    <aura:attribute name="columns1" type="List" />
+
+    <lightning:layout class="slds-grid_align-center">
+        <lightning:layoutItem size="12">
+
+            <header class="slds-modal__header">
+                <h4 class="slds-card__header-title" style="font-size: 1em">
+                    <tr style="vertical-align:center;;text-align: left;">
+                        <button class="slds-badge" onclick="{!c.backclick}">
+                            <lightning:Icon aura:id="chevronleft" iconName="utility:chevronleft" size="x-small" />
+                        </button>
+                        <b> <span style="font-size:15px;padding-left:15px;">Batch Error Summary</span></b>
+                    <tr style="height:25px"></tr>
+                    <table>
+                        <tr style="height:25px">
+                            <td>
+                                <h2><b>Batch No:</b> </h2>
+                            </td>
+                            <td>
+                                <h2>{!v.BatchRecords.batchNo}</h2>
+                            </td>
+                            <td>
+                                <h2><b>Company:</b> </h2>
+                            </td>
+                            <td>
+                                <h2>{!v.BatchRecords.company}</h2>
+                            </td>
+                            <td>
+                                <h2><b>Error Detail:</b> </h2>
+                            </td>
+                            <td>
+                                <h2><a href="{!'https://mainetti--sandbox03.lightning.force.com/lightning/r/Report/00O9D000000mLpcUAE/view?fv0=' + v.BatchRecords.batchNo}"
+                                        target="_blank">View All Error Report</a></h2>
+                            </td>
+                            <!-- <td><h2><a href = "{!'https://mainetti.lightning.force.com/lightning/r/Report/00O0o00000CSvPWEA1/view?fv0=' + v.BatchRecords.batchNo}" target="_blank">View All Error Report</a></h2></td> -->
+
+                        </tr>
+                        <tr style="height:25px">
+                            <td style="width:130px">
+                                <h2><b>Record Submitted: </b></h2>
+                            </td>
+                            <td>
+                                <h2 class="slds-badge">{!v.BatchRecords.totalRecordCount}</h2>
+                            </td>
+                            <td style="width:100px">
+                                <h2> <b>Year:</b> </h2>
+                            </td>
+                            <td style="width:300px">
+                                <h2>{!v.BatchRecords.year}</h2>
+                            </td>
+                        </tr>
+                        <tr style="height:25px">
+                            <td style="width:130px">
+                                <h2><b>Record Pass: </b></h2>
+                            </td>
+                            <td>
+                                <h2 class="slds-badge slds-theme_success">{!v.BatchRecords.totalSuccesCount}</h2>
+                            </td>
+                            <td>
+                                <h2><b>Month:</b> </h2>
+                            </td>
+                            <td style="width:300px">
+                                <h2>{!v.BatchRecords.month}</h2>
+                            </td>
+                        </tr>
+                    </table>
+                    </tr>
+                </h4>
+            </header>
+            <lightning:tabset variant="scoped">
+                <center>
+                    <lightning:tab label="Missing Field Summary" iconName="utility:connected_apps">
+                        <div class="slds-modal__content slds-p-around_small" style="min-height:45vh;">
+                            <div class="slds" aura:id="spinner">
+                                <lightning:spinner style="position: fixed" alternativeText="Loading" size="large" />
+                            </div>
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered"
+                                style="border: 2px solid #f2f2f2;">
+                                <thead>
+                                    <tr class="slds-line-height_reset">
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="No">No</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="Missing Field">Missing Field</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" style="text-align: left;"
+                                                title="Missing Records">Missing Records</div>
+                                        </th>
+                                        <th class="" scope="col">
+                                            <div class="slds-truncate" title="View Report">View Error Detail</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <aura:if isTrue="{!not(empty(v.listOfRecords))}">
+
+                                        <aura:iteration items="{!v.listOfRecords}" var="IndModelData" indexVar="Ind">
+
+                                            <tr class="slds-hint-parent">
+                                                <td data-label="Model Name" style="width:200px;padding-left:30px">
+                                                    <div>
+                                                        <b>{!Ind+1}</b>
+                                                    </div>
+                                                </td>
+
+                                                <td data-label="Color">
+                                                    <div>
+                                                        <b> {!IndModelData.name}</b>
+                                                    </div>
+                                                </td>
+
+                                                <td data-label="Color" style="padding-left:50px">
+                                                    <div class="slds-text-heading_medium slds-text-color_error">
+                                                        <b>{!IndModelData.count}</b>
+                                                    </div>
+                                                </td>
+
+                                                <th>
+                                                    <div>
+                                                        <b><a href="{!IndModelData.reportLink + 'fv0=' + v.BatchRecords.batchNo}"
+                                                                target="_blank">View Error Detail</a></b>
+                                                    </div>
+                                                </th>
+
+
+                                            </tr>
+
+
+                                        </aura:iteration>
+                                        <aura:set attribute="else">
+                                            <tr>
+                                                <td colspan="4">
+                                                    <div class="slds-text-heading_small slds-text-color_error"
+                                                        align="center">
+                                                        <p>No Missing Fields...</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </aura:set>
+                                    </aura:if>
+                                </tbody>
+                            </table>
+
+                        </div>
+
+                    </lightning:tab>
+                </center>
+                <lightning:tab label="Validation Fail Summary" title="Validation Fail Summary"
+                    iconName="utility:warning">
+                    <c:MaterialUploadValidationFailSummary batchNo="{!v.batchId}"
+                        batchNumber="{!v.BatchRecords.batchNo}" />
+                </lightning:tab>
+            </lightning:tabset>
+
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

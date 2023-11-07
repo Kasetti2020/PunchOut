@@ -1,0 +1,163 @@
+<aura:component controller="BulkApprovalController">
+    
+    <aura:attribute name="RORecords" type="Object"/>
+    <aura:attribute name="rowIndex" type="integer" /> 
+    <aura:attribute name="SelectedList" type="List"/>
+    <aura:attribute name="shipto" type="Boolean" default="false"/>
+    <aura:attribute name="shipdate" type="Boolean" default="false"/>
+    <aura:attribute name="quantity" type="Boolean" default="false"/>
+    <aura:attribute name="cancel" type="Boolean" default="false"/>
+    <aura:attribute name="cancelLineItem" type="Boolean" default="false"/>
+    <aura:attribute name="shippingmark" type="Boolean" default="false"/>
+    <aura:attribute name="forwarder" type="Boolean" default="false"/>
+    <aura:attribute name="Factory" type="Boolean" default="false"/>
+    <aura:attribute name="options" type="List" default="[]"/>
+    <aura:attribute name="value" type="List" default="option1"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div class="slds-grid slds-border-bottom">
+        <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Name}"/></div>
+        <div class="slds-col slds-size_1-of-8">{!v.RORecords.RO.What_to_Revise__c}</div>
+        <aura:if isTrue="{!v.shipto}">
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Status__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Bill_to_Ship_to_Address__r.Name}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Bill_to_Ship_to_Address__r.Name}"/></div>
+        </aura:if>
+        <aura:if isTrue="{!v.shipdate}">
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Status__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Expected_Delivery_Date__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Expected_Delivery_Date__c}"/></div>
+        </aura:if>
+        <aura:if isTrue="{!v.Factory}">  
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Status__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Factory_Internal_PO__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Factory_Internal_PO__c}"/></div>
+        </aura:if>
+        <aura:if isTrue="{!v.quantity}">  
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Customer_Refe_Model__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Color__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Status__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Quantity__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Quantity__c}"/></div>
+        </aura:if>
+        <aura:if isTrue="{!v.shippingmark}">  
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Status__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Shipping_Mark__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Shipping_Mark__c}"/></div>
+        </aura:if>
+        <aura:if isTrue="{!v.forwarder}">  
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Status__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Forwarder_Transportation_Details__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Forwarder_Transportation_Details__c}"/></div>
+        </aura:if>
+        <!--<aura:if isTrue="{!v.cancelLineItem}"> 
+         <div class="slds-col slds-size_1-of-8">2<lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Customer_Refe_Model__c}"/></div>
+            <div class="slds-col slds-size_1-of-8">1<lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Color__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Status__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Quantity__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Quantity__c}"/></div>
+        </aura:if>-->
+        <aura:if isTrue="{!v.cancel}"> 
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Status__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"> </div>
+            <div class="slds-col slds-size_1-of-8"> </div>
+            <div class="slds-col slds-size_1-of-8">
+                <ui:inputCheckbox class="slds-m-top_x-small" aura:id="checkbox" text="{!v.RORecords.RO.Id}" value="" change="{!c.handleChange}"/>
+            </div>
+            <aura:set attribute="else">
+                <div class="slds-col slds-size_1-of-8">
+                    <ui:inputCheckbox class="slds-m-top_x-small" aura:id="checkbox" text="{!v.RORecords.RO.Id}" value="" change="{!c.handleChange}"/>
+                </div>
+            </aura:set>
+        </aura:if>
+        
+    </div>
+    
+    <aura:if isTrue="{!v.shipto}">
+        <div class="slds-grid">
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Ship_to_Address1__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Ship_to_Address1__c}"/></div>
+        </div>
+        <div class="slds-grid">
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Ship_to_Company__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Ship_to_Company__c}"/></div>
+        </div>
+        <div class="slds-grid">
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Ship_to_City__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Ship_to_City__c}"/></div>
+        </div>
+        <div class="slds-grid">
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Ship_to_State__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Ship_to_State__c}"/></div>
+        </div>
+        <div class="slds-grid">
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div> 
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Ship_to_Country__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Ship_to_Country__c}"/></div>
+        </div>
+        <div class="slds-grid">
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div> 
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Ship_to_Postcode__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Ship_to_Postcode__c}"/></div>
+        </div>
+        <div class="slds-grid">
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Ship_to_Tel__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Ship_to_Tel__c}"/></div>
+        </div>
+        <div class="slds-grid">
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div> 
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"></div>  
+            <div class="slds-col slds-size_1-of-8"> <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.Old_Ship_to_Email__c}"/></div>
+            <div class="slds-col slds-size_1-of-8"><lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!v.RORecords.RO.New_Ship_to_Email__c}"/></div>
+        </div>
+        
+    </aura:if>
+</aura:component>

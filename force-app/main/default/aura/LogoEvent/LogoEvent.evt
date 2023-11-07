@@ -1,0 +1,12 @@
+<aura:event type="COMPONENT" description="Event template" >
+    
+    <aura:attribute name="Imge" type="String" />
+    <aura:attribute name="Size" type="String" />
+    <aura:attribute name="FabricArray" type="List"/>
+    <aura:attribute name="Country" type="String"/>
+    <aura:attribute name="SelectedInstImage" type="List"/>
+    <aura:attribute name="ExCareIns" type="List"/>
+    <aura:attribute name="FreeText" type="List"/>
+    <aura:attribute name="LogoGeneratorURL" type="String" />
+    
+</aura:event>

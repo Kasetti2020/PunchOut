@@ -1,0 +1,49 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="InvoiceToAddress" type="Ship_Bill_Address__c"/>
+    <aura:attribute name="rowIndex" type="Integer"/>
+      <aura:attribute name="invoicetovalidationflag" type="boolean" />
+     <aura:registerEvent name="appEvent" type="c:DataTransferEvent"/>
+    <aura:method name="InvoicecallChild" action="{!c.validatingfeilds}" />
+   <aura:attribute name="CountryList" type="List"/>
+    
+    <article class="slds-tile slds-media">
+            <div class="slds-media__figure">
+                <force:inputField value="{!v.InvoiceToAddress.Is_Default__c}"  change="{! c.selectDefailtInvoiceToAddress}"/>
+            </div>
+            <div class="slds-media__body">                
+                <div class="slds-tile__detail">
+                    <dl class="slds-list_horizontal slds-wrap">
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Factory_Name}</dt>
+                        <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""> <lightning:input aura:id="field" required="true" variant="label-hidden" value="{!v.InvoiceToAddress.Factory_Name__c}"/></dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Street}</dt>
+                        <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" required="true" variant="label-hidden" value="{!v.InvoiceToAddress.Address_1__c}"/></dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.City}</dt>
+                        <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" required="true" variant="label-hidden" value="{!v.InvoiceToAddress.City__c}"/></dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.State}</dt>
+                        <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" required="true" variant="label-hidden" value="{!v.InvoiceToAddress.State__c}"/></dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Country}</dt>
+                        <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title="">
+                            <lightning:select name="select" label="" class="hide-label" aura:id="field" required="true"  value="{!v.InvoiceToAddress.Country__c}" messageWhenValueMissing="Complete this field.">
+                                <option value="">-- {!$Label.c.None} --</option>
+                                <aura:iteration items="{!v.CountryList}" var="country">
+                                    <option value="{!country}" text="{!country}"></option>
+                                </aura:iteration>
+                            </lightning:select>
+                        </dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title="">&nbsp;&nbsp; {!$Label.c.Postal_Code}</dt>
+                        <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input variant="label-hidden" value="{!v.InvoiceToAddress.Postcode__c}"/></dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Contact_Name}</dt>
+                        <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input variant="label-hidden" aura:id="field" required="true"  value="{!v.InvoiceToAddress.Contact__c}"/></dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Contact_Number}</dt>
+                        <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" required="true" type="tel" variant="label-hidden" maxlength="14" value="{!v.InvoiceToAddress.Tel_No__c}" /></dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate slds-m-bottom--x-small" title=""><span style="color:red;">* </span>{!$Label.c.Contact_Email}</dt>
+                        <dd class="slds-item_detail slds-truncate slds-m-bottom--x-small" title=""><lightning:input aura:id="field" required="true" variant="label-hidden" type="email" value="{!v.InvoiceToAddress.Email_Address__c}"/></dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">&nbsp;&nbsp; {!$Label.c.Action}</dt>
+                        <dd class="slds-item_detail slds-truncate" title=""><a style="color:red;font-size:90%;" onclick="{! c.DeleteIndividualInvoiceToAddress }">{!$Label.c.DELETE}</a></dd>
+                        <!--<lightning:buttonIcon iconName="utility:close" variant="bare"  alternativeText="Settings" />-->
+                    </dl>
+                </div>
+				</div>
+				</article>
+				<hr/>
+</aura:component>

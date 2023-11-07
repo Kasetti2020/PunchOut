@@ -1,0 +1,96 @@
+<aura:component controller="BulkApprovalController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="List" type="Revise_Order__c"/>
+     <aura:attribute name="ListWrapper" type="object"/>
+    <aura:attribute name="page" type="integer"/>
+    <aura:attribute name="pages" type="integer"/>
+    <aura:attribute name="total" type="integer"/>
+    <aura:attribute name="searchText" type="String" default=""/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:handler event="c:PageChange" action="{!c.pageChange}"/>
+    <aura:handler name="searchEvent" event="c:GlobalSearchEvent" action="{!c.handleSearchEvent}"/>
+    
+    <div class="slds-card slds-box">
+        <div class="slds-page-header slds-page-header_record-home">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <span class="slds-icon_container slds-icon-standard-opportunity">
+                                <lightning:icon iconName="standard:record" size="small" />
+                            </span>
+                        </div>
+                        <div class="slds-media__body">
+                            <div class="slds-page-header__name">
+                                <div class="slds-page-header__name-title">
+                                    <h1>
+                                        <span class="slds-page-header__title slds-truncate" title="{!$Label.c.Revise_Sales_Orders}">{!$Label.c.Revise_Sales_Orders}</span>
+                                    </h1>
+                                </div>
+                            </div>
+                        </div>     
+                    </div>
+                </div>
+                 <div class="slds-no-flex slds-m-right_medium">
+                    <lightning:button variant="brand" label="{!$Label.c.Return_To_SO}" iconName="utility:back" iconPosition="left" onclick="{!c.backToSO}"/>
+                </div>
+                <div class="slds-page-header__col-actions">
+                    <div class="slds-page-header__control">
+                        <c:GlobalSearch searchType="BulkApproval"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="slds-card__body">
+            <div class="table-scroll">
+                <!--<table class="slds-table slds-table"> -->
+                <table class="{!v.tablesizeExpand?'slds-table slds-table1 1':'slds-table slds-table2 2'}">
+                    <thead>
+                        <tr class="slds-text-title_caps slds-gray">
+                              <th style="width: 2.5%;"><div class="slds-truncate"></div></th>
+                            <th scope="col" >
+                                <div class="slds-truncate" title="{!$Label.c.Sales_Order}">{!$Label.c.MAGNET_ORDER_NO}</div>
+                            </th>
+                            <th scope="col" >
+                                <div class="slds-truncate" title="{!$Label.c.MSO}">{!$Label.c.MSO}</div>
+                            </th>
+                            <th scope="col" >
+                                <div class="slds-truncate" title="{!$Label.c.Bill_To_Factory}">{!$Label.c.Bill_To_Factory}</div>
+                            </th>
+                            <th scope="col" >
+                                <div class="slds-truncate" title="{!$Label.c.Contact_Email}">{!$Label.c.Contact_Email}</div>
+                            </th>
+                            <th scope="col" >
+                                <div class="slds-truncate" title="{!$Label.c.Order_to_Company_02}">{!$Label.c.Order_to_Company_02}</div>
+                            </th>
+                            <th scope="col">
+                                <div class="slds-truncate" title="{!$Label.c.Order_Status}">{!$Label.c.Order_Status}</div>
+                            </th>
+                            <th scope="col" >
+                                <div class="slds-truncate" title="{!$Label.c.Retailer_Code}">{!$Label.c.Retailer_Code}</div>
+                            </th>
+                            <th scope="col" >
+                                <div class="slds-truncate" title="{!$Label.c.Revision}">{!$Label.c.Revision} </div>
+                            </th>
+                            <th scope="col" >
+                                <div class="slds-truncate" title="{!$Label.c.RO_CreatedDate}">{!$Label.c.RO_CreatedDate}</div>
+                            </th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.List.ROList}" var="item" indexVar="i">
+                            <c:AdminReviseOrderChild List="{!item}"  serialCount="{!i+1}"/> 
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+            {!V.body}
+        </div>
+        <footer class="slds-card__footer footer">
+            <div class="slds-text-align_center">
+                <c:PaginationComponentForInventory page="{!v.page}" pages="{!v.pages}" total="{!v.total}" txt="{!v.searchText}"/>
+            </div>
+        </footer>
+    </div>
+</aura:component>

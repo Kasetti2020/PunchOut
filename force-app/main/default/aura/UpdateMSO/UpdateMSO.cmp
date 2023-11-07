@@ -1,0 +1,106 @@
+<aura:component controller="SOController" implements="force:lightningQuickAction,force:lightningQuickActionWithOutHeader,force:hasRecordId">
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    <aura:attribute name="MSONumber" type="String"/>
+    <aura:attribute name="ExpComDate" type="String"/>
+    <aura:attribute name="ExpDelDate" type="String"/>
+    
+    <aura:attribute name="isLightning" type="Boolean" default="false"/>
+    <aura:attribute name="isClassic" type="Boolean" default="false"/>
+    <aura:attribute name="message" type="String"/>  
+    <aura:attribute name="ristrict" type="Boolean" default ="false"/>
+    
+    <ltng:require styles="{!$Resource.modalclose}"/>
+    
+    <aura:if isTrue="{!v.isLightning}">
+        <aura:if isTrue="{!v.ristrict}">
+            <div class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container slds-size_1-of-1" >
+                    <header class="slds-modal__header">
+                        <h2 class="slds-modal__title slds-hyphenate" style="color:#a41f34;">{!$Label.c.Update_MSO}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <div class="slds-align_absolute-center">
+                            <p> {!v.message} </p>
+                            <br/><br/><br/>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_brand" onclick="{!c.closeModal}">{!$Label.c.Cancel}</button>
+                    </footer>
+                </div>
+            </div>
+            <aura:set attribute="else">
+                <div class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container slds-size_1-of-1" >
+                        <header class="slds-modal__header">
+                            <h2 class="slds-modal__title slds-hyphenate" style="color:#a41f34;">{!$Label.c.Update_MSO}</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium">
+                            <div style="width:70%;margin:0 auto;">
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col">
+                                        <lightning:input type="text" class="slds-text-align_left" name="input" label="{!$Label.c.MSO_Number}" placeholder="{!$Label.c.MSO_Number02}" value="{!v.MSONumber}" />
+                                    </div>
+                                    <div class="slds-col">
+                                        <lightning:input type="date" class="slds-text-align_left" name="input" label="{!$Label.c.Expected_Completion_Date02}" placeholder="{!$Label.c.Expected_Completion_Date}" value="{!v.ExpComDate}" onchange="{!c.onchangedate}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <button class="slds-button slds-button_brand" onclick="{!c.submit}">{!$Label.c.Submit}</button>
+                            <button class="slds-button slds-button_brand" onclick="{!c.closeModal}">{!$Label.c.Cancel}</button>
+                        </footer>
+                    </div>
+                </div>
+            </aura:set>
+        </aura:if>        
+    </aura:if>    
+    <aura:if isTrue="{!v.isClassic}">
+        <aura:if isTrue="{!v.ristrict}">
+            <div class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container slds-size_1-of-1" >
+                    <header class="slds-modal__header">
+                        <h2 class="slds-modal__title slds-hyphenate" style="color:#a41f34;">{!$Label.c.Update_MSO}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <div class="slds-align_absolute-center">
+                            <p> {!v.message} </p>
+                            <br/><br/><br/>
+                        </div>
+                        
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_brand" onclick="{!c.closeModalClassic}">{!$Label.c.Cancel}</button>
+                    </footer>
+                </div>
+            </div>
+            <aura:set attribute="else">
+                <div class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container slds-size_1-of-1" >
+                        <header class="slds-modal__header">
+                            <h2 class="slds-modal__title slds-hyphenate" style="color:#a41f34;">{!$Label.c.Update_MSO}</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium">
+                            <div style="width:60%;margin:0 auto;">
+                                <div class="slds-grid slds-gutters">
+                                    <div class="slds-col">
+                                        <lightning:input type="text" class="slds-text-align_left" name="input" label="{!$Label.c.MSO_Number}" placeholder="{!$Label.c.MSO_Number02}" value="{!v.MSONumber}" />
+                                    </div>
+                                    <div class="slds-col">
+                                        <lightning:input type="date" class="slds-text-align_left" name="input" label="{!$Label.c.Expected_Completion_Date02}" placeholder="{!$Label.c.Expected_Completion_Date}" value="{!v.ExpComDate}" onchange="{!c.onchangedateclassic}" />
+                                    </div>
+                                </div>                                                                
+                            </div>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <button class="slds-button slds-button_brand" onclick="{!c.submitClassic}">{!$Label.c.Submit}</button>
+                            <button class="slds-button slds-button_brand" onclick="{!c.closeModalClassic}">{!$Label.c.Cancel}</button>
+                        </footer>
+                    </div>
+                </div>
+            </aura:set>
+        </aura:if>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+</aura:component>

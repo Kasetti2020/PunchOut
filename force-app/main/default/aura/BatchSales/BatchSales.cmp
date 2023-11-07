@@ -1,0 +1,211 @@
+<aura:component controller="uploadSales">
+    <aura:method name="batchSales" action="{!c.viewError}" description="Batch Detail Method with BatchId as parameter"> 
+        <aura:attribute name="batchId" type="String" default="parameter1"/>        
+    </aura:method>    
+    <aura:attribute name="data" type="object"/>
+    <aura:attribute name="listItems" type="list" default="['Family' , 'Vendor']"/>
+    <aura:attribute name="errordata" type="Sales_Transaction_Stage__c[]" default="{'sobjectType':'Sales_Transaction_Stage__c','ErrorMapData__c': ''}"/>
+    <aura:attribute name="flag" type="Boolean" default="false"/>
+    <aura:attribute name="erroMapFlag" type="Boolean" default="false"/>
+    <aura:method name="rerenderList" action="{!c.viewError}" description="Using this method to refresh the component"/>
+    <aura:attribute name="salesProceedBatchId" type="String"/>
+    <aura:attribute name="proceedStatus" type="boolean" default="false"/>
+    
+    <aura:attribute name="recordIdForRefresh" type="String"/>
+    <aura:attribute name="noRows" type="boolean" default="false"/>
+    <aura:attribute name="companyWeekStatus" type="boolean" default="false"/>
+    <aura:attribute name="messageProceedStatus" type="boolean" default="false"/>
+    <aura:attribute name="openFileDataSubmitted" type="Boolean" default="false"/>
+    
+    <!--declare attributes--> 
+    <aura:attribute name="selectedRecord" type="Sales_Error_Mapping__c" default="{}" description="Use,for store SELECTED sObject Record"/>
+    <aura:attribute name="listOfSearchRecords" type="Sales_Error_Mapping__c[]" description="Use,for store the list of search records which returns from apex class"/>
+    <aura:attribute name="SearchKeyWord" type="string"/>
+    <aura:attribute name="Message" type="String" default="Search Result.."/>
+    <!--declare events hendlers-->  
+    <!--<aura:handler name="osalesErrorMapByEvent" event="c:selectedProductEvent" action="{!c.handleComponentEvent}"/>-->
+    
+    <!-- Pagination Starting --> 
+    <aura:attribute name="PageNumber" type="integer" default="1"/>
+    <aura:attribute name="TotalPages" type="integer" default="0"/>
+    <aura:attribute name="TotalRecords" type="integer" default="0"/>
+    <aura:attribute name="RecordStart" type="integer" default="0"/>
+    <aura:attribute name="RecordEnd" type="integer" default="0"/>     
+    <!-- Pagination Ending -->
+    
+   
+    
+    <!-- Edit Button  Modal PopUp Starting -->  
+    <div>
+        <section aura:id="inLineEditModal" role="dialog" tabindex="-1" aria-labelledby="customerdata" aria-modal="true" aria-describedby="customerBody" class="slds-modal">
+            <div class="slds-modal__container">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+                <header class="slds-modal__header" style="background-color:#66D3FA;">
+                    <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.closeEdit}" variant="bare-inverse" size="large"></lightning:buttonIcon>                    
+                    <h1 id="customerdataLabel" class="slds-text-heading_medium slds-hyphenate"></h1>
+                </header>
+                <div  align='center' class="errorMissing" id="errorMissing"></div>                
+                <div class="slds-modal__content slds-p-around_medium" id="customerBody">
+                    <div class="slds-form-element slds-form-element_horizontal">
+                        <label class="slds-form-element__label" for="horizontal-input-id-01">Map From Value</label>                        
+                        <div class="slds-form-element__control">
+                            <input type="text" Id="display" disabled="true" placeholder="Placeholder Text" size="25" value = "" class="slds-input"/>
+                        </div>
+                        <div onmouseleave="{!c.onblur}" aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single">
+                            <label class="slds-form-element__label" for="horizontal-input-id-01">Map To Value</label>                        
+                            <div class="slds-form-element__control">
+                                <div class="slds-input-has-icon slds-input-has-icon--right">
+                                    <div aura:id="lookup-pill" class="slds-pill-container slds-hide">
+                                        <lightning:pill class="pillSize" label="{!v.selectedRecord.Map_To_Value__c}" name="{!v.selectedRecord.Map_To_Value__c}" onremove="{! c.clear }">
+                                            <aura:set attribute="media">
+                                                <lightning:icon iconName="standard:account" size="x-small" alternativeText="close"/>
+                                            </aura:set>
+                                        </lightning:pill>
+                                    </div>
+                                    <input type="hidden" id="errorMapFields" value=""/>
+                                    <div aura:id="lookupField" class="slds-show">
+                                        <lightning:icon class="slds-input__icon slds-show" iconName="standard:search" size="x-small" alternativeText="search"/>
+                                        <span class="slds-icon_container  slds-combobox__input-entity-icon" title="record">
+                                            <lightning:icon class="slds-icon slds-icon slds-icon_small slds-icon-text-default" iconName="standard:account" size="x-small" alternativeText="icon"/>
+                                            <span class="slds-assistive-text"></span>
+                                        </span>
+                                        <ui:inputText  aura:id="searchValue" size="25"   updateOn="keyup" keyup="{!c.keyPressController}" class="slds-lookup__search-input slds-input leftPaddingClass" value="{!v.SearchKeyWord}" placeholder="search.." />
+                                        <input type="hidden"  id='valueHolder'  name = "" value = ""  />          
+                                    </div>                                                
+                                </div>
+                                <!--This part is for Display typehead lookup result List -->
+                                <ul style="min-height:40px;width:291px;margin-left:68px;" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-lookup__menu slds" role="listbox">
+                                    <lightning:spinner class="slds-hide" variant="brand" size="small" aura:id="mySpinner"/>
+                                    <center> {!v.Message}</center>
+                                    <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                                      <!--  <c:customLookupForFamily oProduct="{!singleRec}" IconName="standard:account"  /> -->
+                                    </aura:iteration>
+                                </ul>
+                            </div>
+                            <table>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td></tr>
+                                <tr><td>&nbsp;</td></tr>
+                                <tr><td>&nbsp;</td></tr>
+                                <tr><td>&nbsp;</td></tr>
+                            </table>                      
+                        </div>
+                    </div>                    
+                </div>                
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="Cancel"
+                                      title="Cancel"
+                                      onclick="{! c.closeEdit }"/>
+                    <lightning:button variant="brand"
+                                      aura:id="hideButton"                                      
+                                      label="Save"                           
+                                      title="Save"
+                                      onclick="{!c.saveErrorMap}"/>
+                </footer>                
+            </div>
+        </section>
+        <div aura:id="inLineEditModalBackdrop" class="slds-backdrop"></div>
+    </div>    
+    <!-- Edit Button  Modal PopUp Ending -->
+    <!-- Error Message Modal PopUp Starting -->
+    <div>
+        <section aura:id="salesErrorModal" role="dialog" tabindex="-1" aria-labelledby="customerdata" aria-modal="true" aria-describedby="customerBody" class="slds-modal">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header" style="background-color:red;">                
+                    <table>
+                        <tr>
+                            <td align="center"> <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.closeErrorModal}" variant="bare-inverse" size="large"></lightning:buttonIcon>
+                                <h3 id="customerdata" style="text-align:center;color:white;font-family: Arial, sans-serif;">Error In Saving Record....</h3></td>
+                        </tr>
+                    </table>  
+                </header>
+            </div>
+        </section>
+        <div aura:id="salesErrorBackdrop" class="slds-backdrop"></div>
+    </div>
+    <!-- Error Message Modal PopUp Ending -->
+    <!-- Success Message Modal PopUp Starting -->
+    <div>
+        <section aura:id="salesSuccessModal" role="dialog" tabindex="-1" aria-labelledby="customerdata" aria-modal="true" aria-describedby="customerBody" class="slds-modal">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header" style="background-color:#66D3FA;">
+                    <table>
+                        <tr>
+                            <td align="center"> <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.closeSuccessModal}" variant="bare-inverse" size="large"></lightning:buttonIcon>
+                                <h3 id="customerdata" style="text-align:center;color:white;font-family: Arial, sans-serif;">Record Inserted Successfully</h3></td>
+                        </tr>
+                    </table>                   
+                </header>        
+            </div>
+        </section>
+        <div aura:id="salesSuccessBackdrop" class="slds-backdrop"></div>
+    </div> 
+    <!-- Success Message Modal PopUp Ending -->
+    <!-- Modal PopUp For Warning Starting -->
+    <div>
+        <section aura:id="salesModal" role="dialog" tabindex="-1" aria-labelledby="customerdata" aria-modal="true" aria-describedby="customerBody" class="slds-modal">
+            <div class="slds-modal__container"> 
+                <header class="slds-modal__header">
+                    <div align="center">
+                        <tr>
+                            <td><lightning:icon iconName="utility:warning" size="medium" alternativeText="Warning!" variant="warning"/></td>
+                            <td><h1 class="slds-text-heading_medium slds-hyphenate">Warning</h1></td>
+                        </tr>
+                    </div>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="customerBody">
+                    <div class="slds-scrollable_x">
+                        <table>
+                            <aura:if isTrue="{!v.messageProceedStatus}">
+                                <tr>
+                                    <td colspan="2"><h3 id="customerdata">Few of the records either do not have "Model" or "Unit sold is 0". Click on "Proceed" button on the screen if you wish to continue.</h3></td>
+                                </tr>
+                            </aura:if>
+                            <tr>
+                                <td colspan="2">&nbsp;</td>
+                            </tr>                    
+                        </table>  
+                    </div>
+                </div>  
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral" class="slds-button_text-brand" label="Cancel" onclick="{!c.closeWarningCanecelModal}"></lightning:button>
+                    <lightning:button variant="neutral" class="slds-button_text-brand" label="Continue" onclick="{!c.closeWarningModal}"></lightning:button>
+                </footer>
+            </div>
+        </section>
+        <div aura:id="salesModalBackdrop" class="slds-backdrop"></div>
+    </div>
+    <!-- Modal PopUp for Warning Ending -->
+    <lightning:layout>        
+        <lightning:layoutItem class="boxx" padding="around-small" >           
+            <aura:if isTrue="{!v.flag}">
+                <lightning:card title="Sales Transaction stage">
+                    <aura:if isTrue="{!v.proceedStatus}">
+                        <lightning:button  variant="success" aura:id ="cursor" label="Proceed" onclick="{!c.proceedClick}" />
+                    </aura:if>&nbsp;&nbsp;
+                    <lightning:button  variant="brand" aura:id ="salesError" label="View Error Data" onclick="{!c.viewSalesErrorData}" />
+                    <lightning:button  variant="brand" aura:id ="salesErrorSum" label="View Error Summary" onclick="{!c.viewSalesErrorSummary}" />
+                    <br/>
+                </lightning:card>
+            </aura:if>
+             <aura:if isTrue="{!v.openFileDataSubmitted}">
+                 <div>
+                     <section aura:id="openFileDataSubmitted" role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                         <div class="slds-modal__container">
+                             <!-- Modal/Popup Box Header Starts here-->
+                             <header class="slds-modal__header">
+                                 <lightning:buttonIcon class="slds-modal__close" alternativeText="Close" iconName="utility:close" onclick="{!c.closeModalopenFileDataSubmittedModal}" variant="bare-inverse" size="large"></lightning:buttonIcon>
+                                 <h3 id="customerdata" style="text-align:center;color:black;font-family: Arial, sans-serif;"><b>Your request for Sales Upload has been submitted Successfully.Your data is getting processed in the background.Once file processing is completed you will receive an email Notification on the Batch Status'</b></h3>
+                             </header>                
+                         </div>
+                     </section>
+                     <div aura:id="openFileDataSubmittedBackdrop" class="slds-backdrop slds-backdrop_open"></div>
+                 </div>
+       </aura:if>
+        </lightning:layoutItem>
+    </lightning:layout>
+</aura:component>

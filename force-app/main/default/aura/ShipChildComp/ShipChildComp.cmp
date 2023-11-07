@@ -1,0 +1,68 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="rowIndex" type="String" />
+    <aura:attribute name="SHList" type="Object"/>
+    <aura:attribute name="expanded" type="String" default="false"/>
+    <aura:attribute name="checkThis" type = "Boolean" default ="true" />
+    <tr>
+        <td>  
+            <button class="slds-button slds-button_neutral" aura:id="toggle" onclick="{!c.toggle}" value="{!v.checkThis}"  style="padding:0 2px;"> 
+                <lightning:Icon aura:id="chevronright" iconName="utility:chevronright" size="x-small"/>
+                <lightning:Icon class="slds-hide" aura:id="chevrondown" iconName="utility:chevrondown" size="x-small"/>
+            </button> 
+        </td>
+        <td>
+            <lightning:icon iconName="standard:shipment" alternativeText="{!$Label.c.Approved}" size="x-small" class="slds-m-right_xx-small"/>
+            <ui:outputText value="{!v.SHList.SHwrap.Name}" class="title"/>
+        </td>
+        
+         <td>
+        <ui:outputText value="{!v.SHList.SHwrap.Retailer_Code__r.Name}" />
+        </td>
+        <td>
+        <ui:outputText value="{!v.SHList.SHwrap.Status__c}" class="{!v.SHList.SHwrap.Status__c == 'Shipped'?'slds-badge slds-badge_success':v.SHList.SHwrap.Status__c == 'Partially Shipped'?'slds-badge slds-badge_warning':''}"/>
+        </td>
+        <td>
+            <ui:outputText value="{!v.SHList.SHwrap.Shipment_Date__c}"/>
+        </td>
+        <td>
+            <ui:outputText value="{!v.SHList.SHwrap.Delivery_Person__c}"/>
+        </td>
+        <td>
+            <ui:outputText value="{!v.SHList.SHwrap.Consignment_Number__c}"/>
+        </td>
+        <td>
+            <ui:outputText value="{!v.SHList.SHwrap.Waybill_Number__c}"/>
+        </td>
+        <td>
+            <ui:outputText value="{!v.SHList.SHwrap.Truck_No__c}"/>
+        </td>
+        <td>
+            <ui:outputText value="{!v.SHList.SHwrap.Tracking_URL__c}"/>
+        </td>
+        <td>
+            <ui:outputDate value="{!v.SHList.SHwrap.CreatedDate}"/>
+            
+        </td>
+    </tr>
+    <tr>
+        <td colspan="12" style="padding-left:36px;border-bottom:1.5px solid gray;">
+            <aura:if isTrue="{!v.expanded}">
+                <table class="slds-table_bordered slds-box" style="padding:0;border-radius:0;">
+                    <tr class="slds-text-title_caps">
+                        <th></th>
+                        <th><div class="slds-truncate">{!$Label.c.Shipment_Line_Item_Name}</div></th>
+                        <th><div class="slds-truncate">{!$Label.c.Mainetti_Order_Line_Item}</div></th>
+                        <th><div class="slds-truncate">{!$Label.c.Mainetti_Model_Code}</div></th>
+                        <th><div class="slds-truncate">{!$Label.c.Customer_Ref_No}</div></th>
+                        <th class="slds-text-align_right"><div class="slds-truncate">{!$Label.c.Shipped_Quantity}</div></th>
+                        <th><div class="slds-truncate">{!$Label.c.STATUS}</div></th>
+                        <th><div class="slds-truncate">{!$Label.c.Shipment_Delivery_Date}</div></th> 
+                    </tr> 
+                    <aura:iteration items="{!v.SHList.SHLIwrap}" var="SHLI">
+                        <c:ShipChild2 SHLILIST="{!SHLI}"/>          
+                    </aura:iteration>
+                </table>
+            </aura:if>
+        </td>
+    </tr>
+</aura:component>

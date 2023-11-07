@@ -1,0 +1,6 @@
+<aura:event type="COMPONENT" description="Event template" >
+    
+    <aura:attribute name="buttonDisabled" type="Boolean" />
+    
+    
+</aura:event>

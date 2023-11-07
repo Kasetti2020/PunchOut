@@ -1,0 +1,19 @@
+.THIS .slds-icon-text-default {
+	fill:#29a4ff;
+}
+.THIS input::-webkit-outer-spin-button {
+    display:none;
+}
+
+.THIS input::-webkit-inner-spin-button {
+    display:none;
+}
+.THIS .slds-input
+{
+    line-height: 1.2rem;
+    min-height: calc(1.2rem + (1px * 2));
+}
+.THIS .ship-qty input
+{
+    text-align: right;
+}

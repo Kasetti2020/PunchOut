@@ -1,0 +1,7 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" controller="UpdateCreateProductConfigurator">
+<aura:attribute name="updateCheckBox" type="Opportunity_Item_Master__c" default="{'sobjectType':'Opportunity_Item_Master__c'}"/>
+<aura:attribute name="recordId" type="Id" />
+<aura:attribute name="abd" type="Opportunity_Item_Master__c" />    
+    Please make sure the product is Polybag/Paper Box
+	<lightning:button variant="brand" label="Yes" onclick="{!c.updateCheck11}"  />
+</aura:component>

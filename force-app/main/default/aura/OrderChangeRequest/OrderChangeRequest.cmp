@@ -1,0 +1,156 @@
+<aura:component controller="SOController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    
+    <aura:attribute name="OpenOrderChangeRequest" type="Boolean" />
+    <aura:attribute name="cancancel" type = "Boolean" default ="true"/>
+     <aura:attribute name="disableOKButton" type = "Boolean" default ="false"/>    
+    <aura:attribute name="options" type="List" />
+    <aura:attribute name="selectedValue" type="String"/>
+    <aura:attribute name="ReviseHeaderList" type="List" />
+    <aura:attribute name="ReviseLineList" type="List" />
+    <aura:attribute name="shiptoid" type="ID"/>
+    <aura:attribute name="shiptoname" type="String"/>
+    <aura:attribute name="index" type="integer"  default="1"/>
+    <aura:attribute name="SOdetails" type="object"/>
+    <aura:attribute name="ReviseOrderRequest" type="object"/> 
+    <aura:attribute name="isconfirmModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="today" type="Date" />
+    <aura:attribute name="listcancelpiclist" type="list" description="to store cancel picklist resons"/>
+    <aura:attribute name="ltngSelectedvalue" type="string" />
+    <!--<aura:attribute name="ReviseOrderList" type="List" default="{'What_to_Revise__c': 'Please select' }"/>-->
+    <aura:attribute name="ReviseOrderObj" type="Revise_Order__c" default="{ 'Mainetti_SO__c': '','Old_Expected_Delivery_Date__c': '','New_Expected_Delivery_Date__c': '' }"/>
+    <aura:handler name="CancelLineReviseComponentEvent" event="c:CancelLineReviseComponentEvent" action="{!c.CancelLineEvent}"/>
+     <!--Spinner Start-->
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:if isTrue="{!v.showSpinner}">    
+        <lightning:spinner class="slds-is-fixed" variant="brand" alternativeText="{!$Label.c.Loading}" size="large" />
+    </aura:if>
+    <lightning:spinner variant="brand" size="large" aura:id="Id_spinner" class="slds-hide" />
+    <!--Spinner End-->  
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <lightning:buttonIcon onclick="{!c.closeOrderChangeRequest}" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" iconName="utility:close" variant="bare" alternativeText="{!$Label.c.Settings}" />
+                
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Online_Order_Change_Form}</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <div class="slds-page-header slds-box" style="border:1px solid lightgray;padding: 0.2rem 1.6rem;">
+                    <div class="slds-page-header__row">
+                        <div class="slds-page-header__col-title">
+                            <div class="slds-media">
+                                <div class="slds-form-element slds-form-element_horizontal1 slds-m-bottom_none slds-size_2-of-5 slds-m-right_large"> 
+                                    <lightning:input label="{!$Label.c.MG_No}" name="input"  value="{!v.SOdetails.SO.Name}" disabled="true"/>  
+                                </div>
+                                <div class="slds-form-element slds-form-element_horizontal1 slds-m-bottom_none slds-size_2-of-5">
+                                    <lightning:input label="{!$Label.c.MSO_No}" name="input"  value="{!v.SOdetails.SO.Mainetti_SO_SC__c}" disabled="true"/>  
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-page-header__col-actions">
+                            <div class="slds-page-header__controls slds-m-top_large">
+                                <div class="slds-page-header__control">
+                                    <ul class="slds-button-group-list">
+                                        <li>
+                                            <lightning:button class="slds-button slds-button_neutral" iconName="utility:record_create" label="{!$Label.c.Add_Change_Request}" onclick="{!c.AddHeaderDetails}"  />
+                                        </li>
+                                        <aura:if isTrue="{!v.cancancel}">
+                                            <li>
+                                                <lightning:button class="slds-button slds-button_neutral" iconName="utility:record_delete" label="{!$Label.c.Cancel_Order}" onclick="{!c.confirmcancelOrder}" />
+                                            </li>
+                                        </aura:if>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="slds-box slds-grid slds-wrap slds-m-vertical_large slds-p-horizontal_none slds-p-bottom_none">
+                    <h2 class="box-title">{!$Label.c.Revise_Details}</h2>
+                    <aura:iteration items="{!v.ReviseHeaderList}" var="headeritem" indexVar="index">
+                        <c:OrderchangeRequestheader ROrderheader="{!headeritem}" ReviseOrderRequest="{!v.ReviseOrderRequest}"  ReviseOrderHeaderList="{!v.ReviseHeaderList}" SOdetails="{!v.SOdetails}" rowIndex="{!index}"/>
+                    </aura:iteration>
+                </div>
+                
+                <div class="slds-box slds-grid slds-wrap slds-m-vertical_large slds-p-horizontal_none slds-p-bottom_none">
+                    <h2 class="box-title">{!$Label.c.Line_Items}</h2>
+                    <table class="slds-table slds-table--bordered1 slds-table--cell-buffer">
+                        <thead>
+                            <tr class="slds-text-title--caps">
+                                <th class="slds-size_2-of-6"><div class="slds-truncate">{!$Label.c.Mainetti_Model}</div></th>
+                                <th class="slds-size_1-of-6" style="padding-left:2px;"><div class="slds-truncate">{!$Label.c.Print}</div></th>
+                                <th class="slds-size_1-of-6" style="padding-left:2px;"><div class="slds-truncate">{!$Label.c.Color}</div></th>
+                                <th class="slds-size_1-of-6" style="padding-left:2px;"><div class="slds-truncate">{!$Label.c.Original_Quantity}</div></th>
+                                <th class="slds-size_1-of-6" style="padding-left:2px;"><div class="slds-truncate">{!$Label.c.New_Quantity}</div></th>  
+                                <th> </th>    
+                            </tr> 
+                        </thead>
+                        <tbody>      
+                            <aura:iteration items="{!v.ReviseLineList}" var="option" indexVar="ind">
+                                <c:OrderchangeRequestLine ROrder="{!option}" ReviseOrderRequest1="{!v.ReviseOrderRequest}" SOdetails="{!v.SOdetails.SOLI}" rowIndex="{!ind}"/>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- popup for cancel revise order and capture Reason for cancel -->
+            <aura:if isTrue="{!v.isconfirmModalOpen}">
+                <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                    <div class="slds-modal__container" style="width:50%;max-width:50%;font-size: 106%;">
+                        <header class="slds-modal__header">
+                            <lightning:buttonIcon iconName="utility:close" onclick="{! c.closeModel }" alternativeText="close" variant="bare-inverse" class="slds-modal__close"/>
+                            <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Cancel_Order_Reason}</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            <div class="slds-grid slds-gutters">
+                                <div class="slds-col">
+                                    <span>{!$Label.c.Cancel_Order_Date}</span>
+                                </div>
+                                <div class="slds-col">
+                                    <span>{!v.today}</span>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters slds-m-top_medium">
+                                <div class="slds-col">
+                                    <span>{!$Label.c.Reason_Order_Cancelled}</span>
+                                </div>
+                                <div class="slds-col">
+                                    <span> <lightning:select aura:id="distance" name="distance" class="hide-label" label="{!$Label.c.Distance}" value="{!v.ltngSelectedvalue}" >
+                                        <option value="Please select">{!$Label.c.Please_select}</option>
+                                        <aura:iteration items="{!v.listcancelpiclist}" var="val">
+                                            <option value="{!val}">{!val}</option>
+                                        </aura:iteration>
+                                        </lightning:select></span>
+                                </div>
+                            </div>
+                            <div class="slds-grid slds-gutters slds-m-top_large">
+                                <div class="slds-col">
+                                    <b>{!$Label.c.Are_you_sure_you_want_cancel_the_Order}</b>
+                                </div>
+                            </div>
+                            <p>
+                                
+                                
+                                
+                            </p>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <button class="slds-button slds-button_brand button_brand" onclick="{!c.cancelRevOrder}" disabled= "{!v.disableOKButton}">{!$Label.c.OK}</button>
+                            <button class="slds-button slds-button_brand button_brand" onclick="{!c.closeModel}">{!$Label.c.Cancel}</button>
+                        </footer>
+                    </div>
+                </section>
+                <div class="slds-backdrop slds-backdrop_open"></div>
+            </aura:if>
+            <!--End of popup-->    
+            <footer class="slds-modal__footer">
+                <lightning:button class="slds-button slds-button_neutral" onclick="{!c.closeOrderChangeRequest}" label="{!$Label.c.Cancel}"/>
+                <lightning:button class="slds-button slds-button_brand" label="{!$Label.c.Submit}" onclick="{!c.saveChangeRequest}"/>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+    
+</aura:component>

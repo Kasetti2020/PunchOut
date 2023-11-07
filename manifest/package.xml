@@ -6,7 +6,14 @@
 		<members>PunchOutWebServiceHandler</members>
 		<members>PunchOutWebServiceLogin</members>
 		<members>XMLgenerate</members>
+		<members>CatalogOrderController</members>
+		<members>SOController</members>
 		<name>ApexClass</name>
+		
+	</types>
+	<types>
+		<members>*</members>
+		<name>AuraDefinitionBundle</name>
 	</types>
 	<version>58.0</version>
 </Package>

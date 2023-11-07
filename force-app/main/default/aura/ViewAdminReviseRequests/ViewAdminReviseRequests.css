@@ -1,0 +1,6 @@
+.THIS .my-brand {
+    --sds-c-button-brand-color-background: #a41f34;
+}
+.THIS .slds-modal__container{
+        width: 100%;
+    }

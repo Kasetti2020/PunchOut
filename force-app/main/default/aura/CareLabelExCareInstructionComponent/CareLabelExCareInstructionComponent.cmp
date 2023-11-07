@@ -1,0 +1,100 @@
+<aura:component >
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+    <aura:method name="getSelectedData" action="{!c.selectedExCareInst}" 
+                 access="public">
+    </aura:method>
+    <aura:method name="viewSelectedData" action="{!c.viewselectedExCareInst}" 
+                 access="public">
+    </aura:method>
+    <aura:method name="clearSelectedData" action="{!c.clearData}" 
+                 access="public">
+        <aura:attribute name="CloneORClear" type="String"/> 
+    </aura:method>
+    
+    <aura:attribute name="viewisExCareInstructionmodal" type="Boolean"/>
+    <aura:attribute name="Excareinstruction" type="List"/>
+    <aura:attribute name="options" type="List" default="[]"/>
+    <aura:attribute name="selectedValues" type="List" default="[]"/>
+    <aura:attribute name="Excarecmpname" type="List"/>
+    <aura:attribute name="selectedposition" type="String"/>
+    <aura:attribute name="tableview" type="Boolean" default="false"/>
+    
+    <aura:attribute name="exCareSelectedData" type="List"/>
+    <aura:attribute name="viewExCareSelectedData" type="Map"/><!-- default="{'position':'','ExcareInstructions':[]}"/>-->
+    
+    <aura:attribute name="deletedCLLIIdList" type="List"/>
+    <aura:attribute name="excareInstructionList" type="List"/>
+    
+     <aura:registerEvent name="loadMyEvent" type="c:LogoEvent"/>
+    
+    <aura:handler name="change" value="{!v.Excareinstruction}" action="{!c.handleExcareChange}" />
+    <aura:registerEvent name="changeTabColorExcareInstructions" type="c:changeTabColor"/>
+    
+    <aura:attribute name="position" type="Boolean" default="false"/>
+
+    <aura:attribute name="selectedExcare" type="String"/>
+    <aura:attribute name="originalExcareInstruction" type="List" default="[]"/>
+    
+    <!--aura:If isTrue="{!v.Excareinstruction.length>0}"-->
+        <div class="slds-grid slds-wrap slds-gutters slds-p-horizontal_medium">
+            <div class="slds-col slds-size_2-of-7">
+                <ui:inputSelect aura:id="ExcareInstruction" label="{!$Label.c.EXCARE_INSTRUCTIONS}" value="{!v.selectedExcare}" >
+                        <option value="">{!$Label.c.Choose_ExcareInstruction}</option>   
+                        <!--aura:iteration items="{!v.options}" var="value">                                         
+                            <option value="{!value}" selected="{!option.key==v.selExcare}"> {!value}</option>
+                        </aura:iteration-->
+                    </ui:inputSelect>
+            </div>
+            
+            <!--<aura:if isTrue="{!v.position}">-->
+                <div class="slds-col slds-size_2-of-7" >
+                    <ui:inputSelect label="Position"  aura:id="ddexcarename" change="{!c.getSelectedPositionValue}" value="{!v.selectedposition}">
+                        <option value="">{!$Label.c.Choose_Position}</option>   
+                        <aura:iteration items="{!v.Excarecmpname}" var="value">                                         
+                            <option value="{!value}" selected='{!value==v.selectedposition}'> {!value}</option>
+                        </aura:iteration>
+                    </ui:inputSelect>
+            </div>
+            <!--</aura:if>-->
+            <div class="slds-col slds-size_1-of-7 slds-p-top_large" style="margin-top:-6px;">
+                <lightning:button variant="brand" label="{!$Label.c.Add}" class="" onclick="{!c.addCareInstruction}"/>
+            </div>
+    </div>
+    <aura:If isTrue="{!v.tableview}">
+        <div class="slds-box slds-p-around_none slds-m-left_medium slds-m-bottom_medium" style="width:61.4%;margin-top:6px;">	
+            <table class="slds-table slds-table_bordered1 slds-table_cell-buffer"> 
+                <tr>
+                    <th>{!$Label.c.Excare_Instruction}</th>
+                    <th>{!$Label.c.Position}</th>
+                    <th style="width:1%;">{!$Label.c.Action}</th>
+                </tr>
+                <aura:iteration items="{!v.excareInstructionList}" var="val" indexVar="index">
+                    <tr> 
+                        <td >{!val.exCareInstruction}</td>
+                        <td >{!val.position}</td>
+                        <td> 
+                            <lightning:buttonIcon iconName="utility:close" size="medium" onclick="{!c.removeRow}" name="{!index}" variant="bare" alternativeText="{!$Label.c.Remove}" title="{!$Label.c.Remove}" iconClass="dark"/>
+                            <!--<lightning:button variant="brand" name="{!index}" label="Remove" class="" onclick="{!c.removeRow}" />-->
+                        </td>
+                    </tr>
+                </aura:iteration>				
+            </table>
+        </div>    
+    </aura:If>
+    <!--aura:set attribute="else"> 
+            <h1 style="margin-left: 31%;padding: 2rem;font-size: 21PX;">Configuration Not Done For This Product!!!...</h1>
+        </aura:set-->
+    <!--/aura:If-->
+    <!--footer class="slds-modal__footer">
+                <lightning:button variant="neutral"
+                                  label="Cancel"
+                                  title="Cancel"
+                                  onclick="{!c.closeExcareInstructionModel}"/>
+                <lightning:button variant="brand"
+                                  label="Select"
+                                  title="Select"
+                                  onclick="{! c.selectedExCareInst }"/>
+            </footer-->
+    
+</aura:component>

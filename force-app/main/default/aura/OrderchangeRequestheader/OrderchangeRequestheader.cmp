@@ -1,0 +1,283 @@
+<aura:component controller="SOController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="rowIndex" type="integer" /> 
+    <aura:attribute name="ROrderheader" type="Object"/> 
+    <aura:attribute name="ReviseOrderHeaderList" type="List"/>
+    <aura:attribute name="AddressList" type="List"/>
+    <aura:attribute name="ReviseOrderRequest" type="Object"/>
+    <aura:attribute name="SOdetails" type="object"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    <aura:attribute name="ReviseOrderObj" type="Revise_Order__c" default="{ 'Mainetti_SO__c': '','Old_Expected_Delivery_Date__c': '','New_Expected_Delivery_Date__c': '' }"/>
+    <aura:attribute name="shiptoid" type="ID"/>
+    <aura:attribute name="shiptoname" type="String"/>
+    <aura:attribute name="checkduplicate" type="List" default ="[]"/>
+    
+    <aura:attribute name="OpenOrderChangeRequest" type="Boolean" />
+    <aura:attribute name="shipTo" type="boolean" default="false"/>
+    <aura:attribute name="shipToDate" type="boolean" default="false"/>
+    <aura:attribute name="FactoryInternalPO" type="boolean" default="false"/>
+    <aura:attribute name="ShippingMark" type="boolean" default="false"/>
+    <aura:attribute name="ForwarderTransportation" type="boolean" default="false"/>
+    <aura:attribute name="restrict3headers" type="boolean" default="true"/>
+    <aura:attribute name="AddressTable" type="boolean" default="false"/>
+    
+    <!--<aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordEvent" action="{!c.handleLookupValueselected}"/>-->
+    <aura:registerEvent name="CancelLineReviseComponentEvent" type="c:CancelLineReviseComponentEvent"/>
+    
+    <table class="slds-table slds-table--bordered1 slds-table--cell-buffer">
+        <thead>
+            <tr class="slds-text-title--caps">
+                <th class="slds-size_1-of-4"><div class="slds-truncate">{!$Label.c.WHAT_TO_REVISE}  <lightning:select aura:id="distance" name="distance" class="hide-label" label="{!$Label.c.Distance}" onchange="{!c.onChange}">
+                    <option value="Please select">{!$Label.c.Please_select}</option>
+                    <option value="Ship To">{!$Label.c.Ship_To}</option>
+                    <option value="Ship Date">{!$Label.c.Ship_Date}</option>
+                    <aura:if isTrue="{!v.restrict3headers}">
+                        <option value="Factory Internal PO">{!$Label.c.Factory_Internal_PO}</option>
+                        <option value="Shipping Mark/Special Instruction">{!$Label.c.Shipping_Mark_Special_Instruction}</option>
+                        <option value="Forwarder/Transportation Details">{!$Label.c.Forwarder_Transportation_Details}</option>
+                    </aura:if>
+                    </lightning:select></div>
+                </th>
+                <th class="slds-size_1-of-4"><div class="slds-truncate">{!$Label.c.Original_Value}</div></th>
+                <th class="slds-size_1-of-4"><div class="slds-truncate">{!$Label.c.Input_New_Value}</div></th>
+                <th class="slds-size_1-of-4 slds-text-align_center"><lightning:buttonIcon iconName="utility:close" variant="bare" alternativeText="{!$Label.c.Settings}" iconClass="dark" onclick="{!c.cancelHeader}"/></th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <aura:if isTrue="{!v.shipTo}">
+                <tr>
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Ship_to_Address}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.SOdetails.SO.Ship_to_Address__r.Name}"  disabled="true"/>
+                    </td>
+                    <td scope="row">
+                        <!-- <c:CustomLookup  whereCondition="{! 'and recordtype.name=\'ship to\' and Customer_Information__c =\''+v.SOdetails.SO.Supplier__c+'\' AND Bill_Ship_Status__c=\'Active\' AND  id!=\''+v.SOdetails.SO.Ship_to_Address__c+'\''}" objectAPIName='Ship_Bill_Address__c' IconName="standard:account" recordID="{!v.shiptoid}" recordName="{!v.shiptoname}" />-->
+                        
+                        <lightning:input class="hide-label" name="input1" value="{!v.shiptoname}" disabled="true" />
+                    </td>
+                    <td class="slds-text-align_center">
+                        <lightning:button class="slds-button slds-button_neutral" iconName="utility:resource_territory" label="{!$Label.c.Select}" onclick="{!c.displayTableAddress}"/>
+                        <!--<lightning:buttonIcon iconName="utility:new_window" variant="bare" alternativeText="Settings" iconClass="dark" onclick="{!c.displayTableAddress}"/>-->
+                    </td>
+                </tr> 
+                <tr>
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Ship_to_Factory}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.SOdetails.SO.Ship_to_Factory__c}" disabled="true"/>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.ROrderheader.New_Ship_to_Company__c}" disabled="true"/>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Ship_to_Street}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.SOdetails.SO.Ship_to_Address1__c}" disabled="true"/>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.ROrderheader.New_Ship_to_Address1__c}" disabled="true"/>
+                    </td>
+                    <td></td>
+                </tr>
+                
+                <tr>
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Ship_to_City}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.SOdetails.SO.Ship_to_City__c}" disabled="true"/>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.ROrderheader.New_Ship_to_City__c}" disabled="true"/>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Ship_to_State}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.SOdetails.SO.Ship_to_State__c}" disabled="true"/>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.ROrderheader.New_Ship_to_State__c}" disabled="true"/>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Ship_to_Country}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.SOdetails.SO.Ship_to_Country__c}" disabled="true"/>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.ROrderheader.New_Ship_to_Country__c}" disabled="true"/>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Ship_to_Postcode}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.SOdetails.SO.Ship_to_Postcode__c}" disabled="true"/>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.ROrderheader.New_Ship_to_Postcode__c}" disabled="true"/>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Ship_to_Contact_Number}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.SOdetails.SO.Ship_to_Tel__c}" disabled="true"/>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.ROrderheader.New_Ship_to_Tel__c}" disabled="true"/>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Ship_to_Contact_Email}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.SOdetails.SO.Ship_to_Email__c}" disabled="true"/>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="input1" value="{!v.ROrderheader.New_Ship_to_Email__c}" disabled="true"/>
+                    </td>
+                    <td></td>
+                </tr>
+            </aura:if>
+            <aura:if isTrue="{!v.shipToDate}">
+                <tr  data-index="{!v.rowIndex}">
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Expected_Completion_Date}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="{!v.rowIndex}" value="{!v.SOdetails.SO.Expected_Completion_Date__c}" disabled="true" />
+                    </td>
+                    <td scope="row">
+                        <ui:inputDate class="hide-label" aura:id="userdate" change="{!c.changeSOExpDelDate}" value="{!v.ROrderheader.New_Expected_Delivery_Date__c}" displayDatePicker="true" format="yyyy-MM-dd"/>
+                    </td>
+                    <td></td>
+                </tr>
+            </aura:if>
+            <aura:if isTrue="{!v.FactoryInternalPO}">
+                <tr  data-index="{!v.rowIndex}">
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Factory_Internal_PO}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="{!v.rowIndex}" value="{!v.SOdetails.SO.Factory_Internal_PO__c}" disabled="true"/>
+                    </td>
+                    <td scope="row">
+                        <lightning:input class="hide-label" name="{!v.rowIndex}" value="{!v.ROrderheader.New_Factory_Internal_PO__c}" onchange="{!c.changeFactoryInternalPO}" />
+                    </td>
+                    <td></td>
+                </tr>
+            </aura:if>
+            <aura:if isTrue="{!v.ShippingMark}">
+                <tr  data-index="{!v.rowIndex}">
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Shipping_Mark_Special_Instruction}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:textarea class="hide-label" name="{!v.rowIndex}" value="{!v.SOdetails.SO.Shipping_Mark__c}" disabled="true" />
+                    </td>
+                    <td scope="row">
+                        <lightning:textarea class="hide-label" name="{!v.rowIndex}" value="{!v.ROrderheader.New_Shipping_Mark__c}" onchange="{!c.changeShippingmark}" />
+                    </td>
+                    <td></td>
+                </tr>
+            </aura:if>
+            <aura:if isTrue="{!v.ForwarderTransportation}">
+                <tr  data-index="{!v.rowIndex}">
+                    <td scope="row" class="slds-size_1-of-4">
+                        <div class="slds-truncate">{!$Label.c.Forwarder_Transportation_Details}</div>
+                    </td>
+                    <td scope="row">
+                        <lightning:textarea class="hide-label" name="{!v.rowIndex}" value="{!v.SOdetails.SO.Transportation_Details__c}" disabled="true" />
+                    </td>
+                    <td scope="row">
+                        <lightning:textarea class="hide-label" name="{!v.rowIndex}" value="{!v.ROrderheader.New_Forwarder_Transportation_Details__c}" onchange="{!c.changeForwarderTransportation}" />
+                    </td>
+                    <td></td>
+                </tr>
+            </aura:if>
+        </tbody>
+    </table>
+    
+    <aura:if isTrue="{!v.AddressTable}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container" style="width:100%;max-width:100%;">
+                <header class="slds-modal__header">
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{!$Label.c.Select_Address}</h2>
+                </header>
+                <div class="slds-modal__content" id="modal-content-id-1">
+                    <div class="slds-box slds-box-no-border slds-m-around_large">
+                        <h2 class="box-title" style="width:80px">{!$Label.c.Ship_To}</h2>
+                        <lightning:layout multipleRows="true">
+                            
+                            <aura:iteration items="{!v.AddressList}" var="address" indexVar="row">
+                                <lightning:layoutItem padding="around-small" size="6">
+                                    
+                                    <article class="slds-tile slds-media">
+                                        <div class="slds-media__figure">
+                                            <lightning:input onchange="{!c.onRadioChange}" type="radio" name="options" value="{!address}"/>
+                                        </div>
+                                        <div class="slds-media__body">                    
+                                            <div class="slds-tile__detail">
+                                                <dl class="slds-list_horizontal slds-wrap">
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Address}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Name}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Factory}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Factory_Name__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Street}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Address_1__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.City}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.City__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.State}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.State__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Country}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Country__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.PostCode}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Postcode__c}</dd>
+                                                    <!--<dt class="slds-item_label slds-text-color_weak slds-truncate" title="">Contact Name</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Contact__c}</dd>-->
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Contact_Number}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Tel_No__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Contact_Email}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Email_Address__c}</dd>
+                                                    
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </lightning:layoutItem >
+                            </aura:iteration>
+                        </lightning:layout>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick="{!c.closeTableAddress}">{!$Label.c.Cancel}</button>
+                    <button class="slds-button slds-button_brand" onclick="{!c.SaveTableAddress}">{!$Label.c.save}</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+</aura:component>

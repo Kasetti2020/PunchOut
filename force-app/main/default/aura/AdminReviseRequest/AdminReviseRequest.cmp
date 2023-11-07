@@ -1,0 +1,182 @@
+<aura:component controller="CatalogOrderController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,lightning:isUrlAddressable,force:lightningQuickAction" access="global">
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="reviseOrderObj" type="object"/>
+    <aura:attribute name="salesOrderLineItem" type="object"/>
+    <aura:attribute name="adminRemarks" type="string"/>
+    <aura:attribute name="isModalOpen" type="boolean" default="false"/>
+    <aura:attribute name="roId" type="string"/>
+    <aura:attribute name="oldSoli" type="object"/>
+    <aura:attribute name="newSoli" type="object"/>
+    <aura:attribute name="pbspOrPpcNotfound" type="Boolean"/>
+    <aura:attribute name="createduser" type="object"/>
+    <aura:attribute name="contact" type="object"/>
+    <lightning:navigation aura:id="navService"/>
+    <aura:if isTrue="{!v.isModalOpen}">
+        <!-- Modal/Popup Box starts here-->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open slds-modal_large">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box Header Starts here-->
+                <header class="slds-modal__header">
+                    <!--button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.close}">
+                            <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                    </button-->
+                    <lightning:buttonIcon iconName="utility:close"
+                                          onclick="{!c.close }"
+                                          alternativeText="{!$Label.c.Close}"
+                                          variant="bare-inverse"
+                                          class="slds-modal__close"/>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Admin_Revise_Request}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium " id="modal-content-id-1">
+                    
+                            <tr>
+                                <th><p style="font-weight: normal;">{!$Label.c.Mainetti_Sales_Order}</p></th>
+                                <td style="width: 15px;"></td>
+                            	<th><p style="font-weight: normal;">{!$Label.c.Order_Created_User}</p></th>
+                                <td style="width: 15px;"></td>
+                            	<th><p style="font-weight: normal;">{!$Label.c.Contact}</p></th>
+                            	<th><p style="font-weight: normal;">{!$Label.c.Customer_Information}</p></th>
+                            </tr>
+                        
+                            <tr>
+                                <td><lightning:button  aura:id="{!data.Id}" name="{!v.reviseOrderObj.Mainetti_SO__c}" label="{!$Label.c.Mainetti_Sales_Order}" onclick="{!c.link}">{!v.reviseOrderObj.Mainetti_SO__r.Name}</lightning:button></td>
+                                <td style="width: 15px;"></td>
+                                <td><lightning:button  aura:id="{!openUser.Id}" name="{!v.createduser.Id}" label="{!$Label.c.Order_Created_User}" onclick="{!c.openUser}">{!v.createduser.Name}</lightning:button></td>
+                                <td style="width: 15px;"></td>
+                                <td><lightning:button  aura:id="{!openContact.Id}" name="{!v.contact.Id}" label="{!$Label.c.Contact}" onclick="{!c.openContact}">{!v.contact.Name}</lightning:button></td>
+                                <td><lightning:button  aura:id="{!openCustomer.Id}" name="{!v.contact.Customer_Information__c}" label="{!$Label.c.Customer_Information}" onclick="{!c.openCustomer}">{!v.contact.Customer_Information__r.Name}</lightning:button></td>
+                                
+                            </tr>
+                        
+                    <tr>
+                        <td><lightning:input name="Order To Company" disabled="true" value="{!v.reviseOrderObj.Name}" label="{!$Label.c.Revise_Order}" /></td>
+                        <td style="width: 15px;"></td>
+                        <td><lightning:input name="Order Source" disabled="true" value="{!v.reviseOrderObj.Mainetti_SO__r.OrderSource__c}" label="{!$Label.c.Order_Source}" /></td>
+                        <td style="width: 15px;"></td>
+                        <aura:if isTrue="{!v.contact.Customer_Information__r.MagNET_Price_Code__c != null}">
+                        <td><lightning:input name="Magnet Price Code" disabled="true" value="{!v.contact.Customer_Information__r.MagNET_Price_Code__c}" label="{!$Label.c.Magnet_Price_Code}"/></td>
+                    	<aura:set attribute="else">
+                        <td><lightning:input name="Magnet Price Code" disabled="true" value="Not Found" label="{!$Label.c.Magnet_Price_Code}"/></td>    
+                        </aura:set>
+                        </aura:if>
+                    </tr>
+                    <aura:if isTrue="{!v.reviseOrderObj.Revise_Order_To_Company__c}">
+                        <tr>
+                            <td><lightning:input name="Order To Company" disabled="true" value="{!v.reviseOrderObj.Order_to_Company__c}" label="{!$Label.c.Order_to_Company_02}" /></td>
+                            <td style="width: 15px;"></td>
+                            <td><lightning:input name="Revise Order To Company" disabled="true" value="{!v.reviseOrderObj.Revise_Order_To_Company__c}" label="{!$Label.c.Revise_Order_To_Company}" /></td>
+                        </tr>
+                    </aura:if>
+                    <tr>
+                        <td><lightning:input name="Currency" disabled="true" value="{!v.reviseOrderObj.Mainetti_SO__r.CurrencyIsoCode}" label="{!$Label.c.Currency}" /></td>
+                        <td style="width: 15px;"></td>
+                        <td><lightning:input name="Revise Currency" disabled="true" value="{!v.reviseOrderObj.Revise_Currency__c}" label="{!$Label.c.Revise_Currency}" /></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <lightning:textarea aura:id="mytextarea"  label="{!$Label.c.remarks}" required="true" value="{!v.adminRemarks}"/>
+                        </td>
+                    </tr>
+                    
+                    &nbsp;
+                    &nbsp;
+                    <center> <p><b>{!$Label.c.Old_sales_Order_Line_Item_Detail}</b></p></center>
+                    <table class="display">
+                        <thead>
+                            <tr>
+                                <th class="head">{!$Label.c.MGLI}</th>
+                                <th class="head">{!$Label.c.Customer_Ref_Model02}</th>
+                                <th class="head">{!$Label.c.Color}</th>
+                                <th class="head">{!$Label.c.Size}</th>
+                                <th class="head">{!$Label.c.Currency}</th>
+                                <th class="head">{!$Label.c.LOCAL_SKU}</th>
+                                <th class="head">{!$Label.c.PRICE_SPECIFICATION_BOOK_PRODUCT}</th>
+                                <th class="head">{!$Label.c.PRICE_BY_CURRENCY}</th>
+                                <th class="head">{!$Label.c.PRICE_100PCS}</th>
+                                <th class="head">{!$Label.c.PRICE_1000PCS}</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.oldSoli}" var="oldSoli">
+                                <tr>
+                                    <td class="body">{!oldSoli.Name}</td>
+                                    <td class="body">{!oldSoli.Customer_Ref_Model__c}</td>
+                                    <td class="body">{!oldSoli.Colour__c}</td>
+                                    <td class="body">{!oldSoli.Size__c}</td>
+                                    <td class="body">{!oldSoli.CurrencyIsoCode}</td>
+                                    <td class="body">{!oldSoli.Local_SKU__c}</td>
+                                    <td class="body"><a data-pbspid="{!oldSoli.Price_Specification_Book_Product__c}" onclick="{!c.handleClick}" >{!oldSoli.Price_Specification_Book_Product__r.Name}</a></td>
+                                    <td class="body"><a data-ppcpid="{!oldSoli.Price_Product_by_Currency__c}" onclick="{!c.handlePPc}" >{!oldSoli.Price_Product_by_Currency__r.Name}</a></td>
+                                    <td class="body">{!oldSoli.Price_100_pcs__c}</td>
+                                    <td class="body">{!oldSoli.Price_1000_pcs__c}</td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                    &nbsp;
+                    &nbsp;
+                    <center> <p><b>
+                        {!$Label.c.New_sales_Order_Line_Item_Detail}</b></p></center>
+                    <table class="display">
+                        <thead>
+                            <tr>
+                                <th class="head">{!$Label.c.MGLI}</th>
+                                <th class="head">{!$Label.c.Customer_Ref_Model02}</th>
+                                <th class="head">{!$Label.c.Color}</th>
+                                <th class="head">{!$Label.c.Size}</th>
+                                <th class="head">{!$Label.c.Currency}</th>
+                                <th class="head">{!$Label.c.LOCAL_SKU}</th>
+                                <th class="head">{!$Label.c.PRICE_SPECIFICATION_BOOK_PRODUCT}</th>
+                                <th class="head">{!$Label.c.PRICE_BY_CURRENCY}</th>
+                                <th class="head">{!$Label.c.PRICE_100PCS}</th>
+                                <th class="head">{!$Label.c.PRICE_1000PCS}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:iteration items="{!v.newSoli}" var="newSoli">
+                                <tr>
+                                    <td class="body">{!newSoli.Name}</td>
+                                    <td class="body">{!newSoli.Customer_Ref_Model__c}</td>
+                                    <td class="body">{!newSoli.Colour__c}</td>
+                                    <td class="body">{!newSoli.Size__c}</td>
+                                    <td class="body">{!newSoli.CurrencyIsoCode}</td>
+                                    <td class="body">{!newSoli.Local_SKU__c}</td>
+                                    <aura:if isTrue="{!newSoli.Price_Specification_Book_Product__c != null}">
+                                        <td class="body"><a data-pbspid="{!newSoli.Price_Specification_Book_Product__c}" onclick="{!c.handleClick}" >{!newSoli.Price_Specification_Book_Product__r.Name}</a></td>
+                                        <aura:set attribute="else">
+                                            <td class="body"><p style="color:red;font-weight: bold;">{!$Label.c.Missing_Price_Book_Product}</p></td>
+                                        </aura:set>
+                                    </aura:if>
+                                    <aura:if isTrue="{!newSoli.PEC_TXT_1__c != null}">
+                                        <td class="body"><a data-ppcpid="{!newSoli.Price_Product_by_Currency__c}" onclick="{!c.handlePPc}" >{!newSoli.PEC_TXT_1__c}</a></td>
+                                        <aura:set attribute="else">
+                                            <td class="body"><p style="color:red;font-weight: bold;">{!$Label.c.Missing_PPC}</p></td>
+                                        </aura:set>
+                                    </aura:if>
+                                    <td class="body">{!newSoli.Price_100_pcs__c}</td>
+                                    <td class="body">{!newSoli.Price_1000_pcs__c}</td>
+                                </tr>
+                            </aura:iteration>
+                        </tbody>
+                    </table>
+                </div>
+                <!--Modal/Popup Box Footer Starts here-->
+                <footer class="slds-modal__footer">
+                    <lightning:button variant="neutral"
+                                      label="{!$Label.c.Reject}"
+                                      title="{!$Label.c.Reject}"
+                                      name="{!v.reviseOrderObj.Mainetti_SO__c}"
+                                      onclick="{! c.rejectReviseRequests }"/>
+                    <lightning:button variant="brand"
+                                      label="{!$Label.c.Accept}"
+                                      title="{!$Label.c.Accept}"
+                                      onclick="{!c.acceptReviseRequest}"
+                                      name="{!v.reviseOrderObj.Mainetti_SO__c}"
+                                      disabled="{!v.pbspOrPpcNotfound}"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+</aura:component>

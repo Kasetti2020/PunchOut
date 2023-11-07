@@ -6,11 +6,11 @@ global class PunchOutWebServiceLogin {
         system.debug('RestContext.request.requestBody.toString())>'+RestContext.request.requestBody.toString());
         string xml=string.valueOf(RestContext.request.requestBody.toString());
      //fromJSON.parseCXML(xml);
-    
-       Map<String, Object> jsonResult =PunchOutWebServiceHandler.xmlToMap(xml);
+    DemoSecClass.parseCXML(xml);
+       //Map<String, Object> jsonResult =PunchOutWebServiceHandler.xmlToMap(xml);
         //system.debug('xmlData><>>>>>>'+jsonResult);
        // PunchOutWebServiceHandler.LoginUrl(jsonResult);
-       PunchOutSetupRequestParser.parseXMl(jsonResult);
+      /// PunchOutSetupRequestParser.parseXMl(jsonResult);
         return 'success';
     }
 }

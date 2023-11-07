@@ -1,0 +1,29 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doint}"/>
+    
+    <aura:attribute name="SOLIlist" type="Object"/>
+    
+    <tr class="slds-box"> 
+        <td>
+        </td>
+        <td><div>{!v.SOLIlist.Name}</div> </td>
+        <td><div> {!v.SOLIlist.Products__r.Name}</div></td>
+        <td class="slds-text-align_right"><div>  <ui:outputText value="{!v.SOLIlist.Supply_Quantity__c}"/></div></td>
+        <!-- <td><div> <ui:inputNumber label="" value="{!v.SOLIlist.Ship_qty__c}" updateOn="keyup" keyup="{!c.checkQty}"/></div></td> -->
+        <td class="slds-text-align_right"><div> <ui:inputNumber class="input-qty" label="" value="{!v.SOLIlist.Ship_qty__c}"/></div></td> 
+        <td class="slds-text-align_right"><div> {!v.SOLIlist.Remaining_Qty__c} </div></td>
+        <!--<td><div> {!v.SOLIlist.APN__c}</div></td>-->
+        <!--  <td><div> {!v.SOLIlist.DEPT_DESC__c}</div></td> -->
+        <td><div> {!v.SOLIlist.Colour__c}</div></td>
+        <td class="slds-text-align_right"><div> {!v.SOLIlist.Style_No__c}</div></td>
+        <td class="slds-text-align_right"><div> {!v.SOLIlist.Size__c}</div></td>
+        <td><div> {!v.SOLIlist.Status__c}</div></td>
+        <td><div> <lightning:formattedDateTime value="{!v.SOLIlist.CreatedDate}" year="numeric" month="numeric" day="numeric" /></div></td> 
+        <!--  <td><div> <lightning:formattedDateTime value="{!v.SOLIlist.LastModifiedDate}" year="numeric" month="numeric" day="numeric" /></div></td> -->
+        <!--<td> 
+            <lightning:buttonIcon class ="slds-button_neutral1" iconName="utility:edit" variant="bare" value="{!v.SOLIlist.Id}" onclick="{!c.EditPOli}" alternativeText="Edit" />
+           
+        </td>-->
+        
+    </tr>
+</aura:component>

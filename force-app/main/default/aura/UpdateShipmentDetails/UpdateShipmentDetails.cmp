@@ -1,0 +1,170 @@
+<aura:component controller="UpdateShipmentDetailController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickActionWithoutHeader" access="global" > 
+    <aura:attribute name="CloseCurrentWindow" type="boolean" default="false"/> 
+    <aura:attribute name="message" type="String"/> 
+    <aura:attribute name="SOList" type="Object"/>
+    <aura:attribute name="SOList1" type="Object"/>
+    <aura:attribute name="SOLILIST" type="Sales_Order_Line_Items__c" default="[]"/> 
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/> 
+    <aura:attribute name="ConfirmShip" type="Boolean" default="false"/>  
+    <aura:attribute name="picvalue" type="List" />
+    <aura:attribute name="selectedValue" type="String"/>
+    <aura:attribute name="Shipmentheader" type="Shipment__c" default="{'sobjectType':'Shipment__c',
+                                                                      'Delivery_Person__c':'',
+                                                                      'Shipment_Date__c':'',
+                                                                      'Expected_Delivery_Date__c':'',
+                                                                      'Waybill_Number__c':'',
+                                                                      'Consignment_Number__c':'',
+                                                                      'Truck_No__c':'',
+                                                                      'Tracking_URL__c':'',
+                                                                      'Retailer_Code__c':'',
+                                                                      'Retailer_Contact__c':''
+                                                                      }" 
+                    />
+    
+    <ltng:require styles="/resource/activatecustomer"/>
+    
+    <!--<lightning:spinner aura:id="mySpinner" />-->
+    <!-- <div class="slds-align_absolute-center" style="height:12rem">{!v.message}</div>-->
+    
+    <div >
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header slds-scrollable">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onclick="{!c.closeModal}" title="Close">
+                        
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" style="color:#a41f34;">Update Shipment Details</h2>
+                </header>
+                <div isTrue="{!v.ConfirmShip==false}" class="slds-modal__content slds-p-around_medium1" id="modal-content-id-1">
+                    <div class="slds-scrollable" style="max-height:60vh;">
+                        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                            <thead>
+                                <tr class="slds-line-height_reset" style="background:#f2f2f2;text-transform:uppercase;">
+                                    <th scope="col" style=""><div class="slds-truncate"><ui:inputCheckbox aura:id="cbox" class="uiInput uiInputCheckbox uiInput--default uiInput--checkbox"  change="{!c.selectAll}"/></div></th>
+                                    <th scope="col" style=""><div class="slds-truncate">SO Number</div></th>
+                                    <th scope="col" style=""><div class="slds-truncate">SOLI Number</div></th>
+                                   
+                                    <th scope="col" style=""><div class="slds-truncate">Retailer Order Number</div></th>
+                                    <th scope="col" style=""><div class="slds-truncate">Customer Ref Model</div></th>
+                                    <th scope="col" style=""><div class="slds-truncate">Status</div></th>
+                                    <th scope="col" style=""><div class="slds-truncate">Mainetti Model Code</div></th>
+                                    <th scope="col" style=""><div class="slds-truncate">Ship to Address</div></th>
+                                    <th scope="col" style=""><div class="slds-truncate">ORDERED QUANTITY</div></th> 
+                                    
+                                    <th scope="col" style=""><div class="slds-truncate">SHIPPING QTY</div></th> 
+                                    <!--<th scope="col" style=""><div class="slds-truncate">SHIPPED DATE</div></th> -->
+                                     <th scope="col" style=""><div class="slds-truncate">SOURCE <span style="visibility:hidden">SRC</span></div></th>
+                                    <th scope="col" style=""><div class="slds-truncate">REMAINING QTY</div></th> 
+                                    <th scope="col" style=""><div class="slds-truncate">Colour</div></th>  
+                                    <th scope="col" style=""><div class="slds-truncate">Family</div></th>
+                                    
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <aura:iteration items="{!v.SOList.SOLIList}" var="var1" indexVar="index">
+                                    <c:SOLIComp SOLIList="{!var1}"  rowIndex="{!index}"/> 
+                                </aura:iteration>
+                                
+                            </tbody>
+                        </table> 
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.closeModal}" style="color:white;background:#a41f34;border-color:#a41f34;">Close</button>
+                        <button class="slds-button slds-button_neutral" onclick="{!c.CreateShipment}" style="color:white;background:#a41f34;border-color:#a41f34;">Create Shipment</button>
+                        <!--<button class="slds-button slds-button_brand">Save</button>-->
+                    </footer>
+                
+                </div>
+                
+                
+                <!-- Shipment POpup starts here -->
+                
+                
+                <aura:if isTrue="{!v.ConfirmShip}">
+                    <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <div class="slds-modal__header">
+                                <button class="slds-button slds-modal__close slds-button--icon-inverse" title="Close" onclick="{!c.closeModal}">
+                                    X<span class="slds-assistive-text">Cancel</span>
+                                </button>
+                                <h2 id="header43" class="slds-text-heading--medium" style="color:rgb(28, 87, 127);">Shipping Details</h2>
+                            </div>
+                            
+                            <div class="slds-modal__content slds-p-around--medium">
+                                <div class="slds-grid slds-wrap">
+                                    
+                                    <!-- -->
+                                    <div class="slds-form-element slds-form_compound slds-m-right_x-small">
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__group">
+                                                <div class="slds-form-element__row">
+                                                    <div class="slds-form-element slds-size_1-of-2">
+                                                        <!-- <lightning:input type="text" name="input1" value = "{!v.supadd.Ship_to_Address1__c}" label="Service Provider" /> -->
+                                                         <lightning:input type="text" name="input1" value = "{!v.Shipmentheader.Delivery_Person__c}" label="Service Provider" required="true"/> 
+                                                        
+                                                    </div>
+                                                    <div class="slds-form-element slds-size_1-of-2">
+                                                        <!-- 
+                                            <lightning:input type="date" name="input1" value ="{!v.Shipmentheader.Shipment_Date__c}" label="Shipment Date" /> 
+                                           -->
+                                                        <ui:inputDate aura:id="expdate" label="Shipment Date" class="field" value="{!v.Shipmentheader.Shipment_Date__c}" displayDatePicker="true" required="true"/> 
+                                                        
+                                                        <!--<lightning:input type="date" aura:id="expdate" label="Shipment Date" class="field" value="{!v.Shipmentheader.Shipment_Date__c}" displayDatePicker="true" variant="label-hidden"/>--> 
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element slds-form_compound slds-m-right_x-small">
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__group">
+                                                <div class="slds-form-element__row">
+                                                    <div class="slds-form-element slds-size_1-of-2">
+                                                        <lightning:input type="text" name="input1" value ="{!v.Shipmentheader.Truck_No__c}" label="Truck Number" />
+                                                    </div>
+                                                    <div class="slds-form-element slds-size_1-of-2">
+                                                        <lightning:input type="text" value ="{!v.Shipmentheader.Waybill_Number__c}" name="input1" label="Waybill Number" />
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="slds-form-element slds-form_compound slds-m-right_x-small">
+                                        <div class="slds-form-element__control">
+                                            <div class="slds-form-element__group">
+                                                <div class="slds-form-element__row">
+                                                    <div class="slds-form-element slds-size_1-of-2">
+                                                        <!-- <lightning:input type="text" value = "{!v.supadd.Ship_to_State__c}" name="input1" label="Ship to State" /> -->
+                                                        <lightning:input type="text" name="input1" value ="{!v.Shipmentheader.Consignment_Number__c}" label="Consignment Number" />
+                                                    </div>
+                                                    <div class="slds-form-element slds-size_1-of-2">
+                                                        <lightning:input type="text" value = "{!v.Shipmentheader.Tracking_URL__c}" name="input1" label="Tracking URL" />                       
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+          
+                                    
+                                    
+                                </div>                   
+                            </div> 
+                            
+                            <div class="slds-modal__footer">
+                                <button class="slds-button slds-button--neutral" style="color:white;background:#a41f34;border-color:#a41f34;" onclick="{!c.closeModal1}">Cancel</button>
+                                <button class="slds-button slds-button--neutral" style="color:white;background:#a41f34;border-color:#a41f34;" onclick="{!c.ConfirmShipment}">Confirm Shipment</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-backdrop slds-backdrop--open"></div>
+                </aura:if>
+                <!-- Shipment popup Ends here -->
+            </div>          
+        </section>
+    </div>
+    
+</aura:component>

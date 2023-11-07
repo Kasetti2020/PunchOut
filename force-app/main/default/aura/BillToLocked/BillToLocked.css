@@ -1,0 +1,6 @@
+.THIS .hide-label label{
+    display:none !important;
+}
+hr:last-child.THIS {
+    display:none;
+}

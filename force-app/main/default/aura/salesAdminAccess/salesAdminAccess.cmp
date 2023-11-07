@@ -1,0 +1,156 @@
+<aura:component controller="salesAdminAccessClass" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="retailerData" type="Sales_Transaction_Stage__c"/>
+    <aura:attribute name="modelData" type="Sales_Transaction_Stage__c"/>
+   <!-- Added by Sai 25-08-2020  Starting-->
+    <aura:attribute name="unitSoldData" type="Sales_Transaction_Stage__c"/>
+    <aura:attribute name="unitSoldDataInDecimal" type="Sales_Transaction_Stage__c"/>
+    <aura:attribute name="unitSoldDataBlank" type="Sales_Transaction_Stage__c"/>
+    <!-- Added by Sai 25-08-2020 Ending-->
+    <aura:attribute name="unitSoldWarning" type="Sales_Transaction_Stage__c"/> <!--Added By Bharath on 18-01/21-->
+    <aura:attribute name="batchId" type="ID"/>
+    
+    
+    <!-- Page Header -->
+    <div class="slds-page-header" role="banner">
+        <div class="slds-grid">
+            <div class="slds-col slds-has-flexi-truncate">
+                <!-- HEADING AREA -->
+                <h1 class="slds-page-header__title slds-truncate" title="Inventory Transaction Master">Mismatch Model/Retailer</h1>
+                <!-- / HEADING AREA -->
+            </div>
+        </div>
+    </div>
+    <!-- Page Header -->
+    
+    <lightning:layout multipleRows="True">
+        <lightning:layoutItem class="box" padding="around-medium" size="7">
+            <lightning:card title="COGS Sales Upload Admin Panel" >                
+                <table id="row" class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_col-bordered slds-table_fixed-layout" >
+                    <col width="350px"></col>
+                    <col width="50px"></col>
+                    <col width="50px"></col>
+                    <thead class="row">
+                        <tr>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Retailer">Retailer Code</div></th>                            
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Mismatch">Mismatch</div></th>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Valid">Valid</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.retailerData}" var="data">
+                            <tr>
+                                <td>
+                                    <div align="center" class="slds-truncate">{!data.Vendor__c}&nbsp;</div>                                    
+                                </td>
+                                <td><div align="center" class="slds-truncate"><input type="checkbox" name="mismatch_check"/></div></td>
+                                <td><div align="center" class="slds-truncate"><input type="checkbox" name="valid_check"/></div></td>           
+                            </tr>
+                        </aura:iteration>
+                    </tbody>                    
+                </table>
+                &nbsp;
+                <table id="row" class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_col-bordered slds-table_fixed-layout" >
+                    <col width="350px"></col>
+                    <col width="50px"></col>
+                    <col width="50px"></col>
+                    <thead class="row">
+                        <tr>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Model">Inventory Model</div></th>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Mismatch">Mismatch</div></th>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Valid">Valid</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.modelData}" var="data">
+                            <tr>
+                                <td>                                    
+                                    <div align="center" class="slds-truncate">{!data.Model__c}&#58;&nbsp;{!data.Category__c}&nbsp;&lt;&gt;&nbsp;{!data.ProductCategory__c}&nbsp;&lt;&gt;&nbsp;{!data.Sub_Category__c}&nbsp;&lt;&gt;&nbsp;{!data.Family__c}</div>
+                                </td>
+                                <td><div align="center" class="slds-truncate"><input type="checkbox" name="mismatch_check"/></div></td>
+                                <td><div align="center" class="slds-truncate"><input type="checkbox" name="valid_check"/></div></td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+                &nbsp;
+                <!-- Added by Sai 25-08-2020  Starting-->
+                <table id="row" class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_col-bordered slds-table_fixed-layout" >
+                    <col width="350px"></col>
+                    <col width="50px"></col>
+                    <col width="50px"></col>
+                    <thead class="row">
+                        <tr>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="UnitSold">Unit_Sold Only </div></th>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Mismatch"></div></th>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Valid">Valid</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.unitSoldData}" var="data">
+                            <tr>
+                                <td>                                    
+                                    <div align="center" class="slds-truncate"><label>UnitSold:</label>{!data.Unit_Sold__c}&nbsp;,<label>SalesEUR:</label>{!data.Sales_EUR__c}&nbsp;,<label>SalesUSD:</label>{!data.Sales_USD__c}&nbsp;,<label>SalesLocal:</label>{!data.Sales_Transaction_Currency__c}</div>
+                                </td>
+                                <td><div align="center" class="slds-truncate"></div></td> 
+                                <td><div align="center" class="slds-truncate"><input type="checkbox" name="valid_check"/></div></td>
+                            </tr>
+                        </aura:iteration>
+                        <aura:iteration items="{!v.unitSoldDataInDecimal}" var="data">
+                            <tr>
+                                <td>                                    
+                                    <div align="center" class="slds-truncate"><label>UnitSold:</label>{!data.Unit_Sold__c}&nbsp;,<label>SalesEUR:</label>{!data.Sales_EUR__c}&nbsp;,<label>SalesUSD:</label>{!data.Sales_USD__c}&nbsp;,<label>SalesLocal:</label>{!data.Sales_Transaction_Currency__c}</div>
+                                </td>
+                                <td><div align="center" class="slds-truncate"></div></td> 
+                                <td><div align="center" class="slds-truncate"><input type="checkbox" name="valid_check"/></div></td>
+                            </tr>
+                        </aura:iteration>
+                        <aura:iteration items="{!v.unitSoldDataBlank}" var="data">
+                            <tr>
+                                <td>                                    
+                                    <div align="center" class="slds-truncate"><label>UnitSold:</label>{!data.Unit_Sold__c}&nbsp;,<label>SalesEUR:</label>{!data.Sales_EUR__c}&nbsp;,<label>SalesUSD:</label>{!data.Sales_USD__c}&nbsp;,<label>SalesLocal:</label>{!data.Sales_Transaction_Currency__c}</div>
+                                </td>
+                                <td><div align="center" class="slds-truncate"></div></td> 
+                                <td><div align="center" class="slds-truncate"><input type="checkbox" name="valid_check"/></div></td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+                <!-- Added by Sai 25-08-2020  Ending-->
+
+                <!-- Added by Bharath 18-01-2021  Starting-->
+                <table id="row" class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_col-bordered slds-table_fixed-layout" >
+                    <col width="350px"></col>
+                    <col width="50px"></col>
+                    <col width="50px"></col>
+                    <thead class="row">
+                        <tr>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="UnitSold">Unit_Sold Warning </div></th>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Mismatch"></div></th>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Valid">Valid</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.unitSoldWarning}" var="data">
+                            <tr>
+                                <td>                                    
+                                    <div align="center" class="slds-truncate"><label>UnitSold:</label>{!data.Unit_Sold__c}&nbsp;,<label>SalesEUR:</label>{!data.Sales_EUR__c}&nbsp;&lt;&gt;&nbsp;<label>SalesUSD:</label>{!data.Sales_USD__c}&nbsp;&lt;&gt;&nbsp;<label>SalesLocal:</label>{!data.Sales_Transaction_Currency__c}</div>
+                                </td>
+                                <td><div align="center" class="slds-truncate"></div></td> 
+                                <td><div align="center" class="slds-truncate"><input type="checkbox" name="valid_check"/></div></td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+                <!-- Added by Bharath on 18-01-2021  Ending-->
+
+                <div align="right">                    
+                    <button class="slds-button slds-button_neutral" name = "Notify" onclick="{!c.notifyClick}">Notify mismatch to User</button>
+                    <button class="slds-button slds-button_neutral" name = "Process" onclick="{!c.processClick}">Proceed to Upload</button> &nbsp;
+                </div>
+            </lightning:card>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+</aura:component>

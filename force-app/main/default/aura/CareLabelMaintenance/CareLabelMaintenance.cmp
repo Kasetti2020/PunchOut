@@ -1,0 +1,36 @@
+<aura:component controller="CareLabelMaintenanceService" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"  access="GLOBAL">
+    <aura:attribute name="selectedTab" type="String"/>
+    <aura:attribute name="selected" type="boolean" default="true"/>
+   <aura:attribute name="retailerID" type="String" default=""/>
+    <aura:attribute name="retailerName" type="String" default=""/>
+    <!--aura:handler name="selectedhandle" event="c:CareLabelTabChangeEvent" action="{!c.selectedtab}"/-->
+    <lightning:tabset selectedTabId="{!v.selectedTab}" variant="vertical" >
+        <lightning:tab label="{!$Label.c.Language_Mapping}" iconName="standard:letterhead" id="Zero" onactive="{!c.selectedtab}">
+            <c:CareLabelLanguageSetup />
+        </lightning:tab>
+        <lightning:tab label="{!$Label.c.Care_Label_Configurator}" iconName="custom:custom67" id="one" onactive="{!c.selectedtab}">
+            <aura:If isTrue="{!v.selected}">
+                <c:CareLabelConfigurator />
+            </aura:If>
+        </lightning:tab>
+        <lightning:tab label="{!$Label.c.Brand_Icon}" iconName="standard:brand" id="two" onactive="{!c.selectedtab}">
+            <c:CareLabelBrandIconSetup />
+        </lightning:tab>
+        <lightning:tab label="{!$Label.c.COUNTRY_OF_ORIGIN}" iconName="custom:custom68" id="three" onactive="{!c.selectedtab}">
+            <c:CountryOfOriginSetup />
+        </lightning:tab>
+        <lightning:tab label="{!$Label.c.Size_Chart}" iconName="standard:quotes" id="four" onactive="{!c.selectedtab}">
+            <c:CareLabelSizeSetup />
+        </lightning:tab>
+        <lightning:tab label="{!$Label.c.Care_Label_Fabric_Component}" iconName="standard:iot_context" id="five" onactive="{!c.selectedtab}">
+            <c:CareLabelFabricSetup />
+        </lightning:tab>
+        <lightning:tab label="{!$Label.c.Care_Instruction_Detail}" iconName="custom:custom62" id="six" onactive="{!c.selectedtab}">
+            <c:CareInstructionDetailSetup />
+        </lightning:tab>
+        <lightning:tab label="{!$Label.c.Excare_Instruction}" iconName="standard:contract" id="seaven" onactive="{!c.selectedtab}">
+            <!--c:CareInstructionDetailSetup/-->
+            <c:ExcareInstructionsetup />
+        </lightning:tab>
+    </lightning:tabset>
+</aura:component>

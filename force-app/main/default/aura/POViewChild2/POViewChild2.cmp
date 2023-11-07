@@ -1,0 +1,82 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doint}"/>
+    <aura:attribute name="IsPOLI" type="Boolean" default="false"/>
+    <aura:attribute name="POLIlist" type="Object"/>
+    <aura:attribute name="POliRecordId" type="String"/>
+    <aura:attribute name="ExpectedDeliveryDate" type="Date"/>
+    <aura:attribute name="SupplyQuantity" type="String"/>
+    <aura:attribute name="colorList" type="List"/>
+    
+    <tr> 
+        <td> </td>        
+        <td> </td>
+        <td><div>{!v.POLIlist.Name}</div> </td>
+        <td><div> {!v.POLIlist.Customer_Ref_Model__c}</div></td>
+        <td><div> {!v.POLIlist.Size__c}</div></td>
+        <td class="highlight">
+            <lightning:select disabled="true" name="select1"  value="{!v.POLIlist.Colour__c}" class="label-hidden" variant="label-hidden" onchange="">
+                <aura:iteration items="{!v.colorList}" var="fld" >
+                    <option  value="{!fld}" text="{!fld}" selected="{!fld==v.POLIlist.Colour__c}"></option>
+                </aura:iteration>
+            </lightning:select>
+        </td>	
+        
+        <td class="slds-text-align_right">
+            <div class="slds-p-right_xx-small">  
+                <ui:outputNumber  value="{!v.POLIlist.Quantity__c}"/>
+                <!--<ui:outputText value="{!v.POLIlist.Quantity__c}"/>-->
+            </div>
+        </td>
+        <td class="slds-text-align_right highlight"><div><ui:inputNumber disabled="true" class="slds-text-align_right " label="" change="{!c.changeQty}" value="{!v.POLIlist.Supply_Quantity__c}"/></div></td>
+        <td><div> {!v.POLIlist.Due_Date_TXT__c}</div></td>
+        <!--<td><div><ui:inputDate aura:id="EndDateField" change="{!c.changeDate}" class="highlight" value="{!v.POLIlist.Expected_Delivery_Date__c}" displayDatePicker="true" format="dd-MM-yyyy"/></div></td>-->
+        <td><div> {!v.POLIlist.Country_Of_Origin_Text__c}</div></td>
+        <td><div> {!v.POLIlist.DEPT_DESC__c}</div></td>
+        <td><div> {!v.POLIlist.APN__c}</div></td>
+        <td><div> {!v.POLIlist.Class__c}</div></td>
+        <td><div> {!v.POLIlist.Dept__c}</div></td>
+        <td><div> {!v.POLIlist.STYLE_DESC__c}</div></td>
+        <td><div> {!v.POLIlist.Style_No__c}</div></td>	
+        <td class="slds-text-align_right"><div> {!v.POLIlist.Selling_Price__c}</div></td>
+        <td><div> {!v.POLIlist.Tag_Size_Color__c}</div></td>
+        <td><div> {!v.POLIlist.Season__c}</div></td>
+        <td><div> {!v.POLIlist.LOCN_TXT__c}</div></td>
+        <td><div> {!v.POLIlist.PLU__c}</div></td>    
+        <!--<td><div> <lightning:formattedDateTime value="{!v.POLIlist.CreatedDate}" year="numeric" month="numeric" day="numeric" /></div></td>
+        <td><div> <lightning:formattedDateTime value="{!v.POLIlist.LastModifiedDate}" year="numeric" month="numeric" day="numeric" /></div></td>-->
+        <td> 
+            <lightning:buttonIcon class ="slds-button_neutral1" iconName="utility:pop_in" variant="bare" value="{!v.POLIlist.Id}" onclick="{!c.viewPOLI}" alternativeText="{!$Label.c.View}" />
+        </td>        
+    </tr>
+    
+    <!-- Model Box Start for POLI-->    
+    <aura:if isTrue="{!v.IsPOLI}">
+        
+        <div class="demo-only" style="">
+            <section role="dialog" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.closeModal}">
+                            <lightning:icon iconName="action:close" size="x-small" alternativeText="{!$Label.c.Close}"/>
+                            <span class="slds-assistive-text" >{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!v.POLIlist.Name}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <!--<force:recordView recordId="{!v.POList.POwrap.Id}" />-->
+                        <lightning:recordForm
+                                              recordId="{!v.POLIlist.Id}"
+                                              objectApiName="Purchase_Order_LineItem__c"
+                                              layoutType="Full"
+                                              mode="readonly"
+                                              columns="2"/>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </div>
+    </aura:if>
+    <!-- Modal Box ends here -->
+    
+    
+</aura:component>

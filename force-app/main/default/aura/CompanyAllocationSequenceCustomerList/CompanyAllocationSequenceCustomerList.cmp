@@ -1,0 +1,145 @@
+<aura:component controller="CompanyAllocationSequenceListClass" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="SOresponse" type="ReuseOrdAllocationWrapper[]"/>
+    <!-- <aura:attribute name="SOresponse" type="Reuse_Order_Allocation__c[]"/>-->
+    <aura:attribute name="Status" type="String"/>
+    <aura:attribute name="ParentComp" type="boolean" default="true"/>
+    <aura:attribute name="ShipComp" type="boolean" default="false"/>
+    <aura:attribute name="ButtonDissable" type="boolean" default="false"/>
+    <aura:attribute name="page" type="integer"/>
+    <aura:attribute name="pages" type="integer"/>
+    <aura:attribute name="total" type="integer"/>
+    <aura:attribute name="searchText" type="String" default=""/>
+    
+    <aura:attribute name="addCmpFlag" type="boolean" default="false"/>
+    <aura:attribute name="SelectedRetailerObj" type="Object" /> 
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doint}"/>
+    <aura:handler event="c:PageChange" action="{!c.pageChange}"/>
+    <aura:handler name="searchRetailerEvent" event="c:GlobalRetailerSearchEvent" action="{!c.handleSearchEvent}"/>
+    
+    <aura:attribute name="navToAddCmp" type="Boolean" default="True"/>
+    <aura:attribute name="SelectedRetailerName" type="String" /> 
+    <aura:attribute name="SelectedRetailer" type="String" />  
+    <aura:handler name="StappComponentEvent" event="c:StappComponentEvent" action="{!c.handleComponentEvent}"/>
+      
+    <aura:attribute name="isEdit" type="Boolean" default="false"/>
+    <aura:attribute name="reuseOrdId" type="string" />
+    <aura:attribute name="retailerDetail" type="string" />
+    <aura:handler name="CompanyAllocationPageListEvent" event="c:CompanyAllocationPageListEvent" action="{!c.handlePageListEvent}"/>
+    
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position: fixed" alternativeText="Loading" size="large" />
+    </div>
+      <lightning:layout horizontalAlign="center">        
+            <lightning:layoutItem class="boxx" padding="around-large" size="8">    
+    <table style="width:100%;background-color:white; border: 2px solid gray;">
+    <aura:If isTrue="{!v.navToAddCmp}">
+        <div class="content">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container1" title="Reuse Order Allocation">
+                           <img src="{!$Resource.MagNETIcons + '/View.png'}" width="50" style="background-color:#a41f34;"/>
+                        </span>
+                    </div>
+                    
+                        <table class="slds-table" style="width:85%;background-color:white; border: 0px solid gray;align:center;"> 
+                            <thead>
+                                <tr class="slds-text-title_caps slds-gray">
+                                    <th style="width: 2.5%;">
+                                        <div class="slds-media__body">
+                                            <h1 style="text-align:center">MagNET reuse order allocation</h1>
+                                         </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>                            
+                                <tr>
+                                    <td>
+                                        <div class="slds-text-align_center" style="width:50%;">
+                                            <div class="slds-form-element slds-form-element_horizontal slds-m-bottom_none">
+                                                <!--  <c:GlobalSearch searchType="OrderHistory" SOStatus="{!v.Status}"/>-->
+                                                <c:GlobalRetailerSearch searchType="OrderHistory"/>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table> 
+                  </header>
+            </div>
+            <div class="slds-box1" style="">
+                <aura:renderIf isTrue="{!v.isError}">
+                    <ui:message title="Error" severity="error" closable="false">
+                        {!v.errorMsg}
+                    </ui:message>
+                    <aura:set attribute="else">  
+                    </aura:set>
+                </aura:renderIf> 
+            </div>
+            <div class="slds-card__body;">
+                <div class="table-scroll slds-scrollable_y">
+                    <table class="slds-table"> 
+                        <thead>
+                            <tr class="slds-text-title_caps slds-gray">
+                                <th style="width: 2.5%;"><div class="slds-truncate"></div></th>
+                                <!--<th style="width: 2.5%;"><div class="slds-truncate"></div></th>-->
+                                <th style="text-align: center; align: center;"><div>Retailer Name</div></th>
+                                <th style="text-align: center; vertical-align: middle;"><div>Status</div></th>
+                                <th style="text-align: center; vertical-align: middle;"><div> Delete/Edit</div></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:If isTrue="{!greaterthan(v.SOresponse.length,0)}">
+                                <aura:iteration items="{!v.SOresponse}" var="so" indexVar="index">
+                                    <!--<c:SalesOrderTable rowIndex="{!index}"/>-->
+                                    <c:CompanyAllocationSequencePageList SOrder="{!so}"  rowIndex="{!index}"/> 
+                                </aura:iteration>
+                                <aura:set attribute="else">
+                                    <tr><td></td>
+                                        <td class="slds-float_right">
+                                    <tr align="center">
+                                        <!--<td style="width:660px"></td>-->
+                                        <div style="width:200px">
+                                            <p>No Records Found...</p></div></tr>
+                                            <tr style ="height:5px"></tr>
+                                    <tr align="center">
+                                       <!-- <td style="width:60px"></td>-->
+                                    <div class="slds-float_right" style="width:200px">
+                                    <lightning:button variant="destructive" label="Click to Add Companies" title="Destructive action" onclick="{!c.handleAddCmp}" class="slds-m-left_x-small"/>
+                                    </div></tr> </td></tr>
+                                 <tr style="height:20px;"></tr>
+                                </aura:set>
+                               
+                            </aura:If>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <footer class="slds-card__footer footer" style="height:20px;">
+                <div class="slds-text-align_center">
+                   <!-- <c:PaginationComponentForInventory page="{!v.page}" pages="{!v.pages}" total="{!v.total}" txt="{!v.searchText}"/>-->
+                </div>
+              <!--  <lightning:buttonIcon iconName="utility:chevronleft"  size="x-small" variant="border-filled" alternativeText="Previous" iconClass="dark" onclick="{!c.previousPage}"/>
+              <lightning:buttonIcon iconName="utility:chevronright"  size="x-small" variant="border-filled" alternativeText="Next" iconClass="dark" onclick="{!c.nextPage}"/>--> 
+      </footer>               
+        </div>
+        </aura:If>
+        
+                </table>
+          </lightning:layoutItem>
+    </lightning:layout>      
+    <aura:If isTrue="{!v.addCmpFlag}">
+        <lightning:layout horizontalAlign="center">        
+            <lightning:layoutItem class="boxx" size="10">
+                <c:TestLookup selectedRetailerRecord="{!v.SelectedRetailerObj}"
+                              SelectedRetailer="{!v.SelectedRetailer}"
+                              retailerDetail = "{!v.retailerDetail}"
+                              isEdit = "{!v.isEdit}"
+                              reuseOrdId = "{!v.reuseOrdId}"/>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </aura:If>
+    
+</aura:component>

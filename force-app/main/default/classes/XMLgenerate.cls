@@ -1,5 +1,5 @@
 public class XMLgenerate {
-    public static void xmlResponseGenerator(string resPonseData,string payloadID,string timestamp){
+    public static String xmlResponseGenerator(string resPonseData,string payloadID,string timestamp){
         Dom.Document doc = new Dom.Document();
         SYstem.debug('doc:'+doc);
         
@@ -21,6 +21,8 @@ public class XMLgenerate {
         fromURL.addTextNode(resPonseData);
         String xmlString = doc.toXmlString();
         System.debug('xmlstring==> ' + xmlString);
+        //return '<?xml version="1.0" encoding="utf-16"?><!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd"><cXML xml:lang="en-US" payloadID="635143174550687417@clientsite.com" timestamp="2013-09-09T14:57:35-05:00">   <Response>     <Status code="200" text="success" />    <PunchoutSetupResponse>      <StartPage>      <URL>https://www.ClientSite.com/Punchout/        punchoutsessionrequest.isch?ps=e82d0d33-9fee-45fe-9d87-a23400a4218d</URL>      </StartPage>    </PunchoutSetupResponse>    </Response></cXML>';
+        return '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd"><cXML xml:lang="en-US" payloadID="1655760397.690501.31608925@punchoutconnect.net" timestamp="2022-06-20T16:26:37-05:00"><Response><Status code="200" text="success"></Status><PunchOutSetupResponse><StartPage><URL>https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQL9ZMYhruB7Vni2IIjWQspnqmQdozLwVoZgtfGXeCOSBGQvIl5AMBOFVaUalW26gbioWF1OecAXArn3wIirX_6H2bL7v</URL></StartPage></PunchOutSetupResponse></Response></cXML>';
     }
     public static void CancelledOrders(string  orderDate,string orderID,string payloadID){
           // Create a new XML document
@@ -195,6 +197,9 @@ public class XMLgenerate {
         request.setBody(xmlString);
         HttpResponse response = http.send(request);
     }
+    
+    
+    
     
     
     

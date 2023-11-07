@@ -1,0 +1,58 @@
+<aura:component  Controller="CareLabelOrder" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global"> 
+    <aura:attribute name="viewisModalOpen" type="Boolean" />
+    <aura:attribute name="sizelist" type="List" />
+    <aura:attribute name="selectedsizechart" type="List" />
+    
+    <aura:attribute name="selectedSize" type="String" />
+    <aura:attribute name="sizeChartData" type="Object"/>
+    <aura:attribute name="viewSizeChartData" type="Object"/>
+    
+    <aura:registerEvent name="changeTabColorSizeChart" type="c:changeTabColor"/> 
+    <aura:registerEvent name="loadMyEvent" type="c:LogoEvent"/>
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:method name="getSelectedData" action="{!c.selectedSize}" 
+                 access="public">
+    </aura:method>
+    <aura:method name="viewSelectedData" action="{!c.viewselectedSize}" 
+                 access="public">
+    </aura:method>
+    <aura:method name="clearSelectedData" action="{!c.clearData}" 
+                 access="public">
+        <aura:attribute name="CloneORClear" type="String"/> 
+    </aura:method>
+    <aura:If isTrue="{!v.sizelist.length>0}">
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-no-row-hover" style="border:1px solid #d4d4d4;width:20%; ">
+            
+            <tbody style="height: 10px; overflow-y: auto;"> 
+                
+                <!--Sizer Chart Picklist Starts here
+                <div  style="width:190px;">
+                    <label> &nbsp;  {!$Label.c.Size}</label>
+                    <div class="slds-scrollable_y" style="height:2rem;width:15rem">
+                    <ui:inputSelect aura:id="checknames" class="slds-col" change="{!c.handlePicklistSelected}" value="{!v.selectedsizechart.EngSize1__c}">
+                        <option value="-NONE-"> {!$Label.c.None}</option>
+                        <aura:iteration items="{!v.sizelist}" var="slist" >           
+                            <option value="{!slist.EngSize1__c}" selected="{!v.selectedsizechart.EngSize1__c==slist}"> {!slist.EngSize1__c}</option>
+                        </aura:iteration>
+                    </ui:inputSelect> 
+                </div>
+                </div> -->
+                <!--Sizer Chart Picklist Ends here -->
+                <div  class="slds-scrollable" style="height:5rem;width:24rem">
+                <lightning:select aura:id="checknames" value="{!v.selectedsizechart.EngSize1__c}" label="{!$Label.c.Size}" onchange="{!C.handlePicklistSelected}">      
+                    <option value="">{!$Label.c.None}</option>
+                    <!--option value="">English</option--> 
+                    <aura:iteration items="{!v.sizelist}" var="slist">
+                        <option value="{!slist.EngSize1__c}" selected="{!v.selectedsizechart.EngSize1__c==slist}" class="slds-form-element__control"> {!slist.EngSize1__c}</option>
+                    </aura:iteration> 
+                </lightning:select>
+                          </div>
+            </tbody>
+            
+            
+        </table>
+        <aura:set attribute="else"> 
+            <h1 style="margin-left: 31%;padding: 2rem;font-size: 21PX;">{!$Label.c.Configuration_Not_Done_For_This_Product}</h1>
+        </aura:set>
+    </aura:If>
+</aura:component>

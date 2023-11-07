@@ -1,0 +1,25 @@
+.THIS .slds-button_neutral{
+    color:#a41f34;
+    border-color:#a41f34;
+}
+.THIS .slds-button_brand{
+    background:#a41f34;
+    border-color:#a41f34;
+    color:White;
+}
+.THIS .slds-card__header-title
+{
+    color:#a41f34;
+    font-weight:bold;
+}
+.THIS .slds-icon-text-default
+{
+    fill:#a41f34;
+}
+.THIS .red
+{
+    background-color:#a41f34;
+}
+.THIS a {
+    color: Black;
+}

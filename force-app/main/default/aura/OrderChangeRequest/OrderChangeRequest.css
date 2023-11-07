@@ -1,0 +1,50 @@
+.THIS h2
+{
+    color:rgb(164, 31, 52);
+}
+.THIS .slds-modal__container{
+    width:75%;
+    max-width:75%;
+}
+.THIS .hide-label label
+{
+    display:none;
+}
+.THIS .box-title
+{
+    display: flex;
+    position: relative;
+    margin-top: -26px;
+    background: white;
+    padding: 0 10px;
+    color:#a90533;
+    margin-left:10px;
+    font-weight: bold;
+    font-size:12px;
+}
+.THIS .slds-button__icon
+{
+    widows: 12px !important;
+    height:12px !important;
+}
+.THIS th
+{
+    background:#f4f4f4 !important;
+    color:gray !important;
+}
+.THIS th:hover
+{
+    background:#f4f4f4 !important;
+    color:gray !important;
+}
+th:hover.THIS 
+{
+    background:#f4f4f4 !important;
+    color:gray !important;
+}
+.THIS th {position:relative !important;padding:5px 2px;}
+.THIS table td {border:0 !important;}
+.THIS .slds-button
+{
+    line-height: 22px;
+}

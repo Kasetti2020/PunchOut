@@ -1,0 +1,14 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/> 
+    <aura:attribute name="banner" type="boolean" default="true"/>
+    <div class="banner-bg slds-align_absolute-center">
+        <div class="content-bg">
+            <p class="para1">{!$Label.c.Welcome_to_MagNET}</p>
+            <h3 class="para2">Production Community</h3>
+            <!--<p class="para1">Providing quality service</p>
+                <h3 class="para2">Value for Money</h3>-->
+        </div>
+    </div>
+    
+    <c:ProductionTermsAndConditions />
+</aura:component>

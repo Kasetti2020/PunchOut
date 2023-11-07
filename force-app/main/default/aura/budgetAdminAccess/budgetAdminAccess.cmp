@@ -1,0 +1,53 @@
+<aura:component  controller="budgetAdminAccessClass" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+	<aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="retailerData" type="Budget_Transaction_Stage__c"/>
+    <aura:attribute name="batchId" type="ID"/>
+    
+    
+    <!-- Page Header -->
+    <div class="slds-page-header" role="banner">
+        <div class="slds-grid">
+            <div class="slds-col slds-has-flexi-truncate">
+                <!-- HEADING AREA -->
+                <h1 class="slds-page-header__title slds-truncate" title="Inventory Transaction Master">Mismatch Retailer</h1>
+                <!-- / HEADING AREA -->
+            </div>
+        </div>
+    </div>
+    <!-- Page Header -->
+    
+    <lightning:layout multipleRows="True">
+        <lightning:layoutItem class="box" padding="around-medium" size="7">
+            <lightning:card title="COGS Budget Upload Admin Panel" >                
+                <table id="row" class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_col-bordered slds-table_fixed-layout" >
+                    <col width="350px"></col>
+                    <col width="50px"></col>
+                    <col width="50px"></col>
+                    <thead class="row">
+                        <tr>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Retailer">Retailer Code</div></th>                            
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Mismatch">Mismatch</div></th>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Valid">Valid</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.retailerData}" var="data">
+                            <tr>
+                                <td>
+                                    <div align="center" class="slds-truncate">{!data.Retailer__c}&nbsp;</div>                                    
+                                </td>
+                                <td><div align="center" class="slds-truncate"><input type="checkbox" name="mismatch_check"/></div></td>
+                                <td><div align="center" class="slds-truncate"><input type="checkbox" name="valid_check"/></div></td>           
+                            </tr>
+                        </aura:iteration>
+                    </tbody>                    
+                </table>
+                <div align="right">                    
+                    <button class="slds-button slds-button_neutral" name = "Notify" onclick="{!c.notifyClick}">Notify mismatch to User</button>
+                    <button class="slds-button slds-button_neutral" name = "Process" onclick="{!c.processClick}">Proceed to Upload</button> &nbsp;
+                </div>
+            </lightning:card>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+</aura:component>

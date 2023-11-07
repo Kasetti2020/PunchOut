@@ -1,0 +1,156 @@
+<aura:component  Controller="CatalogOrderController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    
+    <aura:attribute name="RoList" type="List"/>
+    <aura:attribute name="Retailercmp" type="Boolean" default="true"/>
+    <aura:attribute name="Catalogcmp" type="Boolean" default="false"/>
+    <aura:attribute name="isCartCreated" type="Boolean" default="false"/>
+    <aura:attribute name="completeWrap" type="list"/> 
+    <aura:attribute name="onselectRetailer" type="String"/> 
+    <aura:attribute name="SelectRetailer" type="String"/>  
+    <aura:attribute name="onselectcustomeid" type="String"/> 
+    <aura:attribute name="onselectRetailercode" type="Integer"/>
+    
+    
+    <aura:attribute name="cartVertical" type="String" default="Hanger Business"/>
+    <aura:attribute name="cartCompany" type="String" default=""/>
+    <aura:attribute name="cartCurrency" type="String" default=""/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <!--Order to company and prefererred currency-->
+    <aura:attribute name="selectedCompany" type="string"/>
+    <aura:attribute name="selectedCurrency" type="String"/>
+    <aura:attribute name="searchedCurrency" type="String"/>
+    <aura:attribute name="listOfCompanies" type="List"/>
+    <aura:attribute name="listOfCurrency" type="List"/>
+    <aura:attribute name="showConfirmDialog" type="Boolean" default="false"/>  
+    <aura:attribute name="verticleId" type="string"/>
+    <aura:attribute name="SelectedPiklistCompany" type="String" default=''/>
+    <aura:attribute name="SelectedPiklistCurrency" type="String" default=''/>
+    <aura:attribute name="SelectedPiklistVertical" type="String" default='Hanger Business'/>
+    
+    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src	'self' 'unsafe-inline' *; img-src 'self' data: *"/>
+    
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position: fixed" alternativeText="{!$Label.c.Loading}" size="large" />
+    </div>
+    <aura:If isTrue="{!v.Retailercmp}">  
+        <div class="slds-box slds-p-around_none slds-p-around_medium slds-m-around_medium">
+            <header class="slds-modal__header slds-text-align_left">
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                    <lightning:icon class="slds-icon" iconName="standard:user" alternativeText="{!$Label.c.Doc_image}" /> {!$Label.c.Retailer} </h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                <div class="slds-truncate" style="color:#16325c;font-weight:bold;">{!$Label.c.Retailer_Code_Please_select_a_Retailer}</div>
+                
+                <aura:iteration items="{!v.RoList}" var="retail" >
+                    <aura:if isTrue="{!retail.Online_Enquiry__c}">
+                        <a onclick="{!c.Catalogcmp}" name="{!retail.Name}" title="{!retail.Id}" class="slds-col slds-welcome-mat__tile slds-float_left" >
+                            <div class="slds-box slds-box_link slds-media"  >
+                                <aura:if isTrue="{!retail.Display_Image_In_Document__c}">
+                                    <div class="slds-media__figure slds-media__figure_fixed-width slds-align_absolute-center">
+                                        <div class="slds-welcome-mat__tile-figure">
+                                            <div class="slds-welcome-mat__tile-icon-container">
+                                                <span class="slds-icon_container slds-icon-utility-animal_and_nature retailer-code-img" style="{!'background:url(../servlet/servlet.FileDownload?file='+ retail.Attachments[0].Id+')'}">  
+                                                    <!--<img class="product-image-photo" src="{!'../servlet/servlet.FileDownload?file='+ retail.Attachments[0].Id}" alt='image' width="60"/>-->
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </aura:if>
+                                <div class="slds-media__body">
+                                    <div class="slds-welcome-mat__tile-body slds-truncate" title="{!retail.Name}">
+                                        <output type="text" class="slds-welcome-mat__tile" value="{!retail.Name}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </aura:if>
+                </aura:iteration>  
+                
+            </div> 
+        </div>
+    </aura:If>
+    
+    
+    <!--Confirmation PopUp Start-->
+    <aura:if isTrue="{!v.showConfirmDialog}">
+        <!--Modal Box Start-->
+        <div role="dialog" class="slds-modal slds-fade-in-open " style="border:1px solid black;" >
+            <div class="slds-modal__container">
+                <div style="max-width: 450px;max-height: 750px;border:1px solid black;">
+                    <!--Modal Box Header Start-->
+                    <header class="slds-modal__header">
+                        <h1 class="slds-text-heading--medium"><B>{!$Label.c.Order_Selection}</B></h1>
+                    </header>
+                    <!--Modal Box Header End-->
+                    
+                    <!--Modal Box Content Start-->
+                    <div style="background-color:#cccccc" align="center">
+                        <tr>
+                            <td style="width:300px">
+                                <div class="slds-col slds-m-right_medium">
+                                    <lightning:input type="text" label="{!$Label.c.Selected_Retailer}" name="Selected Retailer" value="{!v.onselectRetailer}"  disabled="true"/>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:300px">
+                                <div class="slds-col slds-m-right_medium">
+                                    <lightning:select aura:id="select" name="select" label="{!$Label.c.Order_Bussiness_Vertical}" onchange="{! c.onVerticleChange }">
+                                        <!--  <option value="">choose one...</option>-->
+                                        <option value="Hanger Business">{!$Label.c.HANGERS_AND_ACCESSORIES}</option>
+                                        <option value="Labels &amp; Tickets">{!$Label.c.LABELS_AND_TICKETS}</option>
+                                        <option value="Flexible Packaging">{!$Label.c.FLEXIBLE_PACKAGING}</option>
+                                        <option value="INTELLIGENT SOLUTIONS">{!$Label.c.EAS_AND_RFID}</option>
+                                        <option value="TLA">{!$Label.c.STRUCTURAL_PACKAGING}</option>
+                                        <option value="MCare">{!$Label.c.MCARE}</option>
+                                    </lightning:select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:300px">
+                                <div class="slds-col slds-m-right_medium">
+                                    <lightning:select name="select1"  value="{!v.selectedCompany}" label="{!$Label.c.Order_To_Company}" onchange="{!c.OrderToCompany}" required="true">
+                                        <option value="NULL" text="{!$Label.c.None}"></option>
+                                        <aura:iteration items="{!v.listOfCompanies}" var="fld" >
+                                            <option value="{!fld}" text="{!fld}" selected="{!fld==v.selectedCompany}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:300px">
+                                <div class="slds-col slds-m-right_medium">
+                                    <lightning:select name="select1"  value="{!v.selectedCurrency}" label="{!$Label.c.Preferred_Currency}" onchange="{!c.preferredCurrency}" required="true">   
+                                        <option value="NULL" text="{!$Label.c.None}"></option>
+                                        <aura:iteration items="{!v.listOfCurrency}" var="fld" >
+                                            <option value="{!fld}" text="{!fld}" selected="{!fld==v.selectedCurrency}"></option>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                </div>
+                            </td>
+                        </tr>
+                    </div>
+                    <!--Modal Box Content End-->
+                    
+                    <!--Modal Box Button Start-->
+                    <footer class="slds-modal__footer">
+                        <lightning:button name='Cancel' label='{!$Label.c.Cancel}' onclick='{!c.cancelPopUp}'/>
+                        <lightning:button variant="brand" name='Start Order' label='{!$Label.c.Start_Order}' onclick='{!c.handleStartOrder}'/>
+                    </footer>
+                    <!--Modal Box Button End-->
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>            
+    </aura:if>
+    <!--Confirmation PopUp End-->
+    
+    
+    <aura:If isTrue="{!v.Catalogcmp}"> 
+        <c:CatalogOrder SelectedRetailer="{!v.onselectRetailer}" onselectcustomeid="{!v.onselectcustomeid}" SelectedRetailercode="{!v.onselectRetailercode}" selectedTab="{!v.cartVertical}" selectedCompany="{!v.cartCompany}" selectedCurrency="{!v.cartCurrency}" cartFlag="{!v.isCartCreated}"/>
+    </aura:If>
+</aura:component>

@@ -1,0 +1,37 @@
+<aura:component controller="MaterialUploadValidationFailSummary" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doint}"/>
+    <aura:attribute name="accordianHeader" type="Object[]"/>
+    <aura:attribute name="batchNo" type="String" />
+    <aura:attribute name="batchNumber" type="String"/>
+    
+    <aura:handler name="MaterialUploadValidationSummaryEvent" event="c:MaterialUploadValidationFailSummaryEvent" action="{!c.handleChildEvent}"/>
+    
+    <lightning:layout horizontalAlign="center">
+        <lightning:layoutItem padding="around" size="12">
+            <table style="width:100%;background-color:white; border: 0px solid gray;">
+                <div class="content">
+                    <div class="slds-modal__content slds-p-around_small" style="min-height:65vh;">
+                        <div class="slds-box slds-p-around_none slds-m-top_small1">
+                            <table class="slds-table">
+                                <tbody >
+                                    <aura:iteration items="{!v.accordianHeader}" var="accordHeader" indexVar="index">
+                                        <c:MaterialUploadValidationFailSummaryDetail accordianHeader="{!accordHeader}" 
+                                                                            rowIndex="{!index}" 
+                                                                            batchNo="{!v.batchNo}"
+                                                                            batchNumber="{!v.batchNumber}" /> 
+                                    </aura:iteration>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </table>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position: fixed" alternativeText="Loading" size="large" />
+    </div>
+    
+</aura:component>

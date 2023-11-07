@@ -1,0 +1,93 @@
+<aura:component controller="CompanyAllocationSequenceListClass" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="rowIndex" type="integer" /> 
+    <aura:attribute name="SOrder" type="Object"/> 
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="retailerList" type="Reuse_Order_Allocation_Detail__c[]"/>
+    <aura:attribute name="proBunList" type="Reuse_Order_Allocation_Detail__c[]"/>
+    <aura:attribute name="parentproBunList" type="Reuse_Order_Allocation_Detail__c[]"/>
+    <aura:attribute name="testBoolean" type="Boolean"/>
+    <div>
+        <lightning:layout horizontalAlign="center">        
+            <lightning:layoutItem class="boxx" padding="around-large" size="12">           
+                <lightning:card class="slds-text-heading_Bold slds-card_boundary slds-text-title_bold card-Color"  title="List Page">
+                    <table class="slds-table slds-table--bordered slds-table--striped">
+                        <thead>
+                            <tr>
+                                <th scope="col"><span class="slds-truncate">Retailer Name</span></th>
+                                <th scope="col"><span class="slds-truncate">Status</span></th>
+                                <th scope="col"><span class="slds-truncate">Action</span></th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <td>
+                        <div  style="height:300px;width:1300px;">
+                            <div class="slds-scrollable_y" style="height:100%;">
+                                <lightning:accordion allowMultipleSectionsOpen="true"  >
+                                    <aura:iteration items="{!v.retailerList}" var="pro">
+                                        <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                                            
+                                            <td style="width:900px;">
+                                                <lightning:accordionSection name="{!pro.Name}" label="{!pro.Name}" class="slds-col slds-size_3-of-3" >
+                                                    
+                                                    
+                                                    <!-- <lightning:datatable
+                                                                     aura:id="accountDataTable"
+                                                                     columns="{! v.columns }"
+                                                                     data="{!childPro.Child_Product__r.Name }"
+                                                                     keyField="Id"
+                                                                     onsave ="{!c.onSave}"
+                                                                     hideCheckboxColumn="true"
+                                                                     onrowaction="{! c.handleRowAction }" />-->
+                                                    
+                                                    <table class="slds-table slds-table--bordered slds-table--cell-buffer">
+                                                        <!--   <thead>
+                                                        <tr class="slds-text-title-caps">
+                                                             <th scope="col">
+                                                                <div class="slds-truncate" Style="Edit" title="Number Sequence">Number Sequence </div>
+                                                            </th>
+                                                            <th scope="col">
+                                                                <div class="slds-truncate" Style="Edit" title="Order To Company">Order To Company </div>
+                                                            </th>
+                                                          
+                                                            
+                                                        </tr>
+                                                    </thead> -->
+                                                        <tbody>
+                                                            <aura:iteration items="{!v.proBunList}" var="childPro" indexVar="ind">
+                                                                 <aura:if isTrue="{!pro.Name == childPro.Name}">
+                                                               <!-- <aura:if isTrue="{!childPro.Child_Product__c != null}">-->
+                                                                
+                                                                   <td>
+                                                                        <div class="slds-truncate" title="">{!childPro.Number_Sequence__c} </div>
+                                                                    </td>                                                                
+                                                                     <td>
+                                                                         <div class="slds-truncate" title="">{!childPro.Order_To_Company__c} </div>
+                                                                     </td>
+                                                                    
+                                                                    
+                                                                
+                                                                <!-- </aura:if>-->
+                                                            </aura:if>
+                                                            </aura:iteration>
+                                                        </tbody>
+                                                    </table>
+                                                </lightning:accordionSection>
+                                            </td>
+                                            <td class="slds-col slds-size_1-of-3"  style="width:300px;">
+                                                <!-- <ui:inputCheckbox aura:id="chkbox" class="slds-input" change="{!c.selectChange}"/> -->
+                                                <lightning:input type="checkbox" checked="{!pro.Status__c}" name="{!pro}" onchange="{!c.onChange}" value="{!pro.Status__c}"/>
+                                            </td>
+                                            <td class="slds-col slds-size_1-of-3"  style="width:300px;"> 
+                                                <lightning:button class="slds-button slds-button_brand slds-m-top_medium Save" iconName="utility:delete" variant="Delete" label="Delete" title="Delete" onclick="{!c.delete}" name="{!pro.Name}" /></td>
+                                        </table>
+                                    </aura:iteration>
+                                </lightning:accordion>
+                            </div>
+                        </div></td>
+                    
+                    
+                </lightning:card>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

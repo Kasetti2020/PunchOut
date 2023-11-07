@@ -1,0 +1,127 @@
+<aura:component controller="SOController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="SOresponse" type="SOController.ResponseWrapper"/>
+    <aura:attribute name="Status" type="String"/>
+    <aura:attribute name="ParentComp" type="boolean" default="true"/>
+    <aura:attribute name="ShipComp" type="boolean" default="false"/>
+    <aura:attribute name="ButtonDissable" type="boolean" default="false"/>
+    <aura:attribute name="page" type="integer"/>
+    <aura:attribute name="pages" type="integer"/>
+    <aura:attribute name="total" type="integer"/>
+    <aura:attribute name="searchText" type="String" default=""/>
+    
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doint}"/>
+    <aura:handler event="c:PageChange" action="{!c.pageChange}"/>
+    <aura:handler name="searchEvent" event="c:GlobalSearchEvent" action="{!c.handleSearchEvent}"/>
+    
+    <aura:attribute name="navToCart" type="Boolean" default="false"/>
+    <aura:attribute name="SelectedRetailerName" type="String" /> 
+    <aura:attribute name="SelectedRetailer" type="String" />  
+    <aura:handler name="StappComponentEvent" event="c:StappComponentEvent" action="{!c.handleComponentEvent}"/>
+    
+     <aura:attribute name="RevisedSOCompanyCmp" type="Boolean" default="false"/>  
+      <aura:attribute name="RevisedSOCurrencyCmp" type="Boolean" default="false"/>  
+      <aura:attribute name="MainFlag" type="Boolean" default="false"/>
+    
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position: fixed" alternativeText="{!$Label.c.Loading}" size="large" />
+    </div>
+     <aura:If isTrue="{! !v.MainFlag}">
+    <aura:If isTrue="{! !v.navToCart}">
+    <div class="content">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container1" title="{!$Label.c.Sales_Order}">
+                        <!--<lightning:icon iconName="standard:entitlement" size="small" alternativeText="Warning!" variant="brand"/>-->
+                        <img src="{!$Resource.MagNETIcons + '/View.png'}" width="50"/>
+                    </span>
+                </div>
+                <div class="slds-media__body" style="min-width:85px">
+                    <h2 class="slds-card__header-title header slds-text-title_caps">
+                        <strong>{!$Label.c.SALES_ORDER_LIST}</strong>
+                    </h2>
+                </div>
+                <div class="slds-no-flex status" style="width:50%;">
+                    <div class="slds-form-element slds-form-element_horizontal slds-m-bottom_none">
+                        <c:GlobalSearchForChildPO searchType="OrderHistory" SOStatus="{!v.Status}"/>
+                    </div>
+                </div> 
+              <!--  <div class="slds-no-flex slds-m-right_medium">
+                    <lightning:button variant="brand" label="{!$Label.c.Admin_Revise_Company}" iconName="utility:change_request" iconPosition="left" onclick="{!c.getRevisedSOCompany}"/>
+                </div>
+                 <div class="slds-no-flex slds-m-right_medium">
+                    <lightning:button variant="brand" label="{!$Label.c.Admin_Revise_Currency}" iconName="utility:change_request" iconPosition="left" onclick="{!c.getRevisedSOCurrency}"/>
+                </div>-->
+                <div class="slds-no-flex status slds-m-right_medium">
+                    <div class="slds-form-element slds-form-element_horizontal slds-m-bottom_none">
+                        <lightning:select name="Status" variant="label-hidden" label="{!$Label.c.STATUS}" value="{!v.Status}" onchange="{!c.StatusFilter}">
+                            <option value="NULL" text="{!$Label.c.Select_Status}"></option>
+                            <aura:iteration items="{!v.SOresponse.ListOfStatus}" var="sts" >
+                                <option value="{!sts}" text="{!sts}"></option>
+                            </aura:iteration>
+                        </lightning:select>
+                    </div>
+                </div>
+                
+            </header>
+        </div>
+        <div class="slds-box1" style="">
+            <aura:renderIf isTrue="{!v.isError}">
+                <ui:message title="Error" severity="error" closable="false">
+                    {!v.errorMsg}
+                </ui:message>
+                <aura:set attribute="else">  
+                </aura:set>
+            </aura:renderIf> 
+        </div>
+        <div class="slds-card__body">
+            <div class="table-scroll  ">
+                <table class="{!v.tablesizeExpand?'slds-table slds-table1 1':'slds-table slds-table2 2'}"> 
+                    <thead>
+                        <tr class="slds-text-title_caps slds-gray">
+                            <th style="width: 2.5%;"><div class="slds-truncate"></div></th>
+                            <th style="width: 2.5%;"><div class="slds-truncate"></div></th>
+                            <th style="width: 6%;"><div class="slds-truncate">{!$Label.c.MAGNET_ORDER_NO}</div></th>
+                            <th style="width: 14%;"><div class="slds-truncate slds-text-align_center">{!$Label.c.STATUS}</div></th>
+                            <!--<th><div class="slds-truncate">Enquiry Status</div></th>-->
+                            <th><div class="slds-truncate">{!$Label.c.RETAILER_PO_NO}</div></th>
+                            <!--<th><div class="slds-truncate">PO Reference</div></th>-->
+                            <th><div class="slds-truncate">{!$Label.c.Mainetti_SO_SC}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.FACTORY_INTERNAL_PO_NO}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.Retailer}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.Order_To_Company}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.CREATED_DATE}</div></th>
+                            <th><div class="slds-truncate"></div></th> 
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.SOresponse.SOList}" var="so" indexVar="index">
+                            <!--<c:SalesOrderTable rowIndex="{!index}"/>-->
+                            <c:SalesOrderTable SOrder="{!so}"  rowIndex="{!index}"/> 
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <footer class="slds-card__footer footer">
+            <div class="slds-text-align_center">
+                <c:PaginationComponentForInventory page="{!v.page}" pages="{!v.pages}" total="{!v.total}" txt="{!v.searchText}"/>
+            </div>
+        </footer>                
+    </div>
+    </aura:If>
+         </aura:If>
+         <aura:If isTrue="{!v.navToCart}">
+            <c:CatalogShipping SelectedRetailerName="{!v.SelectedRetailerName}" SelectedRetailer="{!v.SelectedRetailer}" />
+        </aura:If>
+     <!--Added By BR on 08/12/2021 To Display Revised SO Items-->
+     <aura:if isTrue="{!v.RevisedSOCompanyCmp}">
+        <c:AdminReviseOrder/>
+    </aura:if>
+   
+     <aura:if isTrue="{!v.RevisedSOCurrencyCmp}">
+        <c:AdminReviseOrderCurrency/>
+    </aura:if>
+</aura:component>

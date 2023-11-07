@@ -1,0 +1,112 @@
+<aura:component controller="CompanyAllocationSequenceListClass" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="rowIndex" type="integer" /> 
+    <aura:attribute name="SOrder" type="ReuseOrdAllocationWrapper"/>
+    <!--<aura:attribute name="SOrder" type="Reuse_Order_Allocation__c[]"/>--> 
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    <aura:attribute name="expanded" type="String" default="false"/>
+    <aura:attribute name="checkThis" type = "Boolean" default ="true" />
+    <aura:attribute name="showOrderChangeRequest" type="Boolean" default="false"/>
+    
+    <aura:attribute name="showConfirmDialog" type="boolean" default="false"/>
+    <aura:attribute name="SOrderafterdelete" type="ReuseOrdAllocationWrapper"/>
+    <aura:attribute name="retailertodelete" type="String"/>
+    
+    
+    
+    <aura:registerEvent name="CompanyAllocationPageListEvent" type="c:CompanyAllocationPageListEvent" />
+    
+    <aura:if isTrue="{!v.showConfirmDialog}">
+        <div role="dialog" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container" style="width:455px;">
+                <!--Modal Box Header Start-->
+                <header class="slds-modal__header1" style=" border: 1px solid grey">
+                    <h1 class="slds-text-heading--medium" style="color:Black; background-color: white;text-align: center; ">Confirmation</h1>
+                </header>
+                <!--Modal Box Header End-->
+                
+                <!--Modal Box Content Start-->
+                <div class="slds-modal__content slds-p-around-large" style="height:25px;font-size: 15px;">
+                    <center ><b style="color:grey;">Are you sure you want to delete this item?</b></center>
+                </div>
+                <!--Modal Box Content End-->
+                
+                <!--Modal Box Button Start-->
+                <footer class="slds-modal__footer">
+                    <!-- <lightning:button name='Cancel' variant="Destructive" label='Cancel' onclick='{!c.handleConfirmDialogNo}'/>
+                    <lightning:button variant="brand" name='Delete' label='Delete' onclick='{!c.handleConfirmDialogYes}'/>-->
+                    <button class="slds-button slds-button_text-destructive" onclick="{!c.handleConfirmDialogNo}">Cancel</button>
+                    <button class="slds-button slds-button_destructive" onclick="{!c.handleConfirmDialogYes}">Delete</button>
+                </footer>
+                <!--Modal Box Button End-->
+            </div>
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>            
+    </aura:if>
+    
+    <tr data-index="{!v.rowIndex}">
+        <td>  
+            <button class="slds-button slds-button_neutral" aura:id="toggle" onclick="{!c.toggle}" value="{!v.checkThis}"  style="padding:0 2px;"> 
+                <lightning:Icon aura:id="chevronright" iconName="utility:chevronright" size="x-small"/>
+                <lightning:Icon class="slds-hide" aura:id="chevrondown" iconName="utility:chevrondown" size="x-small"/>
+            </button> 
+        </td>
+        
+        <td scope="row"  data-label="Retailer Name" style="text-align: left; vertical-align: middle;">
+            {!v.SOrder.reuseOrd.Retailer_code_Name__c}
+        </td>
+        <td scope="row" data-label="Status" title="Status" align="right" style="text-align: center; vertical-align: middle;">   
+            <lightning:input type="checkbox" checked="{!v.SOrder.reuseOrd.Active__c}" name="{!v.SOrder.reuseOrd}" onchange="{!c.onChange}" value="{!v.SOrder.reuseOrd.Active__c}"/>
+        </td>
+        
+        <td scope="row" data-label="Action" title="Action" style="text-align: center; vertical-align: middle;">
+            <lightning:buttonIcon class="slds-button " variant="bare" iconName="utility:delete" title="Delete" onclick="{!c.deletebox}" name="{!v.SOrder.reuseOrd.Retailer_code_Name__c}" />
+            &nbsp; &nbsp; &nbsp; &nbsp;
+            <lightning:buttonIcon name="{!v.SOrder.reuseOrd.Id}"
+                                  onclick="{!c.editComp}"
+                                  title="{!v.SOrder.reuseOrd.Retailer_Code__c+'$'+v.SOrder.reuseOrd.Retailer_code_Name__c}"
+                                  class ="slds-button_neutral1"
+                                  iconName="utility:record_update"
+                                  variant="bare" alternativeText="Edit" />  
+        </td>
+        
+    </tr>
+    <tr>
+        <td colspan="12" style="padding-left:34px;border-bottom:1.5px solid gray;">
+            <aura:if isTrue="{!v.expanded}">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="padding:0;border-radius:0;width:90%;align:center;border: 2px solid #f2f2f2;" role="grid">
+                    <thead>
+                        <tr class="slds-text-title_caps">  
+                            <th scope="col" style=""><div class="slds-truncate"></div></th>
+                            <th scope="col" style=""><div class="slds-truncate"></div></th>
+                            <th scope="col" style="text-align: left; align: center;"><div class="slds-truncate"><b>Number Sequence</b></div></th>
+                            <th scope="col" style="text-align: left; align: center;padding-left:40px;"><div class="slds-truncate"><b>Order To Company</b></div></th>
+                            <th scope="col" style=""><div class="slds-truncate"><b>Active</b></div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.SOrder.reuseOrdDetail}" var="soli" indexVar="row">
+                            <tr class="slds-hint-parent">
+                                <td></td>
+                                <td></td>
+                                <td scope="row" data-label="Number Sequence" title="" style="text-align: left;padding-left:55px">
+                                    <div class="slds-truncate">
+                                        {!row+1}</div>
+                                </td>
+                                <td data-label="Order To Company" title="{!soli.Order_To_Company__c}"  style="text-align: left;padding-right:45px">
+                                    <div class="slds-truncate">
+                                        <lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!soli.Order_To_Company__c}"/></div>
+                                </td>
+                                <td data-label="Status" title="Active" style="text-align: left;padding-left:15px">
+                                    <div class="slds-truncate">
+                                        <lightning:input type="checkbox" checked="{!soli.Active__c}" name="{!soli.Active__c}" value="{!soli.Active__c}" disabled="true"/></div>
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                        
+                    </tbody>
+                </table>
+                <tr style="height:7px">    </tr>   
+            </aura:if>
+        </td>
+    </tr>
+</aura:component>

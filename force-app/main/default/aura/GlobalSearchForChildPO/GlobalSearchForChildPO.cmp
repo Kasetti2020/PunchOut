@@ -1,0 +1,19 @@
+<aura:component controller="GlobalSearchController" implements="forceCommunity:searchInterface,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="searchText" type="String" default=""/>
+    <aura:attribute name="searchType" type="String"/>
+    <aura:attribute name="SOStatus" type="String"/>
+    <aura:attribute name="ids" type="List"/>
+    
+    <aura:registerEvent name="searchEvent" type="c:GlobalSearchEvent"/>
+    <!--aura:handler name="change" value="{!v.searchText}" action="{!c.searchTextClear}"/-->
+     
+    <div class="slds-form-element slds-lookup" data-select="single">
+        <div class="slds-form-element__control">
+            <div class="slds-input-has-icon slds-input-has-icon--right">
+                <lightning:buttonIcon iconName="utility:search" variant="bare" onclick="{!c.handleClick}" alternativeText="{!$Label.c.SEARCH}" class="slds-input__icon" />
+                <!--ui:inputText value="{!v.searchText}" class="slds-lookup__search-input slds-input" placeholder="Search"/-->
+                <lightning:input variant="label-hidden" class="slds-lookup__search-input" name="Search" value="{!v.searchText}" onchange="{!c.keyCheck}" placeholder="{!$Label.c.Search_here}" onkeypress="{!c.handleClick}"/>
+            </div>
+        </div>
+    </div>
+</aura:component>

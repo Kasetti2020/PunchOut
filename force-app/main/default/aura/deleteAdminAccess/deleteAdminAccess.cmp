@@ -1,0 +1,58 @@
+<aura:component controller="deleteAdminAccessClass" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="deleteInventoryTransactionMasterBatch" type="Inventory_Transaction_Master__c"/>
+    <aura:attribute name="batchId" type="ID"/>
+    
+    
+    <!-- Page Header -->
+    <div class="slds-page-header" role="banner">
+        <div class="slds-grid">
+            <div class="slds-col slds-has-flexi-truncate">
+                <!-- HEADING AREA -->
+                <h1 class="slds-page-header__title slds-truncate" title="Inventory Transaction Master">Delete Batch Request</h1>
+                <!-- / HEADING AREA -->
+            </div>
+        </div>
+    </div>
+    <!-- Page Header -->
+    
+    <lightning:layout multipleRows="True">
+        <lightning:layoutItem class="box" padding="around-medium" size="7">
+            <lightning:card title="COGS Sales Upload Admin Panel" >
+                <!-- Added by Sai 13-03-2021  Starting-->
+                <table id="row" class="slds-table slds-table_bordered slds-table_striped slds-table_cell-buffer slds-table_col-bordered slds-table_fixed-layout" >
+                    <col width="350px"></col>
+                    <col width="100px"></col>
+                    <thead class="row">
+                        <tr>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Delete Batch Information">Delete Batch Information</div></th>
+                            <th scope="col"><div align = "center" class="slds-truncate" title="Confirm Delete">Confirm Delete</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.deleteInventoryTransactionMasterBatch}" var="data">
+                            <tr>
+                                <td>                                    
+                                    <div align="left" class="slds-truncate"><label>Batch No:</label>{!data.uploadedBatchNo__c}<br></br></div>
+                                    <div align="left" class="slds-truncate"><label>Sales Company:</label>{!data.Sales_Company__c}<br></br></div>
+                                    <div align="left" class="slds-truncate"><label>Sales Year:</label>{!data.Sales_Year__c}<br></br></div>
+                                    <div align="left" class="slds-truncate"><label>Sales Month:</label>{!data.Sales_Month__c}<br></br></div>
+                                    <div align="left" class="slds-truncate"><label>Total Nunber of Row:</label>{!data.Total_Row_Count__c}<br></br></div>
+                                    <div align="left" class="slds-truncate"><label>Delete Reason:</label>{!data.Void_Reason__c}</div>
+                                </td>
+                                <td><div align="center" class="slds-truncate"><input type="checkbox" name="valid_check"/></div></td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+                <!-- Added by Bharath on 18-01-2021  Ending-->
+
+                <div align="right">                    
+                    <button class="slds-button slds-button_neutral" name = "Process" onclick="{!c.processClick}">Confirm Process</button> &nbsp;
+                </div>
+            </lightning:card>
+        </lightning:layoutItem>
+    </lightning:layout>
+    
+</aura:component>

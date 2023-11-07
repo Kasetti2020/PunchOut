@@ -1,0 +1,63 @@
+<aura:component controller="CustomerInfoModifyController" implements="forceCommunity:profileMenuInterface,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:attribute name="userName" type="String"/>
+
+    <aura:attribute name="showLanguageSection" type="Boolean" default="false" />
+    <aura:attribute name="defaultLanguage" type="String"/>
+    <aura:attribute name="availableLanguage" type="List"/>
+    <aura:attribute name="selectedLanguage" type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div style="display:flex;margin-right:20px;">	
+        
+        <div class="slds-p-around_medium lgc-bg">
+            <td>
+                <lightning:icon size="small"  alternativeText="{!$Label.c.Event}" iconName="utility:user" class="user-icon" />
+            </td>
+            <td>
+            <lightning:buttonMenu label="{!v.userName}" onselect="{!c.handleClick}" variant="bare" >
+                <lightning:menuItem value="1" label="{!$Label.c.HOME}" />
+                <lightning:menuItem value="2" label="{!$Label.c.Change_Language}" />
+                <lightning:menuItem value="3" label="{!$Label.c.Logout}" />
+            </lightning:buttonMenu>
+            </td>
+        </div>
+    </div>
+    
+    <!--  Code to reset Language starts from here --> 
+    
+      <aura:if isTrue="{!v.showLanguageSection}">
+        <div style="">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container" style="width:35%;min-width:35%;">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="{!$Label.c.Close}" onclick="{!c.CloseLanguageData}">
+                            <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.Change_Language}</h2>
+                    </header> 
+                    
+                    <div class="slds-modal__content slds-p-around_x-large" id="modal-content-id-1">   
+                        <div>					
+                            <lightning:input aura:id="DefaultLanguage" class="slds-m-bottom_small" label="{!$Label.c.Default_Language}" disabled="true" value="{!v.defaultLanguage}"/>
+                            <!--lightning:input aura:id="pass" class="slds-m-bottom_medium" name="Select a Language" label="{!$Label.c.Select_a_Language}" value="{!v.password}" onchange="{}"/-->
+                            
+                            <lightning:select name="Language" label="{!$Label.c.Select_a_Language}" aura:id="Language" value="{!v.selectedLanguage}" onchange="{!c.changeLanguage}">
+                                <option>{!$Label.c.None}</option>
+                                <aura:iteration items="{!v.availableLanguage}" var="option">
+                                    <option text="{!option}" value="{!option.value}" selected="{!option.selected}"/>
+                                </aura:iteration>
+                            </lightning:select>
+
+                        </div> 
+                    </div>    
+                    <footer class="slds-modal__footer">
+                        <button class="slds-button slds-button_neutral" onclick="{!c.CloseLanguageData}">{!$Label.c.Cancel}</button>
+                        <button class="slds-button slds-button_brand" onclick="{!c.UpdateLanguageData}">{!$Label.c.Submit}</button>
+                    </footer>
+                </div>
+            </section>
+        </div>
+    </aura:if>
+</aura:component>

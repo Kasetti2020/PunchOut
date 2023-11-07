@@ -1,0 +1,146 @@
+<aura:component controller="CareLabelMaintenanceService" implements="force:appHostable" >
+    <aura:attribute name="retailerID" type="String"/>
+    <aura:attribute name="retailerName" type="String"/>
+    <aura:attribute name="productID" type="String"/>
+    <aura:attribute name="productName" type="String"/>
+    <aura:attribute name="sizeChartId" type="String"/>
+    <aura:attribute name="sizeList" type="List" />
+    <aura:attribute name="sizedataval" type="string" />
+    <aura:attribute name="langnew1" type="String"/>
+    <aura:attribute name="langnew2" type="String"/>
+    <aura:attribute name="langnew3" type="String"/>
+    <aura:attribute name="langnew4" type="String"/>
+    <aura:attribute name="langnew5" type="String"/>
+    <aura:attribute name="sizeval" type="String"/>
+    <aura:attribute name="sizecharts" type="Size_Chart__c[]" />
+    <aura:attribute name="sizechartList" type="Size_Chart__c[]"/> 
+    <aura:attribute name="sizeSetup" type="Size_Chart__c"/>
+    <aura:attribute name="SetupFlag" type="boolean" default="false"/>
+    <aura:attribute name="formflag" type="boolean" default="false"/>
+    <aura:attribute name="langnew1Flag" type="boolean" default="false"/>
+    <aura:attribute name="langnew2Flag" type="boolean" default="false"/>
+    <aura:attribute name="langnew3Flag" type="boolean" default="false"/>
+    <aura:attribute name="langnew4Flag" type="boolean" default="false"/>
+    <aura:attribute name="langnew5Flag" type="boolean" default="false"/>
+    <aura:attribute name="languagesizeEng" type="boolean" default="true"/>
+    <aura:attribute name="newFlag" type="boolean" default="false"/>
+    <aura:attribute name="proFlag" type="boolean" default="false"/>
+    <aura:attribute name="newFlag1" type="boolean" default="false"/>
+    <aura:attribute name="retailerLang" type="Retailer_Code__c" />
+    <aura:attribute name="fields" type="String[]"
+                    default="['Name', 'Industry','Size1__c','Size2__c','Size3__c','Size4__c','Size5__c','Size1a__c','Size2a__c','Size3a__c','Size4a__c','Size5a__c','Size6a__c','size1b__c','size2b__c','size3b__c','size4b__c','size5b__c','size6b__c','Size1c__c','Size2c__c','Size3c__c','Size4c__c','Size5c__c','Size6c__c','Size1d__c','Size2d__c','Size3d__c','Size4d__c','Size5d__c','Size6d__c']"/>
+    <!--ForInsertion-->
+    <aura:attribute name="newsize" type="Object"/>
+    <aura:attribute name="check" type="Boolean" default="true"/>
+    <aura:attribute name="simpleNewSizechart" type="Size_Chart__c" default="{'sobjectType' : 'Size_Chart__c'                                                                            
+                                                                            }"/>
+    <aura:attribute name="newinsertionerror" type="String"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <!--aura:handler name="init" value="{!this}" action="{!c.doInit}" /-->
+    <aura:handler name="change" value="{!v.retailerID}" action="{!c.retailerChangeEvent}" />
+    <aura:handler name="change" value="{!v.productID}" action="{!c.productChangeEvent}" />
+    <aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordEvent" action="{!c.handleLookupEvent}"/>
+    <aura:registerEvent name="componentEventFired" type="c:CareLabelTabChangeEvent"/>
+    <!--END-->
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position:fixed" alternativeText="{!$Label.c.Loading}" size="large" />
+    </div>
+    <article class="slds-card">
+        
+        
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="standard:quotes" alternativeText="" size="medium"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>{!$Label.c.Care_Label_Size_Setup}</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-3 slds-form-element slds-form-element_horizontal1"> 
+                    <c:CustomLookup recordID="{!v.retailerID}" recordName="{!v.retailerName}" whereCondition ="AND Online_Enquiry__c=true"  objectAPIName="Retailer_Code__c" IconName="standard:account" label="{!$Label.c.Retailer_Code}" />
+                </div>
+                <aura:if isTrue="{!v.retailerID}">
+                    <div class="slds-col slds-size_1-of-3 slds-form-element_horizontal1">
+                        <!--<c:CustomLookup recordID="{!v.productID}" recordName="{!v.productName}" objectAPIName="Product__c" whereCondition ="{!v.retailerID != null ? 'AND Business_Vertical__c =\'Labels &amp; Tickets\'  AND Id IN (select Product_Unique_ID__c  from Price_Specification_Book_Product__c  where Retailer_Code__c =\''+v.retailerID+'\')':''}" IconName="standard:account" label="Label" /-->
+                        <c:CustomLookup recordID="{!v.productID}" recordName="{!v.productName}" objectAPIName="Product__c" whereCondition ="{!v.retailerID != null ? 'AND Business_Vertical__c =\'Labels &amp; Tickets\' AND Status__c=\'Active\' AND Variable_Data_Product__c=\'Yes\'  AND Id IN (select Product_Unique_ID__c  from Price_Specification_Book_Product__c  where Retailer_Code__c =\''+v.retailerID+'\')':''}" IconName="standard:account" label="{!$Label.c.Label}"  />
+                    </div> 
+                </aura:if>
+            </div>                 
+        </div>
+        <!-- Phase 2.1 Changes Sizecart start-->
+        <aura:if isTrue="{!v.productID}">
+            <aura:if isTrue="{!v.newFlag}">
+                <div class="slds-col slds-size_1-of-1 slds-p-vertical_small slds-p-right_medium slds-text-align_right"> 
+                    <lightning:button variant="brand" label="{!$Label.c.Add_Size}"  onclick="{!c.addNewRow}"  iconName="utility:add" />
+                </div>
+                <div class="Create size chart">
+                    <table aria-multiselectable="true"  class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_resizable-cols hide-label" role="grid">
+                        <tr>
+                            <aura:if isTrue="{!v.languagesizeEng}">
+                            <th>English(Size)<span style="color:red; font-size: 150%;">*</span></th>
+                            </aura:if>
+                            <aura:if isTrue="{!v.langnew1Flag}">
+                                <th>{!v.langnew1}<span style="color:red; font-size: 150%;">*</span></th>						
+                                
+                            </aura:if>
+                            <aura:if isTrue="{!v.langnew2Flag}">
+                                <th>{!v.langnew2}<span style="color:red; font-size: 150%;">*</span></th>					
+                                
+                            </aura:if>
+                            <aura:if isTrue="{!v.langnew3Flag}">
+                                <th>{!v.langnew3}<span style="color:red; font-size: 150%;">*</span></th>					
+                                
+                            </aura:if>
+                            <aura:if isTrue="{!v.langnew4Flag}">
+                                <th>{!v.langnew4}<span style="color:red; font-size: 150%;">*</span></th>				
+                                
+                            </aura:if>
+                            <aura:if isTrue="{!v.langnew5Flag}">
+                                <th>{!v.langnew5}<span style="color:red; font-size: 150%;">*</span></th>					
+                                
+                            </aura:if>
+                            <th style="width:4%;">
+                            </th>
+                        </tr>
+                        <aura:iteration items="{!v.sizechartList}" var="item1" indexVar="index1">
+                            <tr>
+                                <td><lightning:input aura:id="contactField" value="{!item1.EngSize1__c}" required="true"  variant="label-hidden" /></td> 
+                                <aura:if isTrue="{!v.langnew1Flag}">
+                                    <td><lightning:input  value="{!item1.Size1__c}" required="true"/></td>
+                                </aura:if>
+                                <aura:if isTrue="{!v.langnew2Flag}">
+                                    <td><lightning:input  value="{!item1.Size1a__c}" required="true" /></td>
+                                </aura:if>
+                                <aura:if isTrue="{!v.langnew3Flag}">
+                                    <td><lightning:input  value="{!item1.size1b__c}" required="true" /></td>
+                                </aura:if>
+                                <aura:if isTrue="{!v.langnew4Flag}">
+                                    <td><lightning:input  value="{!item1.Size1c__c}" required="true" /></td>
+                                </aura:if>
+                                <aura:if isTrue="{!v.langnew5Flag}">
+                                    <td><lightning:input  value="{!item1.Size1d__c}" required="true" /></td>
+                                </aura:if>
+                                <td><lightning:buttonIcon value="{!index1}" iconName="utility:close" variant="bare" onclick="{!c.removeDeletedRow }" size="large" alternativeText="{!$Label.c.DELETE}" title="{!$Label.c.DELETE}" /></td>    
+                            </tr> 
+                        </aura:iteration>
+                    </table>
+                    <footer class="slds-card__footer slds-text-align_right">
+                        <aura:if isTrue="{!v.check}">
+                        <lightning:button iconName="utility:check" label="{!$Label.c.save}" variant="brand" onclick="{!c.submitSetup}"/>
+                            <aura:set attribute="else">
+                                <lightning:button iconName="utility:check" label="{!$Label.c.Update}" variant="brand" onclick="{!c.submitSetup}"/>
+                            </aura:set>
+                        </aura:if>
+                    </footer>
+                </div>
+            </aura:if>
+        </aura:if>   
+         <!-- Phase 2.1 Changes Sizecart End-->
+    </article>
+</aura:component>

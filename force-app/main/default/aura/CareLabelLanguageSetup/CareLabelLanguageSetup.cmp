@@ -1,0 +1,83 @@
+<aura:component controller="CareLabelMaintenanceService" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="retailerID" type="String"/>
+    <aura:attribute name="retailerName" type="String"/>
+    <aura:attribute name="languageid1" type="String"/>
+    <aura:attribute name="languagename1" type="String"/>
+    <aura:attribute name="languageid2" type="String"/>
+    <aura:attribute name="languagename2" type="String"/>
+    <aura:attribute name="languageid3" type="String"/>
+    <aura:attribute name="languagename3" type="String"/>
+    <aura:attribute name="languageid4" type="String"/>
+    <aura:attribute name="languagename4" type="String"/>
+    <aura:attribute name="languageid5" type="String"/>
+    <aura:attribute name="languagename5" type="String"/>
+    <aura:attribute name="newflag" type="boolean" default="false"/> 
+    <aura:attribute name="Lang1" type="boolean" default="false"/> 
+    <aura:attribute name="Lang2" type="boolean" default="false"/> 
+    <aura:attribute name="Lang3" type="boolean" default="false"/> 
+    <aura:attribute name="Lang4" type="boolean" default="false"/> 
+    <aura:attribute name="Lang5" type="boolean" default="false"/> 
+    <aura:attribute name="RetailerLanguagesetup" type="Retailer_Code__c" default="{ 'sobjectType': 'Retailer_Code__c',
+                                                                                  'Name': '',
+                                                                                  'Lang_1__c': '',
+                                                                                  'Lang_2__c': '',
+                                                                                  'Lang_3__c': '',
+                                                                                  'Lang_4__c':'',
+                                                                                  'Lang_5__c':'',
+                                                                                  }"/>
+    
+    
+    <aura:handler name="change" value="{!v.retailerID}" action="{!c.retailerChangeEvent}" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordEvent" action="{!c.handleLookupEvent}"/>
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="standard:quotes" alternativeText="" size="medium"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>{!$Label.c.Language_Mapping}</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner slds-m-bottom_large">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-3">
+                    <c:CustomLookup recordID="{!v.retailerID}" recordName="{!v.retailerName}" objectAPIName="Retailer_Code__c" whereCondition ="AND Online_Enquiry__c=true" IconName="standard:account" label="{!$Label.c.Retailer_Code}"  />
+                </div>
+            </div> 
+        </div>
+        <aura:if isTrue="{!v.newflag}">
+            <div class="slds-box slds-box slds-p-around_none slds-m-around_medium slds-m-top_large">
+                <div class="slds-card__body slds-card__body_inner">                
+                    <lightning:messages />
+                    <div class="slds-grid slds-gutters slds-wrap slds-form-element_horizontal">
+                        <h2 class="box-title">{!$Label.c.Languages}</h2>
+                        <div class="slds-col slds-size_1-of-3 slds-m-vertical_small">
+                            <c:CustomLookup recordID="{!v.languageid1}" recordName="{!v.languagename1}" objectAPIName="Language__c" IconName="standard:account" label="{!$Label.c.Language1}"  aura:id="lang1id" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-3 slds-m-vertical_small">
+                            <c:CustomLookup recordID="{!v.languageid2}" recordName="{!v.languagename2}" objectAPIName="Language__c" IconName="standard:account" label="{!$Label.c.Language2}"  aura:id="lang2id"  />
+                        </div>
+                        <div class="slds-col slds-size_1-of-3 slds-m-vertical_small">
+                            <c:CustomLookup recordID="{!v.languageid3}" recordName="{!v.languagename3}" objectAPIName="Language__c" IconName="standard:account" label="{!$Label.c.Language3}"   aura:id="lang3id"/>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3 slds-m-vertical_small">
+                            <c:CustomLookup recordID="{!v.languageid4}" recordName="{!v.languagename4}" objectAPIName="Language__c" IconName="standard:account" label="{!$Label.c.Language4}"  aura:id="lang4id" />
+                        </div>
+                        <div class="slds-col slds-size_1-of-3 slds-m-vertical_small">
+                            <c:CustomLookup recordID="{!v.languageid5}" recordName="{!v.languagename5}" objectAPIName="Language__c" IconName="standard:account" label="{!$Label.c.Language5}"  aura:id="lang5id" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="slds-card__footer slds-text-align_right">
+                <lightning:button iconName="utility:check" aura:id="submit" variant="brand" type="submit" label="{!$Label.c.save}" onclick="{!c.handleOnSuccess}"/>
+            </footer> 
+        </aura:if>
+    </article>
+</aura:component>

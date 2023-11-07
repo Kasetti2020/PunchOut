@@ -1,0 +1,12 @@
+.THIS .hide-label label1
+{
+    display:none !important;
+}
+.THIS.hide-label label1
+{
+    display:none !important;
+}
+.THIS .slds-button_icon
+{
+    color:rgb(164, 31, 52);
+}

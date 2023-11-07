@@ -1,0 +1,111 @@
+<aura:component >
+    <!--Handler-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="CareSelectedData" type="List"/>
+    <aura:attribute name="vaiwCareSelectedData" type="List"/>
+    <aura:attribute name="selectedcareInstruction" type="List" />
+    <aura:attribute name="selectedcareImage" type="map" />
+    <aura:attribute name="SelectedInstImage" type="List" /><!--default="{}"-->
+    <aura:method name="getSelectedData" action="{!c.bindSelectedData}" 
+                 access="public">
+    </aura:method>
+    
+    <aura:method name="viewSelectedData" action="{!c.viewbindSelectedData}" 
+                 access="public">
+    </aura:method>
+    
+    <aura:method name="clearSelectedData" action="{!c.clearData}" 
+                 access="public">
+        <aura:attribute name="CloneORClear" type="String"/> 
+    </aura:method>
+    
+     <aura:registerEvent name="loadMyEvent" type="c:LogoEvent"/>
+    <!--Attribute-->
+    <aura:attribute name="viewisCareInstructionmodal" type="Boolean"/> 
+    <aura:attribute name="options" type="List" default="[]"/>
+    <aura:attribute name="Careinstruction" type="List"/>
+    <aura:attribute name="otherInstruction" type="Map"/>
+    <aura:attribute name="selectedOtherInstruction" type="List"/>
+    <aura:attribute name="selectedCarTabId" type="string" default="care-0"/> 
+    <aura:attribute name="showDiv" type="boolean" default="true"/>
+    <aura:attribute name="show" type="boolean" default="true"/>
+
+    <aura:registerEvent name="changeTabColorCareInstructionDetails" type="c:changeTabColor"/>
+    <div class="slds-grid slds-wrap slds-gutters slds-p-horizontal_medium slds-p-bottom_none">
+        <lightning:tabset aura:id="tabset" selectedTabId="{!v.selectedCarTabId}">
+            <aura:iteration items="{!v.Careinstruction}" var="careInst" indexVar="index">
+                <lightning:tab label="{!careInst.washInstructionGroupTranslated}" id="{!'care-'+index}">
+                    <div class="slds-grid black">
+                        <div class="slds-col slds-size_1-of-2">
+                            <aura:If isTrue="{!careInst.options.length>0}">
+                                <lightning:dualListbox id="{!careInst.washInstructionGroup}" aura:id="washInstruction"
+                                                       class="washInstruction"
+                                                       name="{!careInst.careIdList}"  
+                                                       label= "{!careInst.washInstructionGroupTranslated}"
+                                                       sourceLabel="{!$Label.c.Available}" 
+                                                       selectedLabel="{!$Label.c.Selected}" 
+                                                       fieldLevelHelp="You can select Maximum 8 options" 
+                                                       options="{!careInst.options}"
+                                                       value="{!careInst.selectedValues.length>0?careInst.selectedValues:''}"
+                                                       onchange="{!c.handleChange }" 
+                                                       disableReordering="true"/>
+                                <aura:set attribute="else">
+                                      {!$Label.c.Data_not_set_to_this_particular_Group}
+                                </aura:set>
+                                
+                            </aura:If>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2">
+                            <div class="slds-grid slds" style="margin-top:22px;height:17rem;overflow-y:scroll;">
+                                <aura:if isTrue="{!v.selectedOtherInstruction.length>0}">
+                                    <!--aura:If isTrue="{!careInst.washInstructionGroup=='Retailer Care Code'}"-->
+                                      <aura:If isTrue="{!careInst.washInstructionGroup=='Special Code'}">
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <aura:iteration items="{!v.selectedOtherInstruction}" var="careInst1" indexVar="index">
+                                                <aura:If isTrue="{!v.showDiv}">
+                                                    
+                                                    <lightning:textarea name="{!index}" label="{!'Description-'+careInst1.instr}" value="{!careInst1.descr}" readonly="true"/>
+                                                    
+                                                </aura:If>
+                                                
+                                            </aura:iteration>
+                                        </div>
+                                    </aura:If>
+                                </aura:if>
+                                <!--aura:if  isTrue="{!and(v.show, careInst.washInstructionGroup=='Retailer Care Code')}"-->
+                                <aura:if  isTrue="{!and(v.show, careInst.washInstructionGroup=='Special Code')}">
+                                <div class="slds-col slds-size_1-of-2">
+                                    <aura:iteration items="{!v.SelectedInstImage}" var="careInst1">
+                                        <aura:If isTrue="{!careInst1.group==careInst.washInstructionGroup}">
+                                            <div id="careinstImage" class="slds-col slds-size_1-of-2" style="height: 280px;"> 
+                                               <aura:if  isTrue="{!careInst1.descr!= null}">
+                                                    <img class="icon-image" src="{!careInst1.descr}" alt='image' name="" />
+                                               </aura:if> 
+                                            </div>
+                                        </aura:If>
+                                    </aura:iteration>
+                                    </div>
+                                    <aura:set attribute="else">
+                                        <div class="slds-col slds-size_1-of-2">
+                                            <div class="slds-grid slds-grid-wrap">
+                                                <aura:iteration items="{!v.SelectedInstImage}" var="careInst1">
+                                                    <aura:If isTrue="{!careInst1.group==careInst.washInstructionGroup}">
+                                                        <div id="careinstImage" class="slds-col slds-size_1-of-2">
+                                                            <aura:if  isTrue="{!careInst1.descr!= null}">
+                                                               <img class="icon-image" src="{!careInst1.descr}" alt='image' name="" /> 
+                                                            </aura:if>
+                                                        </div>
+                                                    </aura:If>
+                                                </aura:iteration>
+                                            </div>
+                                        </div>
+                                    </aura:set>
+                                </aura:if>
+                            </div>
+                        </div>
+                    </div>
+                </lightning:tab> 
+            </aura:iteration>
+        </lightning:tabset>
+    </div>
+</aura:component>

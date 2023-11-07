@@ -1,0 +1,99 @@
+<aura:component controller="MainettiOrderController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doint}"/>
+    <aura:attribute name="SOList" type="MainettiOrderController.wrapper[]"/>
+    <aura:attribute name="page" type="integer"/>
+    <aura:attribute name="pages" type="integer"/>
+    <aura:attribute name="total" type="integer"/>
+    <aura:handler event="c:PageChange" action="{!c.pageChange}"/>    
+    <aura:attribute name="IsSpinner" type="boolean" default="false"/>
+    <aura:attribute name="ParentComp" type="boolean" default="true"/>
+    <aura:attribute name="ShipComp" type="boolean" default="false"/>
+    <aura:attribute name="ButtonDissable" type="boolean" default="false"/> 
+    <aura:attribute name="searchText" type="String" default=""/>
+    
+    <!-- Attributes Declared for CheckBox Filters-->
+    <aura:attribute name="NewOrdersCheck" type="boolean" default="false"/>
+    <aura:attribute name="OrderUnderProcessCheck" type="boolean" default="false"/>
+    
+    <aura:handler name="searchEvent" event="c:GlobalSearchEvent" action="{!c.handleSearchEvent}"/> 
+    
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position: fixed" variant="brand" alternativeText="{!$Label.c.Loading}" size="large" />
+    </div>
+    
+    <aura:if isTrue="{!v.ParentComp}">
+        <div class="content">                
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container1" title="contact">
+                            <img src="{!$Resource.MagNETIcons + '/PO.png'}" width="50"/>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <div class="slds-grid">
+                            <div class="slds-col slds-size_1-of-3">
+                                <h2 class="slds-card__header-title header slds-text-title_caps slds-p-top_x-small">
+                                    <strong>{!$Label.c.Mainetti_Order_List}</strong>
+                                </h2>
+                            </div>
+                            <div class="slds-col slds-size_1-of-9 slds-p-top_x-small slds-p-right_x-small">
+                               <label>{!$Label.c.Sales_Order}</label> 
+                            </div>
+                            <div class="slds-col slds-size_1-of-3">
+                                 <c:GlobalSearch searchType="PrintShopSO" NewOrdersCheck="{!v.NewOrdersCheck}" OrderUnderProcessCheck="{!v.OrderUnderProcessCheck}"/>
+                            </div>
+                            <div style="width:64px;">
+                            </div>
+                            <div class="" align="left" width="250px">
+                                <lightning:input type="checkbox" aura:id="boxPack" value="NewOrders" label="{!$Label.c.New_Orders}"                                    
+                                                 onchange="{!c.checkboxSelect}"/>
+                                <lightning:input type="checkbox" aura:id="boxPack1" value="UnderProcessOrders"  label="{!$Label.c.Under_Processing_Orders}"                                     
+                                                 onchange="{!c.checkboxSelect1}"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-no-flex slds-m-left_medium">
+                          <lightning:button variant="brand" label="{!$Label.c.Start_Manufacturing}" iconName="utility:component_customization" iconPosition="left" onclick="{!c.DownloadCSV}"/>
+                     </div>
+                    
+                </header>
+            </div>
+            <div class="slds-card__body">
+                <div class="table-scroll  ">
+                    <table class="slds-table"> 
+                        <thead>
+                            <tr class="slds-text-title_caps slds-gray">
+                                <th style="width:2.5%;"><div class="slds-truncate"></div></th>
+                                <th style="width:2.2%;"><div class="slds-truncate"><ui:inputCheckbox aura:id="cbox" class="cBox" change="{!c.selectAll}"/></div></th>
+                                <th><div class="slds-truncate">{!$Label.c.Retailer_PO}</div></th>
+                                <th><div class="slds-truncate">{!$Label.c.Order_Status}</div></th>
+                                <th><div class="slds-truncate">{!$Label.c.Sales_Order}</div></th>
+                                <th><div class="slds-truncate">{!$Label.c.Retailer}</div></th>
+                                <!--<th><div class="slds-truncate">Status</div></th>-->
+                                <th><div class="slds-truncate">{!$Label.c.Supplier}</div></th>
+                                <th><div class="slds-truncate">{!$Label.c.CREATED_DATE}</div></th>
+                                <th><div class="slds-truncate">{!$Label.c.Exp_Completion_Date}</div></th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <aura:if isTrue="{!not(empty(!v.SOList))}">
+                            <aura:iteration items="{!v.SOList}" var="var1" indexVar="index">
+                                <c:SOViewChild SOList="{!var1}"  rowIndex="{!index}"/> 
+                                
+                            </aura:iteration>
+                            </aura:if>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <footer class="slds-card__footer footer">
+                <div class="slds-text-align_center">
+                    <c:PaginationComponentForInventory page="{!v.page}" pages="{!v.pages}" total="{!v.total}" txt="{!v.searchText}"/>
+                    {!V.body}
+                </div>                    
+            </footer>                
+        </div>
+    </aura:if>
+</aura:component>

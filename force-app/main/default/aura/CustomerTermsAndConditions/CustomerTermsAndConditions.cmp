@@ -1,0 +1,43 @@
+<aura:component >
+    <p  style="font-family: 'Helvetica Thin', Arial;color:#A90533;text-transform: uppercase;font-size: 25px;line-height: 34px;padding: 4px;"><div class="slds-box slds-theme_shade slds-theme_alert-texture slds-text-heading_medium slds-text-align_center">{!$Label.c.END_USER_LICENSE_AGREEMENT_EULA}</div></p>
+     <br/>
+    
+    <div style="font-size: 12px;color:#808080;font-family:Arial,Hlvetica,sans-serif;Margin:0px 0px 0px 0px;Padding:0px 20px 7.46719px 0px;filter: contrast(70%)">
+    <p>{!$Label.c.Terms_and_Conditions01}
+        {!$Label.c.Terms_and_Conditions02} {!$Label.c.Terms_and_Conditions03} 
+        </p>
+    <br/>
+    
+    <p><div style="font-weight: bold">{!$Label.c.X1_PORTAL_LICENSE}</div>
+        {!$Label.c.Terms_and_Conditions04}
+        </p>
+     <br/>
+    <p><div style="font-weight: bold">{!$Label.c.X2_PERMITTED_LICENSE_USES_AND_RESTRICTIONS}  </div>
+        {!$Label.c.Terms_and_Conditions05} {!$Label.c.Terms_and_Conditions06} {!$Label.c.Terms_and_Conditions07} {!$Label.c.Terms_and_Conditions08} {!$Label.c.Terms_and_Conditions09} {!$Label.c.Terms_and_Conditions10} 	{!$Label.c.Terms_and_Conditions11} {!$Label.c.Terms_and_Conditions12} {!$Label.c.Terms_and_Conditions13}
+        
+        </p>
+     <br/>
+    <p><div style="font-weight: bold">
+        {!$Label.c.X3_TERM_AND_TERMINATION} </div>
+        {!$Label.c.Terms_and_Conditions14} 
+        
+       </p>
+     <br/>
+    <p>
+        <div style="font-weight: bold">
+        {!$Label.c.X4_SERVICE_LEVEL_AGREEMENT}  </div>
+        {!$Label.c.Any_service_level_agreement_in_effect_between_the_Customer_and_Mainetti_shall_no} 
+        
+       </p>
+     <br/>
+    <p>
+        <div style="font-weight: bold">
+        {!$Label.c.X5_USE_OF_DATA} </div>
+        {!$Label.c.Terms_and_Conditions15} {!$Label.c.Terms_and_Conditions16} 	{!$Label.c.Terms_and_Conditions17} {!$Label.c.Terms_and_Conditions18} {!$Label.c.Terms_and_Conditions19} {!$Label.c.Terms_and_Conditions20} {!$Label.c.Terms_and_Conditions21} 
+        
+        </p>
+    
+    </div>
+     <br/>
+    
+</aura:component>

@@ -1,0 +1,199 @@
+<aura:component controller="CareLabelMaintenanceService" implements="force:appHostable" >
+    <aura:attribute name="retailerID" type="String"/>
+    <aura:attribute name="retailerName" type="String"/>
+    <aura:attribute name="productID" type="String"/>
+     <aura:attribute name="proids" type="String" default="" />
+    <aura:attribute name="productName" type="String"/>
+    <aura:attribute name="config" type="Item_Master__c" default="{ 'sobjectType': 'Item_Master__c',
+                                                                 'Name': '',
+                                                                 'Retailer__c': '',
+                                                                 'Item_Name__c': '',
+                                                                 'Brand_Icon__c': false,
+                                                                 'Care_Instruction__c': false,
+                                                                 'Country_Of_Origin__c': false,
+                                                                 'Excare_Instruction__c': false, 
+                                                                 'Fabric_Component__c': false,
+                                                                 'Free_Text__c': false,
+                                                                 'Size_Chart__c': false,
+                                                                 'Season_Month__c':false,
+                                                                 'Season_Year__c':false,
+                                                                 'Supplier_Number__c':false,
+                                                                 'Wash_Instruction__c':false,
+                                                                 'Wash_Modifiers__c':false,
+                                                                 'Special_Instructions__c':false,
+                                                                 'Drying_Instructions__c':false,
+                                                                 'Drying_Modifiers__c':false,
+                                                                 'Ironing_Instructions__c':false,
+                                                                 'Bleaching_Dry_Cleaning_Instructions__c':false,
+                                                                 'Others__c':false,
+                                                                 'Style_Number__c':false,
+                                                                 'RN_Number__c':false,
+                                                                 'Lot_Number__c':false,
+                                                                 'Labelling_Code__c':false,
+                                                                 'Packaging_Code__c':false,
+                                                                 'Item_Number__c':false,
+                                                                 'Care_Instruction__c':false
+                                                                 }"/>
+    
+    <aura:attribute name="configuratorFlag" type="boolean" default="false"/>
+     <aura:attribute name="othersflag" type="boolean" default="false"/>
+     <aura:attribute name="otherdisdlag" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.productID}" action="{!c.productChangeEvent}" />
+    <aura:handler name="change" value="{!v.retailerID}" action="{!c.retailerChangeEvent}" />
+    <aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordEvent" action="{!c.handleLookupEvent}"/>
+    
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position:fixed" alternativeText="{!$Label.c.Loading}" size="large" />
+    </div>
+    
+    <article class="slds-card">
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <lightning:icon iconName="standard:quotes" alternativeText="" size="medium"/>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title">
+                        <span>{!$Label.c.Care_Label_Configurator}</span>
+                    </h2>
+                </div>
+            </header>
+        </div>
+        <div class="slds-card__body slds-card__body_inner slds-m-bottom_large1">
+            <div class="slds-grid slds-gutters">
+                <div class="slds-col slds-size_1-of-11 slds-col slds-p-vertical_xx-small">
+                <label>{!$Label.c.Retailer_Code}</label>
+                </div>
+                <div class="slds-col slds-size_1-of-4 slds-form-element_horizontal1">
+                    <c:CustomLookup recordID="{!v.retailerID}" recordName="{!v.retailerName}" objectAPIName="Retailer_Code__c" whereCondition ="AND Online_Enquiry__c=true" IconName="standard:account"/>
+                </div>
+                <div class="slds-col slds-size_1-of-11 slds-form-element_horizontal1">
+                </div>
+                    <aura:if isTrue="{!v.retailerID}">
+                        <div class="slds-col slds-col slds-size_1-of-11 slds-p-vertical_xx-small">
+                        <label>{!$Label.c.Label}</label>
+                        </div>
+                        <div class="slds-col slds-size_1-of-4 slds-form-element_horizontal1">
+                    <!--<c:CustomLookup recordID="{!v.productID}" recordName="{!v.productName}" objectAPIName="Product__c" whereCondition ="{!v.retailerID != null ? 'AND Business_Vertical__c =\'Labels &amp; Tickets\'  AND Id IN (select Product_Unique_ID__c  from Price_Specification_Book_Product__c  where Retailer_Code__c =\''+v.retailerID+'\')':''}" IconName="standard:account"  /-->
+                    <c:CustomLookup recordID="{!v.productID}" recordName="{!v.productName}" objectAPIName="Product__c" whereCondition ="{!v.retailerID != null ? 'AND Business_Vertical__c =\'Labels &amp; Tickets\' AND Status__c=\'Active\'  AND Variable_Data_Product__c=\'Yes\'  AND Id IN (select Product_Unique_ID__c  from Price_Specification_Book_Product__c  where Retailer_Code__c =\''+v.retailerID+'\')':''}" IconName="standard:account"  />
+                    <!-- <c:CustomLookup recordID="{!v.productID}" recordName="{!v.productName}" objectAPIName="Price_Specification_Book_Product__c " whereCondition ="{!v.retailerID!=null ? ' AND Product_Unique_ID__r.Business_Vertical__c =\'Labels &amp; Tickets\' AND Retailer_Code__c =\''+v.retailerID+'\'':''}" IconName="standard:account" /-->
+                    </div>     
+                     </aura:if>
+                          
+            </div> 
+        </div>
+        
+        <aura:if isTrue="{!v.configuratorFlag}">
+            <div class="slds-box slds-grid slds-wrap slds-m-horizontal_medium">
+			<h2 class="box-title">{!$Label.c.Care_Label_Details}</h2>
+                <div class="slds-size_1-of-4 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.Brand_Icon}" name="Brand Icon" checked="{!v.config.Brand_Icon__c}" />
+                </div>
+                <div class="slds-size_1-of-4 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.Size_Chart}" name="Size Chart" checked="{!v.config.Size_Chart__c}"/>
+                </div>
+                <div class="slds-size_1-of-4 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.COUNTRY_OF_ORIGIN}" name="Country Of Origin" checked="{!v.config.Country_Of_Origin__c}" />
+                </div>
+                <div class="slds-size_1-of-4 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.Fabric_Component}" name="Fabric Component" checked="{!v.config.Fabric_Component__c}" />
+                </div>
+            </div>
+            
+            <div class="slds-box slds-grid slds-wrap slds-m-around_medium">
+			<h2 class="box-title">{!$Label.c.Care_instructions}</h2>
+                <div class="slds-size_1-of-5 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.Wash_Instruction}" name="Wash Instruction" checked="{!v.config.Wash_Instruction__c}" />
+                </div>
+                <div class="slds-size_1-of-5 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.Wash_Modifiers}" name="Wash Modifiers" checked="{!v.config.Wash_Modifiers__c}"  />
+                </div>
+                <div class="slds-size_1-of-5 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.Bleaching_DryCleaning}" name="Bleaching/DryCleaning" checked="{!v.config.Bleaching_Dry_Cleaning_Instructions__c}" />
+                </div>
+                <div class="slds-size_1-of-5 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.Drying_Instruction}" name="Drying Instruction" checked="{!v.config.Drying_Instructions__c}"  />
+                </div>
+                <div class="slds-size_1-of-5 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.Drying_Modifiers}" name="Drying Modifiers" checked="{!v.config.Drying_Modifiers__c}"  />
+                </div>
+                <div class="slds-size_1-of-5 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.Ironing_Instructions}" name="Iron Instructions" checked="{!v.config.Ironing_Instructions__c}" />
+                </div>
+                <div class="slds-size_1-of-5 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.Special_Instructions}" name="Special Instructions" checked="{!v.config.Special_Instructions__c}" />
+                </div>
+				<div class="slds-size_1-of-5 slds-p-around_x-small">
+                    <lightning:input type="checkbox" label="{!$Label.c.EXCARE_INSTRUCTIONS}" name="Excare Instructions" checked="{!v.config.Excare_Instruction__c}" />
+                </div>
+                <div class="slds-size_1-of-5 slds-p-around_x-small">
+                    <!--lightning:input type="checkbox" label="Retailer Care Code" aura:id="otherid" name="Others" checked="{!v.config.Others__c}" /-->
+                <!--<ui:inputCheckbox class="free-text-checkbox" aura:id="otherid" label="Others" value="{!v.config.Retailer_Care_Code__c}"  /-->
+                <lightning:input type="checkbox" label="{!$Label.c.Special_Code}" aura:id="otherid" name="Others" checked="{!v.config.Others__c}" />
+                </div>
+            </div>
+            
+            <div class="slds-box slds-grid slds-wrap slds-m-around_medium">
+			<h2 class="box-title">{!$Label.c.FREE_TEXT}</h2>
+                <div class="slds-size_1-of-4 slds-p-around_x-small">
+                    <ui:inputCheckbox class="free-text-checkbox" aura:id="checkbox" label="{!$Label.c.FREE_TEXT}" value="{!v.config.Free_Text__c}" change="{!c.onCheck}"/>
+					</div>
+               <!-- <div class="slds-size_1-of-4 slds-p-around_x-small">
+                    <ui:inputCheckbox aura:id="checkbox" value="{!v.config.Free_Text__c}" change="{!c.onCheck}"/>
+					<span class="slds-form-element__label"> ExCare Instruction</span>
+                </div-->
+                
+                <aura:if isTrue="{!v.config.Free_Text__c}">           
+                    <div class="slds-grid slds-wrap slds-size_1-of-1 slds-m-horizontal_small1">
+                        <div class="slds-size_1-of-4 slds-p-around_x-small">
+                            <lightning:input type="checkbox" label="{!$Label.c.Style_Number}" name="Style Number" checked="{!v.config.Style_Number__c}" />
+                        </div>
+                        <div class="slds-size_1-of-4 slds-p-around_x-small">
+                            <lightning:input type="checkbox" label="{!$Label.c.Labelling_Code}" name="Labelling Code" checked="{!v.config.Labelling_Code__c}" />
+                        </div>
+                         <div class="slds-size_1-of-4 slds-p-around_x-small">
+                            <lightning:input type="checkbox" label="{!$Label.c.Packaging_Code}" name="Packaging Code" checked="{!v.config.Packaging_Code__c}" />
+                        </div>
+                        
+                        <div class="slds-size_1-of-4 slds-p-around_x-small">
+                            <lightning:input type="checkbox" label="{!$Label.c.Season_Month}" name="Season Month" checked="{!v.config.Season_Month__c}" />
+                        </div>
+                         <div class="slds-size_1-of-4 slds-p-around_x-small">
+                            <lightning:input type="checkbox" label="{!$Label.c.Season_Year}" name="Season year" checked="{!v.config.Season_Year__c}" />
+                        </div>
+                         <div class="slds-size_1-of-4 slds-p-around_x-small">
+                            <lightning:input type="checkbox" label="{!$Label.c.Supplier_Number}" name="Supplier Number" checked="{!v.config.Supplier_Number__c}" />
+                        </div>
+                         <div class="slds-size_1-of-4 slds-p-around_x-small">
+                            <lightning:input type="checkbox" label="{!$Label.c.Item_Number}" name="Item Number" checked="{!v.config.Item_Number__c}" />
+                        </div>
+                        
+                        <div class="slds-size_1-of-4 slds-p-around_x-small">
+                            <lightning:input type="checkbox" label="{!$Label.c.RN_Number}" name="RN Number" checked="{!v.config.RN_Number__c}" />
+                        </div>
+                        <div class="slds-size_1-of-4 slds-p-around_x-small">
+                            <lightning:input type="checkbox" label="{!$Label.c.Lot_Number}" name="Lot number" checked="{!v.config.Lot_Number__c}" />
+                        </div>
+                          <div class="slds-size_1-of-4 slds-p-around_x-small">
+                            <lightning:input type="checkbox" label="{!$Label.c.Care_Instruction}" name="Care Instruction" checked="{!v.config.Care_Instruction__c}" />
+                        </div>
+                    </div>
+                </aura:if>
+            </div>
+            <div class=" slds-grid slds-wrap">
+                <div class="slds-hide">
+                    <lightning:input label="{!$Label.c.Retailer}" name="Retailer" value="{!v.config.Retailer__c}" />
+                </div>
+                <div class="slds-hide">
+                    <lightning:input label="{!$Label.c.Product}" name="Product" value="{!v.config.Item_Name__c}" />
+                </div>
+            </div>
+            <!--FreeText-->
+             <footer class="slds-card__footer slds-text-align_right">	
+                <!--lightning:button iconName="utility:check" variant="brand" label="{!$Label.c.cancel}" title="{!$Label.c.cancel}" onclick="{!c.cancelmethod}" /-->
+                <lightning:button iconName="utility:check" variant="brand" label="{!$Label.c.save}" title="{!$Label.c.save}" onclick="{! c.submitConfigurations }" />
+            </footer>
+        </aura:if>
+    </article>
+</aura:component>

@@ -1,0 +1,103 @@
+<aura:component Controller="CareLabelOrder" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:attribute name="viewBrandOpenModal" type="Boolean" />
+    <aura:attribute name="Brandlist" type="List" />
+    <aura:attribute name="BrandIconCheckbox" type="List" />
+    <aura:attribute name="selectedBrand" type="String" />
+    <aura:attribute name="brandIcondata" type="Object"/>
+    <aura:attribute name="viewBrandIcondata" type="Object"/>
+    <aura:attribute name="attributeVar" type="String" default="Main"/>
+    
+    <aura:registerEvent name="changeTabColorBrandIcon" type="c:changeTabColor"/> 
+    <aura:registerEvent name="loadMyEvent" type="c:LogoEvent"/>
+
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:method name="getSelectedData" action="{!c.selectedBrand}" 
+                 access="public">
+    </aura:method>
+    
+    <aura:method name="viewSelectedData" action="{!c.viewSelectedBrand}" 
+                 access="public">
+    </aura:method>
+    
+    <aura:method name="clearSelectedData" action="{!c.clearData}" 
+                 access="public">
+        <aura:attribute name="CloneORClear" type="String"/> 
+    </aura:method>
+    
+    <!-- Content-Security-Policy-->
+    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src	'self' 'unsafe-inline' *; img-src 'self' data: *"/>
+    <aura:If isTrue="{!v.Brandlist.length>0}">
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_2-of-4">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-no-row-hover slds-box" style="padding: 0;">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col"><div class="slds-truncate" ></div></th>
+                            <th scope="col"><div class="slds-truncate" >{!$Label.c.Icon_Image}</div></th> 
+                            <th scope="col"><div class="slds-truncate" >{!$Label.c.Art_Code} </div></th> 
+                            <th scope="col"><div class="slds-truncate" > {!$Label.c.Brand_Icon_Name}</div></th> 
+                        </tr>
+                    </thead>
+                    <tbody> 
+                        <aura:iteration items="{!v.Brandlist}" var="Braniconlist" indexVar="ind">
+                            <tr>
+                                <td>
+                                    <ui:inputRadio aura:id="checkBrandNames" name="{!Braniconlist}" value="{!Braniconlist.BrandIconCheckbox}" text="{!Braniconlist.Name}" change="{!c.onchangedSelected}"/>    
+                                </td>
+                                <td> 
+                                    <!--div class="uiOutputRichText" linkify="true" >
+                               <aura:unescapedHtml value="{!Braniconlist.Brand_Icon__c}"/>
+                           </div-->
+                                    <!-- <img class="icon-image" src="{!Braniconlist.Image__c}" alt='image' name="" /> -->
+                                    <aura:if isTrue="{!v.attributeVar=='Main'}">                                         
+                                        <div class="img-zoom-container"> 
+                                            <div class="img-zoom-container-inner" >
+                                                <div id="{!'my-div-'+ind}" tabindex="1"  onmouseenter="{!c.magnifyMain}" onmouseleave="{!c.magnifyMainleave}">
+                                                <img id="{!'my-img-'+ind}" class="myimage" src="{!Braniconlist.Image__c}" width="100"/>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <aura:set attribute="else">    
+                                            <div class="img-zoom-container">
+                                                <div class="img-zoom-container-inner" >
+                                                   <div id="{!'my1-div-'+ind}" tabindex="1"  onmouseenter="{!c.magnifySub}" onmouseleave="{!c.magnifySubleave}">
+                                                    <img id="{!'my1-img-'+ind}" class="myimage" src="{!Braniconlist.Image__c}" width="100"/>
+                                                       </div> 
+                                                </div>                                                
+                                            </div>
+                                        </aura:set>
+                                    </aura:if>
+                                </td>
+                                <td scope="row">
+                                    <div class="slds-truncate" title="{!Braniconlist.Art_Code__c}">{!Braniconlist.Art_Code__c}</div>
+                                </td>
+                                <td scope="row">
+                                    <div class="slds-truncate" title="{!Braniconlist.Name}"><ui:outputText value="{!Braniconlist.Name}" /></div>
+                                </td>
+                            </tr>                     
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+            <div class="slds-col slds-size_1-of-4">
+                <aura:if isTrue="{!v.attributeVar=='Main'}">   
+                    <div id="{!'myresult'+v.attributeVar}" class="img-zoom-result"  style="display:none;"></div>  
+                    <aura:set attribute="else"> 
+                        <div id="{!'myresult1'+v.attributeVar}" class="img-zoom-result"  style="display:none;"></div>
+                    </aura:set>
+                </aura:if>
+                
+                
+            </div>
+        </div>
+        
+        <aura:set attribute="else"> 
+            <h1 style="margin-left: 31%;padding: 2rem;font-size: 21PX;">{!$Label.c.Configuration_Not_Done_For_This_Product}</h1>
+        </aura:set>
+    </aura:If>
+    
+    
+    
+</aura:component>

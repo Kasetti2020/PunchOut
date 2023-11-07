@@ -1,0 +1,9 @@
+<aura:event type="COMPONENT">
+    <aura:attribute name="changeTabColorBrandIcon" type="String"/>
+    <aura:attribute name="changeTabColorFabricComponent" type="String"/>
+    <aura:attribute name="changeTabColorSizeChart" type="String"/>
+    <aura:attribute name="changeTabColorCountryOfOrigin" type="String"/>
+    <aura:attribute name="changeTabColorCareInstructionDetails" type="String"/>
+    <aura:attribute name="changeTabColorExcareInstructions" type="String"/>
+    <aura:attribute name="changeTabColorFreeText" type="String"/>    
+</aura:event>

@@ -1,0 +1,1085 @@
+<aura:component controller="Datauploader" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:attribute name="fileName" type="String" default="" />
+    <aura:attribute name="FileHeader" type="String" default=""/>
+    <aura:attribute name="ProductVertical" type="String" default=""/>
+    <aura:attribute name="QBOEntity" type="String" default=""/>
+    <aura:attribute name="Defaultvalue" type="String" default=""/>
+    <!--<aura:attribute name="readCSVData1" type="integer" />-->
+    <aura:attribute name="VariableDataMap" type="Variable_Data_Mapping__c[]"/>
+    <aura:attribute name="FieldNameValues" type="List"/>
+    <aura:attribute name="ColNameVal" type="List"/>
+    <aura:handler name="init" value="{!this}" action="{!c.onload}" />
+    <aura:attribute name="showLoadingSpinner" type="boolean" default="false" />
+    <center><lightning:spinner aura:id="spinner" class="slds-hide" alternativeText="upload file"/></center>
+    <aura:attribute name="RetailNames" type="List"/>
+    <aura:attribute name="DestinationIndicator" type="List"/>
+    <aura:attribute name="Retailercodes" type="String" default=""/>
+    <aura:attribute name="ErrorMessage" type="List"/> 
+    <aura:attribute name="Excaretid" type="string"/>
+    <aura:attribute name="RetailerNames" type="Map" default="{'Excaretid':'','ActiveTemp':true}"/> 
+    <aura:attribute name="noOfColoumns" type="string"/>
+    <aura:handler name="oSelectedRecordEvent" event="c:selectedsObjectRecordEvent" action="{!c.handleLookupValueselected}"/>
+    <aura:attribute name="createContactFlag" type="Boolean" default="false"/>
+    <aura:attribute name="RetailNameValues" type="List"/>
+    <aura:attribute name="selectedTemplate" type="String"/>
+    <aura:attribute name="ActiveTemplateFlag" type="Boolean" default="false"/>
+    <aura:attribute name="ExistingTemplateFlag" type="Boolean" default="false"/>
+    <aura:attribute name="ExistingTemplateName" type="List"/>
+    <aura:attribute name="ExistingTemplateId" type="String"/>
+    <aura:handler name="change" value="{!v.RetailerNames.Excaretid}" action="{!c.ClearPickValue}"/>
+    <aura:attribute name="ExistTemplateFlag" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:attribute name="RetailNamesNProdVertical" type="List"/>
+    <aura:attribute name="DisableUpload" type="boolean" default="false" />
+    <aura:attribute name="DisableCancelbutton" type="boolean" default="true" />
+    <aura:attribute name="ActiveTemp" type="Boolean" default="true"/>
+    
+    <article class="slds-card">
+        <div class="slds-grid slds-card__header">
+            <!-- Uploading the variable Data file  -->
+            <div class="slds-col slds-p-top_xx-large slds-box slds-m-right_small slds-p-around_none" >
+                <div class="">
+                    <article class="slds-card" style="background: rgb(243, 242, 242);padding-bottom: 0.24rem;">
+                        <div class="slds-card__header slds-grid">
+                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                <div class="slds-media__figure">
+                                    <span class="slds-icon_container slds-icon-standard-account" title="account">
+                                        <lightning:icon class="red" iconName="standard:related_list" alternativeText="Event" />  
+                                    </span>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h2 class="slds-card__header-title">          
+                                        <span>Upload File</span>
+                                    </h2>
+                                </div>
+                            </header>
+                        </div>
+                    </article>
+                    <aura:if isTrue="{!!v.DisableUpload}">
+                        <div class="slds-col slds-m-around_small">
+                            <label class="slds-form-element__label"><span style="color:red">*</span>Retailer</label>
+                            <c:CustomLookup recordID="{!v.RetailerNames.Excaretid}" recordName="{!v.RetailerNames.ExcaretName}" objectAPIName="Retailer_Code__c" whereCondition="" IconName="standard:pricebook" label=""/>
+                        </div>
+                        <aura:set attribute = "else">
+                            <div class="slds-col slds-m-around_small">
+                                <lightning:input type="text" value="{!v.RetailerNames.ExcaretName}" disabled="true" /> 
+                            </div>
+                        </aura:set>
+                    </aura:if>
+                    <div class="slds-col slds-m-around_small">
+                        <lightning:select aura:id="ProductVertical" name="select2" value="{!v.RetailerNames.ProductVertical}" label="Product Vertical" required="true" disabled="{!v.DisableUpload}">
+                            <option value="None">None</option>
+                            <aura:iteration aura:id="TemplateNames" items="{!v.RetailNamesNProdVertical}" var="FValues">
+                                <option value="{!FValues.fieldAPI}">{!FValues.fieldLabel}</option>
+                            </aura:iteration> 
+                        </lightning:select>  
+                    </div> 
+                   <div class="slds-col">
+                        <div class="slds-m-around_small">
+                            <div class="slds-file-selector slds-file-selector_files" style="display:block;">
+                                <div class="slds-file-selector__dropzone">
+                                    <input aura:id="file" type="file" name="file" class="slds-file-selector__input slds-assistive-text" accept=".csv" id="file-upload-input-01" onchange="{!c.handleFilesChange}" aria-labelledby="file-selector-primary-label file-selector-secondary-label" disabled="{!v.DisableUpload}"/>
+                                    <label class="slds-file-selector__body" for="file-upload-input-01" id="file-selector-secondary-label">
+                                        <span class="slds-file-selector__button slds-button slds-button_neutral">
+                                            <lightning:icon iconName="utility:upload" size="xx-small" alternativeText="Approved"/>
+                                            Choose File</span>  
+                                    </label>
+                                    <div>
+                                        <span class="slds-file-selector__text slds-medium-show">{!empty(v.fileName)?'or Drop Files':v.fileName}</span>  
+                                    </div>
+                                </div>
+                            </div>                            
+                        </div>
+                        <br/>
+                        <footer class="slds-modal__footer">
+                            <lightning:button aura:id="badge" class="slds-button slds-button_brand" onclick="{!c.onloadFile}" label="Upload" disabled="{!v.DisableUpload}"/>      
+                        </footer>
+                    </div>
+                    <aura:if isTrue="{!v.showLoadingSpinner}">
+                        <div class="slds-text-body_small slds-text-color_error">Uploading... 
+                            <img src="/auraFW/resources/aura/images/spinner.gif" class="spinner-img" alt="Loading"/>'
+                        </div>
+                    </aura:if>
+                </div>
+            </div>
+            <br/>  
+            <div class="slds-col slds-size_3-of-4 slds-box slds-p-around_none">
+                <article class="slds-card">
+                    <div class="slds-card__header slds-grid" style="background: rgb(243, 242, 242);">
+                        <header class="slds-media slds-media_center slds-has-flexi-truncate" style="position:relative;top:-4px;">
+                            <div class="slds-media__figure">
+                                <span class="slds-icon_container slds-icon-standard-account" title="account">
+                                    <lightning:icon class="red" iconName="standard:drafts" alternativeText="Event" />
+                                </span>
+                            </div>
+                            <div class="slds-media__body">
+                                <h2 class="slds-card__header-title">
+                                    <span>Map Fields</span>
+                                </h2>
+                            </div>
+                            <div class="slds-no-flex slds-size_2-of-4 slds-form-element_horizontal">
+                                <lightning:select aura:id="SelectOptions4" name="select4" label="Saved Mapping" onchange="{!c.PickRetailName}" disabled="{!empty(v.RetailerNames.Excaretid)}">
+                                    <option value="none">None</option>
+                                    <aura:iteration aura:id="TemplateNames" items="{!v.RetailNameValues}" var="FValues">
+                                        <option value="{!FValues.fieldAPI}">{!FValues.fieldLabel}</option>
+                                    </aura:iteration>
+                                </lightning:select>  
+                            </div>
+                        </header>
+                    </div>
+                </article>
+                <div class="slds-card__body slds-card__body_inner">
+                    <div class="slds-grid slds-wrap slds-gutters">
+                        <!-- <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12 slds-large-size_3-of-12">
+                            <c:CustomLookup recordID="{!v.RetailerNames.Excaretid}" recordName="" objectAPIName="Customer_Information__c" whereCondition="" IconName="standard:pricebook" label="Retailer"/>
+                        </div>-->
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12 slds-large-size_3-of-12">
+                            <lightning:input type="text" name="options" id="checkbox-2" label="Template Name" value="{!v.RetailerNames.FileHeader}" />
+                        </div>
+                        
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12 slds-large-size_3-of-12">
+                            <lightning:input value="{!v.DestinationIndicator.length}" label="No Of Coloumns" disabled="true"></lightning:input>
+                        </div>
+                        
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12 slds-large-size_3-of-12 slds-p-top_xx-small">
+                            <div class="slds-checkbox">
+                                <label class="slds-checkbox__label" for="checkbox-2">Active Template</label>
+                                <!--<lightning:input type="checkbox" name="checkoptions" id="checkbox-3" value="{!v.RetailerNames.ActiveTemp}" checked="true" onchange="{!c.ActiveTemplates}"/>--> 
+                                <lightning:input type="checkbox" name="checkoptions" id="checkbox-3" value="{!v.RetailerNames.ActiveTemp}" checked="{!v.RetailerNames.ActiveTemp}" disabled="true"/> 
+                            </div>  
+                        </div>
+                    </div>
+                </div>               
+                <div>
+                    <table class="slds-table slds-table_bordered slds-table_cell-buffer"> 
+                        <thead>
+                            <tr class="slds-text-title_caps">
+                                <th scope="col">
+                                    <div class="slds-truncate" title="First Name">File Header</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="First Name">Column Name</div>
+                                </th>
+                                <th>
+                                    <div class="slds-truncate" title="PO Field">Destination Indicator</div>
+                                </th>
+                                <th scope="col" style="width:25%">
+                                    <div class="slds-truncate" title="QBO Entity">QBO Entity</div>
+                                </th>
+                                <!-- <th scope="col">
+                                    <div class="slds-truncate" title="Defalut Value">Defalut Value</div>
+                                </th>-->
+                                <th>
+                                    <div class="slds-truncate" title="Reset">Mandatory</div>
+                                </th>
+                                <th scope="col">
+                                    <div class="slds-truncate" title="Reset">Reset</div>
+                                </th>   
+                            </tr>
+                        </thead> 
+                        <tbody>
+                            <aura:iteration items="{!v.DestinationIndicator}" var="ColNameVals" indexVar="ind"> 
+                                <tr>
+                                    <td>
+                                        <div class="card card-body">
+                                            Column {!ind+1}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <ui:outputText value="{!ColNameVals.coloumnName}"></ui:outputText>
+                                    </td>
+                                    <td>
+                                        <div class="slds-p-bottom_medium">
+                                        <lightning:select aura:id="SelectOptions2" name='{!ind}' value="{!ColNameVals.objectName}" onchange="{!c.objectNameSelectHandler}">
+                                            <option value="None">None</option>
+                                            <option value="PO">PO Header</option>
+                                            <option value="POL">PO Details</option>
+                                            <option value="Both">Both</option>
+                                        </lightning:select> 
+                                        </div>
+                                    </td> 
+                                    <td>
+                                        <div class="slds-p-bottom_medium">
+                                        <lightning:select aura:id="SelectOptions1" name='{!ind}' value="{!ColNameVals.fieldName}" disabled="{!ColNameVals.objectName=='None'}">
+                                            <option value="Select QBO Field">Select QBO Field</option>
+                                            <aura:iteration items="{!v.FieldNameValues}" var="FValues">
+                                                <aura:if isTrue="{!ColNameVals.objectName==FValues.objectName}">
+                                                    <option value="{!FValues.fieldAPI}" >{!FValues.fieldLabel}</option>
+                                                </aura:if>
+                                            </aura:iteration>
+                                        </lightning:select> 
+                                        </div>
+                                    </td>
+                                    
+                                    <!--<td>
+                                        <lightning:input aura:id ="input1" type="String" value="{!ColNameVals.defaultValue}"/>
+                                    </td>-->
+                                    <td>
+                                        <div class="slds-p-bottom_medium">
+                                        <lightning:select aura:id="SelectOptions3" name="select3" value="{!ColNameVals.mandatoryField}">
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option> 
+                                        </lightning:select>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="slds-p-top_medium">
+                                            <button name='{!ind}' class="slds-button slds-p-bottom_small" onclick="{!c.clearData}"><lightning:icon iconName="action:refresh" alternativeText="Reset" variant="Reset" size="x-small"/></button>
+                                        </div>                                    
+                                    </td> 
+                                </tr>
+                            </aura:iteration> 
+                        </tbody>
+                        <br/>
+                        <br/>    
+                    </table>
+                    <footer class="slds-modal__footer">
+                        <div style="">
+                            <button class="slds-button slds-button_brand" onclick="{!c.doSave}">Save</button>
+                            <button class="slds-button slds-button_neutral" onclick="{!c.CancelUpload}" disabled="{!v.DisableCancelbutton}">Cancel</button> 
+                        </div>                    
+                    </footer>
+                </div>  
+            </div>	  
+        </div>
+    </article> 
+    <aura:if isTrue="{!v.createContactFlag}">
+        <div class="demo-only" style="">
+            <section role="dialog" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeTemplate}">
+                            <lightning:icon iconName="action:close" size="x-small" alternativeText="close"/>
+                            <span class="slds-assistive-text" >Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Variable Data Mapping</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:recordEditForm objectApiName="Variable_Data_Mapping__c" recordId="{!v.selectedTemplate}">
+                            <lightning:messages/>
+                            <div class="slds-grid slds-wrap paddingAround">
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Name"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="No_of_Columns__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Retailer_Codes__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Product_Vertical__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_A__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AA__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_A__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AA__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_A_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AA_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_A__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AA__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_A__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AA__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_B__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AB__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_B__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AB__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_B_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AB_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_B__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AB__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_B__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AB__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_C__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AC__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_C__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AC__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_C_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AC_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_C__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AC__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_C__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AC__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_D__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AD__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_D__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AD__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_D_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AD_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_D__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AD__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_D__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AD__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_E__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AE__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_E__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AE__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_E_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AE_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_E__c" /></b>
+                                </div> <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                <b><lightning:outputField fieldName="Default_Value_AE__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_E__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AE__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_F__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AF__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_F__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AF__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_F_Destination_indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AF_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_F__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AF__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_F__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AF__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_G__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AG__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_G__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AG__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_G_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AG_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_G__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AG__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_G__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AG__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_H__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AH__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_H__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AH__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_column_H_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AH_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_H__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AH__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_H__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AH__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_I__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AI__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_I__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AI__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_I_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AI_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_I__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AI__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_I__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AI__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_J__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AJ__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_J__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AJ__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_J_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AJ_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_J__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AJ__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_J__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AJ__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_K__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AK__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_K__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AK__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_K_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AK_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_K__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AK__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_K__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AK__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_L__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AL__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_L__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AL__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_L_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AL_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_L__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AL__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_L__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AL__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_M__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AM__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_M__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AM__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_M_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AM_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_M__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AM__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_M__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AM__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_N__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AN__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_N__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AN__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_N_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AN_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_N__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AN__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_N__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AN__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_O__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AO__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_O__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AO__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_O_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AO_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_O__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AO__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_O__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AO__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_P__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AP__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_P__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AP__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_P_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AP_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_P__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AP__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_P__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AP__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_Q__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AQ__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_Q__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AQ__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_Q_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AQ_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_Q__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AQ__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_Q__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AQ__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_R__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AR__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_R__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AR__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_R_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AR_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_R__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AR__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_R__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AR__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_S__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AS__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_S__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AS__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_S_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AS_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_S__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AS__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_S__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AS__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_T__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AT__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_T__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AT__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_T_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AT_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_T__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AT__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_T__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AT__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_U__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AU__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_U__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AU__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_U_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AU_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_U__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AU__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_U__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AU__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_V__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AV__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_V__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AV__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_V_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AV_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_V__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AV__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_V__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AV__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_W__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AW__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_W__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AW__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_W_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AW_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_W__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AW__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_W__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AW__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_X__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AX__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_X__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AX__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_X_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AX_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_X__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AX__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_X__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AX__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_Y__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AY__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_Y__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AY__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_Y_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AY_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_Y__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AY__c" /></b>
+                                </div> 
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_Y__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AY__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_Z__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AZ__c"/></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_Z__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="PO_Field_AZ__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_Z_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="File_Column_AZ_Destination_Indicator__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_Z__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Default_Value_AZ__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_Z__c" /></b>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-6 slds-large-size_3-of-6">
+                                    <b><lightning:outputField fieldName="Required_field_AZ__c" /></b>
+                                </div>
+                            </div>
+                        </lightning:recordEditForm>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop--open"></div>
+        </div>
+    </aura:if>
+    <!--<aura:if isTrue="{!v.ActiveTemplateFlag}">
+        <div class="demo-only" style="">
+            <section role="dialog" class="slds-modal slds-fade-in-open slds-modal_medium">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick="{!c.closeTemplate}">
+                            <lightning:icon iconName="action:close" size="x-small" alternativeText="close"/>
+                            <span class="slds-assistive-text" >Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Existing Template infomration</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning:recordEditForm objectApiName="Variable_Data_Mapping__c" recordId="{!v.ExistingTemplateName[0].fieldAPI}">
+                            <lightning:messages/>
+                            <div class="slds-grid slds-wrap paddingAround">
+                                <p><b>Template <b><lightning:outputField fieldName="Name" variant="Tetsing"/></b> is Activated template for selected Retailer. if you want to make this template as active template please click on "Yes" button. if you dont want to make this as active template click on "No" button</b></p>
+                            </div>
+                            <button class="slds-button slds-button_brand " onclick="{!c.ChangeActiveTemplate}">Yes</button>
+                            <button class="slds-button slds-button_neutral " onclick="{!c.CancelActiveTemplate}">No</button> 
+                        </lightning:recordEditForm>
+                    </div>
+                </div>   
+            </section>
+        </div>
+    </aura:if>-->
+</aura:component>

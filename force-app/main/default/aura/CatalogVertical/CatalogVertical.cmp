@@ -1,0 +1,353 @@
+<aura:component controller="CatalogOrderController"  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!--Declare Attributes-->
+    <aura:attribute name="completeWrap" type="object" /> 
+    <aura:attribute name="selectedCompany" type="String"/>
+    <aura:attribute name="selectedCurrency" type="String"/>
+    <aura:attribute name="searchedCurrency" type="String"/>
+    <aura:attribute name="sizerIndex" type="Integer"/>
+    <!--Retailer Attributes-->
+    <aura:attribute name="SelectedRetailerName" type="String" /> 
+    <aura:attribute name="SelectedRetailerId" type="String" />  
+    <aura:attribute name="displayPagination" type="Boolean"/>
+    <aura:attribute name="parentcmp" type="Boolean" default="false"/>
+    <aura:attribute name="onselectcustomeid" type="String" /> 
+    <!--Vertical Attributes -->
+    <aura:attribute name="selectedTab" type="String"/>
+    <aura:attribute name="sizerhanger" type="Boolean" default="false" />
+    <!--QuickViewProduct Attributes-->
+    <aura:attribute name="quickview" type="Boolean" default="false" />
+    <aura:attribute name="quickviewSizer" type="Boolean" default="false" />
+    <aura:attribute name="LabelQuickview" type="Boolean" default="false" />
+    
+    <aura:attribute name="catalogVertical" type="Boolean" />
+    <aura:attribute name="logo" type="Boolean" />
+    <aura:attribute name="quickviewedProduct" type="Object" />
+    <aura:attribute name="SelectedProductData" type="Object" />
+    <!--CareLabel Attributes-->
+    <aura:attribute name="carelabelcalling" type="Boolean" default="false" />
+    <aura:attribute name="careLabelOrder" type="boolean"/>
+    <aura:attribute name="flagFamily" type="Boolean" default="true" />
+    <aura:attribute name="hangerListDetail" type="Boolean" default="false"/>
+    <!--bulkAdd-->
+    <aura:attribute name="bulkAddData" type="String"/>
+    <aura:method name="getBulkData" action="{!c.bulkAdd}" 
+                 access="public">
+    </aura:method>     
+     <aura:registerEvent name="disableBulkAddButton" type="c:DisableBulkAddButton"/>
+    <!--<aura:handler name="CatalogEvent" event="c:CatalogEvent" action="{!c.doInit}"/>-->
+    <!--Content-Security-Policy-->
+    <meta http-equiv="Content-Security-Policy" content="default-src *; script-src 'self' 'unsafe-inline' 'unsafe-eval' *; style-src	'self' 'unsafe-inline' *; img-src 'self' data: *"/>
+    
+    <!--Spinner Start -->
+    <aura:attribute name="showSpinner" type="Boolean" default="false" />
+    <aura:if isTrue="{!v.showSpinner}">    
+        <lightning:spinner class="slds-is-fixed" alternativeText="{!$Label.c.Loading}" size="large" />
+    </aura:if>
+    <!--Spinner End-->
+    
+    <aura:if isTrue="{!v.catalogVertical}">   
+        <aura:If isTrue="{!v.selectedTab!='Labels &amp; Tickets'}">
+            <div class="slds-grid_vertical-align-end">                        
+                <div class="products-grid slds-grid slds-wrap">
+                    <aura:iteration items="{!v.completeWrap}" var="prod" indexVar='ind'>
+                        <aura:iteration items="{!prod.tempMap}" var="tempValue" indexVar="key">
+                            <aura:if isTrue="{!tempValue.key == prod.selectedColor}">
+                                <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-3 slds-large-size_1-of-6 slds-float_left slds-text-align_center">
+                                    <div class="product-item">                                        
+                                        <div class="{!tempValue.value.addedToCart ? ' item-inner Selected_BG':' item-inner'}">
+                                            <!--<div class="{!tempValue.value.addedToCart ? 'icon-sale-label sale-left':'slds-hide'}">Added</div>-->
+											<div class="{!tempValue.value.addedToCart ? 'slds-show':'slds-hide'}"><div class="{!tempValue.value.addedAsLabel? 'icon-sale-label inCart_font-size sale-left Pending' :tempValue.value.addedToCart?'icon-sale-label inCart_font-size sale-right Added':''}">{!tempValue.value.addedAsLabel? $Label.c.Pending :tempValue.value.addedToCart? $Label.c.Added:''}</div></div>
+                                            
+                                            <div class="product-thumbnail">
+                                                <div class="btn-quickview">
+                                                    <a onclick="{!c.quickviewcmp}" name="{!ind}">
+                                                        <span><lightning:icon size="x-small" name="sdgh" iconName="utility:search" alternativeText="{!$Label.c.Approved}" />{!$Label.c.Quick_View}</span>
+                                                    </a>
+                                                </div> 
+                                            </div>
+                                            <div class="pro-box-info">
+                                                <aura:if isTrue="{!tempValue.value.proImgURL}">
+                                                    <a class="product-item-photo" style="{!'background:url('+tempValue.value.proImgURL+')'}" name="{!tempValue.value.priceBookId}"> 
+                                                        <!--<img class="product-image-photo" src="{!tempValue.value.proImgURL}" alt='image' name="{!ind}" onclick="{!c.quickviewcmp}"/>-->
+                                                    </a>
+                                                    <aura:set attribute="else">   
+                                                        <a class="product-item-photo no-item-img" style="{!'background:url('+$Resource.NoImageContent+')'}">
+                                                            <!--<img src="{!$Resource.NoImageContent}"/>-->
+                                                        </a>
+                                                    </aura:set>
+                                                </aura:if>
+                                                <div class="slds-p-vertical_small" style="font-size:10.4px;}">
+                                                    <p class="slds-truncate" title="{!tempValue.value.MainettiModelCode+''+tempValue.value.MainettiModelCode+''+prod.productfamily}"><b>{!tempValue.value.MainettiModelCode}({!prod.productfamily})</b></p>                                           
+                                                    <p class="slds-truncate" style="color:dimgrey;height:15px;" title="{!tempValue.value.proddescription}">{!tempValue.value.proddescription}</p>
+                                                    <p class="slds-truncate" style="color:dimgrey;height:15px;" title="{!tempValue.value.proddescription2}">{!tempValue.value.proddescription2}</p> 
+                                                  
+                                                    <aura:if isTrue="{!v.selectedTab=='MCare'}">
+                                                        <p class="slds-truncate" style="color:dimgrey;height:15px;" title="{!tempValue.value.proddescription3}">{!tempValue.value.proddescription3}</p>
+                                                    </aura:if>
+                                                    <p class="slds-truncate" title="{!tempValue.value.custRefModel}"><b>{!$Label.c.Cust_Model} </b>{!tempValue.value.custRefModel}</p>
+                                                    <aura:if isTrue="{!tempValue.value.showPrice}">
+                                                        
+                                                            
+                                                                <aura:if isTrue="{!and(tempValue.value.proPrice !=null,tempValue.value.showPicklistPrice == '100')}">
+                                                                <p class="price slds-truncate" >
+                                                                    <b>{!$Label.c.Price_100} </b><!--<lightning:formattedNumber value="{!tempValue.value.proPrice}" /> -->
+                                                                    <aura:if isTrue="{!tempValue.value.currencyType!='NA'}">
+                                                                        <lightning:formattedNumber value="{!tempValue.value.proPrice}" style="currency" currencyCode="{!tempValue.value.currencyType}"/>
+                                                                        <aura:set attribute="else">
+                                                                            <lightning:formattedNumber value="{!tempValue.value.proPrice}" />
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </p>
+                                                                </aura:if>
+                                                                <!--Added By Bharath on 04/11/2021 Starts -->
+                                                        <aura:if isTrue="{!and(tempValue.value.proPriceBy1000 !=null,tempValue.value.showPicklistPrice == '1000')}">
+                                                        <p class="price slds-truncate" >
+                                                            <b>{!$Label.c.Price_1000} </b><!--<lightning:formattedNumber value="{!tempValue.value.uomPrice}" /> -->
+                                                            <aura:if isTrue="{!tempValue.value.currencyType!='NA'}">
+                                                                <lightning:formattedNumber value="{!tempValue.value.proPriceBy1000}" style="currency" currencyCode="{!tempValue.value.currencyType}"/>
+                                                                <aura:set attribute="else">
+                                                                    <lightning:formattedNumber value="{!tempValue.value.proPriceBy1000}" />
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </p>
+                                                        </aura:if>
+                                                        <!--Added By Bharath on 04/11/2021 Ends -->
+                                                    <!--Added By Raghu on 10/11/2021 Starts -->
+                                                    <aura:if isTrue="{!and(tempValue.value.uomPrice !=null,tempValue.value.showPicklistPrice == 'UOM')}"> 
+                                                        <p class="price slds-truncate" >
+                                                            <b>{!$Label.c.UOM_Price} </b><!--<lightning:formattedNumber value="{!tempValue.value.uomPrice}" /> -->
+                                                            <aura:if isTrue="{!tempValue.value.currencyType!='NA'}">
+                                                                <lightning:formattedNumber value="{!tempValue.value.uomPrice}" style="currency" currencyCode="{!tempValue.value.currencyType}"/>
+                                                                <aura:set attribute="else">
+                                                                    <lightning:formattedNumber value="{!tempValue.value.uomPrice}" />
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </p>
+                                                    </aura:if>
+                                                                 <!--Added By Raghu on 10/11/2021 Ends -->
+                                                            
+                                                        </aura:if> 
+                                                   
+                                                    <aura:if isTrue="{!tempValue.value.fullboxQty}">
+                                                        <p class="slds-truncate" title="{!tempValue.value.boxquantity}"><b>{!$Label.c.Box_Quantity} </b>{!tempValue.value.boxquantity}</p>
+                                                    </aura:if>
+                                                    <!--Tony 20200511 Revised-->
+                                                   <!-- <p><b>Variable Data:</b>{!tempValue.value.vardataproduct}</p>-->
+                                                </div>
+                                                
+                                                <div class="slds-grid slds-m-bottom_x-small">
+                                                    <aura:if isTrue="{!tempValue.value.vardataproduct=='Yes'}">
+                                                        <!--aura:if isTrue="{!or(or(or(or(or(or(prod.productfamily=='SIDE SIZER',prod.productfamily=='CROWN SIZER'),prod.productfamily=='RING SIZER'),prod.productfamily=='CROWN SIZER'),prod.productfamily=='SQUARE SIZER'),prod.productfamily=='TOP CAP SIZER'),prod.productfamily=='OTHER SIZER')}"-->
+                                                        <div class="slds-col slds-size_1-of-1">
+                                                            <button class="slds-button slds-button_destructive slds-button_red slds-button_red"  name="{!ind}" data-record="" onclick="{!c.SizerProduct}"> {!$Label.c.Select}</button>   
+                                                        </div>
+                                                        <aura:set attribute="else">
+                                                            <div class="slds-col">  
+                                                                <div class="slds-box slds-box_xx-small slds-form-element__control slds-grow slds-m-right_xx-small slds-m-top_xxx-small">
+                                                                    <ui:outputText value="{!tempValue.value.UomOrder}"/>
+                                                                </div>
+                                                            </div>
+                                                            <div class="slds-col slds-size_2-of-5 slds-m-right_xx-small">
+                                                                <aura:if isTrue="{!v.selectedTab=='Hanger Business'}">
+                                                                    <div class="color selected-color-icon">
+                                                                        <ul>
+                                                                            <li><a class='{!tempValue.key}' id='{!tempValue.key}' title="{!tempValue.key}" href="" name="{!ind}" onclick='{!c.colorChange}'></a></li>
+                                                                        </ul>
+                                                                    </div>
+                                                                </aura:if>
+                                                                <aura:if isTrue="{!v.selectedTab=='MCare'}">
+                                                                    <div class="color selected-color-icon">
+                                                                        <ul>
+                                                                            <li><a class='{!tempValue.key}' id='{!tempValue.key}' title="{!tempValue.key}" href="" name="{!ind}" onclick='{!c.colorChange}'></a></li>
+                                                                        </ul> 
+                                                                    </div>
+                                                                </aura:if>
+                                                                
+                                                                <lightning:input class="hide-label input-qty"  type="number" placeholder="{!$Label.c.Qty}" name="{!ind}" id="Quant" value="{!tempValue.quantity}" disabled="{!tempValue.value.addedToCart}" onchange='{!c.handleQtyChange}'/>
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-3">
+                                                                <button class="{!tempValue.value.addedToCart ? 'slds-button slds-button_destructive slds-button_red slds-button_red-disabled':'slds-button slds-button_destructive slds-button_red'}"  data-record="{!ind+' '+key}" onclick="{!c.saveproddata}" disabled="{!tempValue.value.addedToCart}"> {!tempValue.value.addedToCart ? $Label.c.Added_Cart:$Label.c.ADD_TO_CART}</button>
+                                                            </div>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </div>
+                                                
+                                                <aura:if isTrue="{!v.selectedTab=='Hanger Business'}">
+                                                    <!--aura:if isTrue="{!or(or(or(or(or(or(prod.productfamily=='SIDE SIZER',prod.productfamily=='CROWN SIZER'),prod.productfamily=='RING SIZER'),prod.productfamily=='CROWN SIZER'),prod.productfamily=='SQUARE SIZER'),prod.productfamily=='TOP CAP SIZER'),prod.productfamily=='OTHER SIZER')}"-->
+                                                    <aura:if isTrue="{!tempValue.value.vardataproduct=='Yes'}">
+                                                        <aura:set attribute="else">
+                                                            <div>
+                                                                <aura:iteration items="{!prod.tempMap}" var="tempValue" indexVar="key">
+                                                                    <div class="{!tempValue.key}">
+                                                                        <div class="color">
+                                                                            <ul>
+                                                                                <li><a class='{!tempValue.key}' id='{!tempValue.key}' title="{!tempValue.key}" href="" name="{!ind}" onclick='{!c.colorChange}'></a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </aura:iteration>
+                                                            </div>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:if>
+                                                <aura:if isTrue="{!v.selectedTab=='MCare'}">
+                                                    <!--aura:if isTrue="{!or(or(or(or(or(or(prod.productfamily=='SIDE SIZER',prod.productfamily=='CROWN SIZER'),prod.productfamily=='RING SIZER'),prod.productfamily=='CROWN SIZER'),prod.productfamily=='SQUARE SIZER'),prod.productfamily=='TOP CAP SIZER'),prod.productfamily=='OTHER SIZER')}"-->
+                                                    <aura:if isTrue="{!tempValue.value.vardataproduct=='Yes'}">
+                                                        <aura:set attribute="else">
+                                                            <div>
+                                                                <aura:iteration items="{!prod.tempMap}" var="tempValue" indexVar="key">
+                                                                    <div class="{!tempValue.key}">
+                                                                        <div class="color">
+                                                                            <ul>
+                                                                                <li><a class='{!tempValue.key}' id='{!tempValue.key}' title="{!tempValue.key}" href="" name="{!ind}" onclick='{!c.colorChange}'></a></li>
+                                                                            </ul>
+                                                                        </div>
+                                                                    </div>
+                                                                </aura:iteration>
+                                                            </div>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:if>
+                                             
+                                            </div> 
+                                            
+                                            <br/>
+                                        </div> 
+                                    </div>
+                                </div> 
+                            </aura:if>
+                            
+                        </aura:iteration>
+                    </aura:iteration>
+                </div>																
+            </div>
+        </aura:If>
+        <aura:If isTrue="{!v.selectedTab=='Labels &amp; Tickets'}">
+            <div class="products-grid slds-grid slds-wrap">
+                <aura:iteration items="{!v.completeWrap}" var="prod" indexVar='ind'>
+                    <aura:iteration items="{!prod.tempMap}" var="tempValue" indexVar="key">
+                        <aura:if isTrue="{!tempValue.key == prod.selectedColor}">
+                            <div class="slds-col slds-small-size_1-of-1 slds-medium-size_1-of-3 slds-large-size_1-of-6 slds-float_left slds-text-align_center">
+                                <div class="product-item">
+                                    <div class="{!tempValue.value.addedToCart ? ' item-inner Selected_BG':' item-inner'}">
+                                        <div class="{!tempValue.value.addedToCart ? 'slds-show':'slds-hide'}"><div class="{!tempValue.value.addedAsLabel? 'icon-sale-label inCart_font-size sale-left Pending' :tempValue.value.addedToCart?'icon-sale-label inCart_font-size sale-right Added':''}">{!tempValue.value.addedAsLabel? $Label.c.Pending :tempValue.value.addedToCart?$Label.c.Added:''}</div></div>
+                                           
+                                         <!--div class="{!tempValue.value.addedToCart ? 'icon-sale-label sale-left':'slds-hide'}">Added</div-->
+                                        <div class="product-thumbnail">
+                                            <div class="btn-quickview">
+                                                <a onclick="{!c.quickviewcmp}" name="{!ind}">
+                                                    <span><lightning:icon size="x-small" name="sdgh" iconName="utility:search" alternativeText="{!$Label.c.Approved}" />{!$Label.c.Quick_View}</span>
+                                                </a>
+                                            </div> 
+                                        </div>
+                                        
+                                        <div class="pro-box-info">
+                                            
+                                            <aura:if isTrue="{!tempValue.value.proImgURL}">
+                                                <a class="product-item-photo" style="{!'background:url('+tempValue.value.proImgURL+')'}" name="{!ind}" onclick="{!c.quickviewcmp}"> 
+                                                    <!--<img class="product-image-photo" src="{!tempValue.value.proImgURL}" alt='image' name="{!ind}" onclick="{!c.quickviewcmp}"/>-->
+                                                </a> 
+                                                <aura:set attribute="else">   
+                                                    <a class="product-item-photo no-item-img" style="{!'background:url('+$Resource.NoImageContent+')'}">
+                                                        <!--<img src="{!$Resource.NoImageContent}"/>-->
+                                                    </a>
+                                                </aura:set>
+                                            </aura:if>
+                                            <div class="slds-p-vertical_small" style="font-size:10.4px;">
+                                                <p class="slds-truncate" title="{!prod.Name+''+ prod.productfamily}"><b>{!prod.Name}({!prod.productfamily})</b></p>
+                                                <!--Added for phase 2.1 requirement to display description2 from price&specification-->
+                                                <p class="slds-truncate" style="color:dimgrey;height:15px;" title="{!tempValue.value.proddescription}">{!tempValue.value.proddescription}</p>
+                                                <p class="slds-truncate" style="color:dimgrey;height:15px;" title="{!tempValue.value.proddescription2}">{!tempValue.value.proddescription2}</p>
+                                                <p class="slds-truncate" title="{!tempValue.value.custRefModel}"><b>{!$Label.c.Cust_Model} </b>{!tempValue.value.custRefModel}</p>
+                                                <!-- Tony Revised 20200511 -->
+                                                <!--<p><b>Variable Data:</b>{!tempValue.value.vardataproduct}</p>-->
+                                                <aura:if isTrue="{!tempValue.value.fullboxQty}">
+                                                    <p class="slds-truncate" title="{!tempValue.value.boxquantity}"><b>{!$Label.c.Box_Quantity}</b>{!tempValue.value.boxquantity}</p>
+                                                </aura:if>
+                                                <aura:if isTrue="{!tempValue.value.showPrice}">
+                                                    <aura:if isTrue="{!and(tempValue.value.proPrice !=null,tempValue.value.showPicklistPrice == '100')}">
+                                                    <p class="price slds-truncate" >
+                                                        <b>{!$Label.c.Price_100} </b><!--<lightning:formattedNumber value="{!tempValue.value.proPrice}" /> -->
+                                                        <aura:if isTrue="{!tempValue.value.currencyType!='NA'}">
+                                                            <lightning:formattedNumber value="{!tempValue.value.proPrice}" style="currency" currencyCode="{!tempValue.value.currencyType}"/>
+                                                            <aura:set attribute="else">
+                                                                <lightning:formattedNumber value="{!tempValue.value.proPrice}" />
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </p>
+                                                    </aura:if>
+                                                     <!--Added By Bharath on 04/11/2021 Starts -->
+                                                     <aura:if isTrue="{!and(tempValue.value.proPriceBy1000 !=null,tempValue.value.showPicklistPrice == '1000')}">
+                                                        <p class="price slds-truncate" >
+                                                            <b>{!$Label.c.Price_1000} </b><!--<lightning:formattedNumber value="{!tempValue.value.uomPrice}" /> -->
+                                                            <aura:if isTrue="{!tempValue.value.currencyType!='NA'}">
+                                                                <lightning:formattedNumber value="{!tempValue.value.proPriceBy1000}" style="currency" currencyCode="{!tempValue.value.currencyType}"/>
+                                                                <aura:set attribute="else">
+                                                                    <lightning:formattedNumber value="{!tempValue.value.proPriceBy1000}" />
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </p>
+                                                    </aura:if>
+                                                    <aura:if isTrue="{!and(tempValue.value.uomPrice !=null,tempValue.value.showPicklistPrice == 'UOM')}">
+                                                        <p class="price slds-truncate" >
+                                                            <b>{!$Label.c.UOM_Price} </b><!--<lightning:formattedNumber value="{!tempValue.value.uomPrice}" /> -->
+                                                            <aura:if isTrue="{!tempValue.value.currencyType!='NA'}">
+                                                                <lightning:formattedNumber value="{!tempValue.value.uomPrice}" style="currency" currencyCode="{!tempValue.value.currencyType}"/>
+                                                                <aura:set attribute="else">
+                                                                    <lightning:formattedNumber value="{!tempValue.value.uomPrice}" />
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </p>
+                                                    </aura:if>
+                                                   <!--Added By Bharath on 04/11/2021 Ends -->
+                                                </aura:if>
+                                            </div>
+                                            <aura:if isTrue="{!tempValue.value.vardataproduct=='No'}">
+                                                <div class="slds-grid slds-m-bottom_x-small">
+                                                    <div class="slds-col">
+                                                        
+                                                        <div class="slds-box slds-box_xx-small slds-form-element__control slds-grow slds-m-right_xx-small slds-m-top_xxx-small">
+                                                            <ui:outputText value="{!tempValue.value.UomOrder}"/>
+                                                        </div>
+                                                    </div>
+                                                    <div class="slds-col slds-size_2-of-5 slds-m-right_xx-small">
+                                                        <lightning:input class="hide-label input-qty"  type="number"  name="{!ind}" id="Quant" value="{!tempValue.quantity}" disabled="{!tempValue.value.addedToCart}" onchange="{!c.handleQtyChange}"/>
+                                                    </div>
+                                                    <div class="slds-col slds-size_1-of-3"> 
+                                                        <button class="{!tempValue.value.addedToCart ? 'slds-button slds-button_destructive slds-button_red slds-button_red-disabled':'slds-button slds-button_destructive slds-button_red'}"  data-record="{!ind+' '+key}" onclick="{!c.saveproddata}" disabled="{!tempValue.value.addedToCart}"> {!tempValue.value.addedToCart ? $Label.c.Added_Cart:$Label.c.ADD_TO_CART}</button>
+                                                    </div>
+                                                </div>
+                                                <aura:set attribute="else"> 
+                                                    <button class="slds-button slds-button_destructive slds-button_red slds-m-bottom_x-small" onclick="{!c.SelectLabel}" name="{!ind}">{!$Label.c.Select_Label}</button>
+                                                </aura:set>
+                                            </aura:if>
+                                        </div>  
+                                        <br/>
+                                    </div> 
+                                </div>
+                            </div> 
+                        </aura:if>
+                    </aura:iteration>
+                </aura:iteration>
+            </div>	
+        </aura:If>
+    </aura:if>
+    <aura:If isTrue="{!v.quickview}">
+        <aura:If isTrue="{!and(v.selectedTab=='Labels &amp; Tickets',!v.LabelQuickview)}">
+            <c:CareLabelOrder displayPagination="{!v.displayPagination}" careLabelOrder="{!v.careLabelOrder}" quickview="{!v.quickview}"  selectedTab="{!v.selectedTab}" retailerID="{!v.SelectedRetailerId}" completewrapdata="{!v.completeWrap}"  flagFamily="{!v.flagFamily}" selectedProduct="{!v.quickviewedProduct}" onselectcustomeid="{!v.onselectcustomeid}" catalogVertical="{!v.catalogVertical}" catalogOrder="{!v.parentcmp}" selectedCurrency="{!v.selectedCurrency}"  searchedCurrency="{!v.searchedCurrency}"  logo="{!v.logo}" />
+            <aura:set attribute="else"> 
+                <c:QuickviewProduct LabelQuickview="{!v.LabelQuickview}" selectedTab="{!v.selectedTab}" completeWrap="{!v.completeWrap}" quickviewprod="{!v.quickview}" quickviewedProduct="{!v.quickviewedProduct}" onselectcustomeid="{!v.onselectcustomeid}"/>
+            </aura:set>
+        </aura:If> 
+    </aura:If>
+  
+    <aura:If isTrue="{!v.sizerhanger}">
+    <c:HangerSizercmp isSizerQuickview="false" sizerIndex="{!v.sizerIndex}" searchedCurrency="{!v.searchedCurrency}" selectedTab="{!V.selectedTab}" flagFamily="{!v.flagFamily}" displayPagination="{!v.displayPagination}" catalogVertical="{!v.catalogVertical}" retailerID="{!v.SelectedRetailerId}" completeWrap="{!v.completeWrap}" hangersizer="{!v.sizerhanger}" selectedCompany="{!v.selectedCompany}" selectedCurrency="{!v.selectedCurrency}" onselectcustomeid="{!v.onselectcustomeid}" hangerListDetail="{!v.hangerListDetail}"/>
+    
+</aura:If>
+    
+    <aura:If isTrue="{!v.quickviewSizer}">
+        <c:HangerSizercmp quickviewSizer="{!v.quickviewSizer}" isSizerQuickview="true" sizerIndex="{!v.sizerIndex}" selectedTab="{!V.selectedTab}" flagFamily="{!v.flagFamily}" displayPagination="{!v.displayPagination}" catalogVertical="{!v.catalogVertical}" retailerID="{!v.SelectedRetailerId}" completeWrap="{!v.completeWrap}" hangersizer="{!v.sizerhanger}" selectedCompany="{!v.selectedCompany}" selectedCurrency="{!v.selectedCurrency}" onselectcustomeid="{!v.onselectcustomeid}" hangerListDetail="{!v.hangerListDetail}"/>
+    </aura:If>
+</aura:component>

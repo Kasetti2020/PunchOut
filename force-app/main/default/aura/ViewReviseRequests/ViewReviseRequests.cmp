@@ -1,0 +1,362 @@
+<aura:component controller="SOController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    
+    <aura:attribute name="isViewReviseReqEnabled" type="Boolean" />
+    <aura:attribute name="isSaveRequired" type="Boolean" />
+    <aura:attribute name="isCancelOrderflag" type="Boolean" />
+    <aura:attribute name="SOObj" type="object"/>
+    <aura:attribute name="revOrderVerWrp" type="object"/>
+    
+    <aura:attribute name="AddressTable" type="boolean" default="false"/>
+    <aura:attribute name="AddressList" type="List"/>
+    
+    <section class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                
+                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{!$Label.c.View_Revise_Requests} {!v.SOObj.Name}</h2>
+            </header>
+            
+            <div class="slds-modal__content slds-p-around_medium1">
+                <div class="slds-table slds-table_bordered1">
+                    <table class="slds-table slds-table_bordered"> 
+                        <thead>
+                            <tr class="slds-line-height_reset" style="background:gray;text-transform:uppercase;">
+                                <th scope="col" ><div class="slds-truncate">{!$Label.c.Revise_No}</div></th>
+                                <th scope="col" ><div class="slds-truncate">{!$Label.c.Revise_Created_Date}</div></th>
+                                <th scope="col" style="width:1%;"><div class="slds-truncate">{!$Label.c.Revision_Type}</div></th>
+                                <th scope="col" class="slds-text-align_center"><div class="slds-truncate">{!$Label.c.STATUS}</div></th>
+                                <th scope="col" ><div class="slds-truncate">{!$Label.c.Revise_Details}</div></th>
+                                <th scope="col" ><div class="slds-truncate">{!$Label.c.Old_Value}</div></th>
+                                <th scope="col" ><div class="slds-truncate">{!$Label.c.New_Value}</div></th>
+                              
+                                <th>  <aura:if isTrue="{!v.isCancelOrderflag}">
+                                    <div class="slds-truncate">{!$Label.c.Cancel_Date}</div>
+                                   </aura:if>
+                                </th>
+                                <th>  <aura:if isTrue="{!v.isCancelOrderflag}">
+                                   <div class="slds-truncate">{!$Label.c.Cancel_reason}</div>
+                                </aura:if>
+                                </th>
+                            </tr>
+                        </thead>
+                        <aura:iteration items="{!v.revOrderVerWrp}" var="revVer" indexVar="index">
+                            
+                            <tbody>
+                                <aura:iteration items="{!revVer.ReviseReqWrapList}" var="rev" indexVar="indexi">
+                                    <tr>									
+                                        <td>
+                                            {!revVer.revVersion}<ui:outputText value="{!rev.Id}"/>
+                                        </td>									
+                                        <td>
+                                            <lightning:formattedDateTime value="{!rev.revOData.CreatedDate}" year="numeric" month="numeric" day="numeric" />
+                                        </td>
+                                        <td>
+                                            <ui:outputText value="{!rev.revOData.What_to_Revise__c}"/>
+                                        </td>
+                                        <td>
+                                            <ui:outputText value="{!rev.revOData.Status__c}"  class="{!rev.revOData.Status__c == 'Approved'?'slds-badge slds-badge_success':rev.revOData.Status__c == 'Approve Pending'?'slds-badge slds-badge_warning':rev.revOData.Status__c == 'Rejected'?'slds-badge slds-badge_danger':'slds-badge slds-badge_transparent'}"/>
+                                            <!--<lightning:input name="" variant="label-hidden" readonly="true" label="" value="{!rev.revOData.Status__c}"/>-->
+                                        </td>
+                                        <td style="vertical-align: top;"> 
+                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Ship To'}">
+                                                <p>{!$Label.c.Factory_Name}</p>
+                                                <p>{!$Label.c.Street} </p>
+                                                <p>{!$Label.c.City} </p>
+                                                <p>{!$Label.c.State} </p>
+                                                <p>{!$Label.c.Country} </p>
+                                                <p>{!$Label.c.Postal_Code}</p>
+                                                <p>{!$Label.c.Contact_Name}</p>
+                                                <p>{!$Label.c.Contact_Number}</p>
+                                                <p>{!$Label.c.Contact_Email} </p>
+                                                <aura:set attribute="else">
+                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Ship Date'}">
+                                                        <p>{!$Label.c.Expected_Completion_Date} </p>
+                                                        <aura:set attribute="else">
+                                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Factory Internal PO'}">
+                                                                <p>{!$Label.c.Factory_Internal_PO}</p>
+                                                                <aura:set attribute="else">
+                                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Shipping Mark/Special Instruction'}">
+                                                                        <p>{!$Label.c.Shipping_Mark_Special_Instruction}</p>												  
+                                                                        <aura:set attribute="else">
+                                                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Forwarder/Transportation Details'}">
+                                                                                <p>{!$Label.c.Forwarder_Transportation_Details02}</p>
+                                                                                <aura:set attribute="else">
+                                                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Quantity'}">
+                                                                                        <p>{!$Label.c.Customer_Ref_Model}</p>
+                                                                                        <p>{!$Label.c.Quantity01}</p>
+                                                                                        <aura:set attribute="else">
+                                                                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Cancel Line Item'}">
+                                                                                                <p>{!$Label.c.Customer_Ref_Model}</p>
+                                                                                                <aura:set attribute="else">
+                                                                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Cancel Order'}">
+                                                                                                        <p><ui:outputText value="{!$Label.c.Cancel_Order}"/></p>
+                                                                                                    </aura:if>
+                                                                                                </aura:set>
+                                                                                            </aura:if>
+                                                                                        </aura:set>	 
+                                                                                    </aura:if>
+                                                                                </aura:set>		
+                                                                            </aura:if>
+                                                                        </aura:set>	   
+                                                                    </aura:if>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:set>
+                                            </aura:if>
+                                        </td>
+                                        <td style="vertical-align: top;">
+                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Ship To'}">
+                                                <p><ui:outputText value="{!rev.oldVal.Old_Ship_to_Company__c}"/></p>
+                                                <p><ui:outputText value="{!rev.oldVal.Old_Ship_to_Address1__c}"/></p>
+                                                <p><ui:outputText value="{!rev.oldVal.Old_Ship_to_City__c}"/></p>
+                                                <p><ui:outputText value="{!rev.oldVal.Old_Ship_to_State__c}"/></p>
+                                                <p><ui:outputText value="{!rev.oldVal.Old_Ship_to_Country__c}"/></p>
+                                                <p><ui:outputText value="{!rev.oldVal.Old_Ship_to_Postcode__c}"/></p>
+                                                <p><ui:outputText value="{!rev.oldVal.Old_Bill_to_Ship_to_Address__r.Contact__c}"/></p>
+                                                <p><ui:outputText value="{!rev.oldVal.Old_Ship_to_Tel__c}"/></p>
+                                                <p><ui:outputText value="{!rev.oldVal.Old_Ship_to_Email__c}"/></p>
+                                                <aura:set attribute="else">
+                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Ship Date'}">
+                                                        <p><ui:outputText value="{!rev.oldVal.Old_Expected_Delivery_Date__c}"/></p>
+                                                        <aura:set attribute="else">
+                                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Factory Internal PO'}">
+                                                                <p><ui:outputText value="{!rev.oldVal.Old_Factory_Internal_PO__c}"/></p>
+                                                                <aura:set attribute="else">
+                                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Shipping Mark/Special Instruction'}">
+                                                                        <p><ui:outputText value="{!rev.oldVal.Old_Shipping_Mark__c}"/></p>
+                                                                        <aura:set attribute="else">
+                                                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Forwarder/Transportation Details'}">
+                                                                                <p><ui:outputText value="{!rev.oldVal.Old_Forwarder_Transportation_Details__c}"/></p>
+                                                                                <aura:set attribute="else">
+                                                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Quantity'}">
+                                                                                        <p><ui:outputText value="{!rev.oldVal.Mainetti_Model__c}"/></p>
+                                                                                        <p><ui:outputNumber value="{!rev.oldVal.Old_Quantity__c}"/></p>
+                                                                                        <aura:set attribute="else">
+                                                                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Cancel Line Item'}">
+                                                                                                <p><ui:outputText value="{!rev.oldVal.Mainetti_Model__c}"/></p>
+                                                                                                <aura:set attribute="else">
+                                                                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Cancel Order'}">
+                                                                                                        <p><ui:outputText value="Cancel Order"/></p>
+                                                                                                    </aura:if>
+                                                                                                </aura:set>
+                                                                                            </aura:if>
+                                                                                        </aura:set>	 
+                                                                                    </aura:if>
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </aura:set>
+                                                                
+                                                            </aura:if>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:set>
+                                            </aura:if>
+                                        </td>
+                                        <td style="color:#a41f34" class="text-bold">                                            
+                                            <aura:if isTrue="{!rev.iseditable}">                                                
+                                                <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Ship To'}">
+                                                    <p><ui:outputText value="{!rev.newVal.New_Ship_to_Company__c}"/></p>                                                                        
+                                                    <p><ui:outputText value="{!rev.newVal.New_Ship_to_Address1__c}"/></p>
+                                                    <p><ui:outputText value="{!rev.newVal.New_Ship_to_City__c}"/></p>
+                                                    <p><ui:outputText value="{!rev.newVal.New_Ship_to_State__c}"/></p>
+                                                    <p><ui:outputText value="{!rev.newVal.New_Ship_to_Country__c}"/></p>
+                                                    <p><ui:outputText value="{!rev.newVal.New_Ship_to_Postcode__c}"/></p>
+                                                    <p><ui:outputText value="{!rev.newVal.New_Bill_to_Ship_to_Address__r.Contact__c}"/></p>
+                                                    <p><ui:outputText value="{!rev.newVal.New_Ship_to_Tel__c}"/></p>
+                                                    <p><ui:outputText value="{!rev.newVal.New_Ship_to_Email__c}"/></p>
+                                                    <p><lightning:button class="slds-button slds-button_neutral" iconName="utility:resource_territory" label="{!$Label.c.Select}" onclick="{!c.displayTableAddress}"/></p>
+                                                    
+                                                    <aura:set attribute="else">
+                                                        <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Ship Date'}">
+                                                            <p><ui:inputDate class="hide-label" aura:id="userdate" change="{!c.changeSOExpDelDate}" value="{!rev.newVal.New_Expected_Delivery_Date__c}" displayDatePicker="true" format="yyyy-MM-dd"/></p>
+                                                            
+                                                            <aura:set attribute="else">
+                                                                <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Factory Internal PO'}">
+                                                                    <p><lightning:textarea variant="label-hidden" class="label-hidden" value="{!rev.newVal.New_Factory_Internal_PO__c}" maxlength="100"  /></p>
+                                                                    
+                                                                    <aura:set attribute="else">
+                                                                        <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Shipping Mark/Special Instruction'}">
+                                                                            <p><lightning:textarea variant="label-hidden" class="label-hidden" value="{!rev.newVal.New_Shipping_Mark__c}" onchange="" maxlength="100"  /></p>
+                                                                            
+                                                                            
+                                                                            <aura:set attribute="else">
+                                                                                <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Forwarder/Transportation Details'}">
+                                                                                    <p><lightning:textarea variant="label-hidden" class="label-hidden" name="" value="{!rev.newVal.New_Forwarder_Transportation_Details__c}" onchange="" maxlength="100"  /></p>
+                                                                                    
+                                                                                    
+                                                                                    <aura:set attribute="else">
+                                                                                        <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Quantity'}">
+                                                                                            <p>
+                                                                                                <lightning:textarea type="number" name="{!rev.newVal.Id}" value="{!rev.newVal.New_Quantity__c}" class="label-hidden" variant="label-hidden" onchange="{!c.changeSOLIqty}" maxlength="100"  />
+                                                                                                <!--<lightning:input type="number" name="{!rev.newVal.Id}" value="{!rev.newVal.New_Quantity__c}" onchange="{!c.quantityChange}"/>-->
+                                                                                            </p>
+                                                                                            
+                                                                                            <aura:set attribute="else">
+                                                                                                <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Cancel Line Item'}">
+                                                                                                    <p><ui:inputCheckbox label="{!$Label.c.Abort}" change="{!c.onAbortCancel}" name="{!rev.newVal.Id}"/></p>
+                                                                                                    
+                                                                                                    <aura:set attribute="else">
+                                                                                                        <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Cancel Order'}">
+                                                                                                            <p>
+																											<!--<ui:inputText value="{!rev.revOData.Status__c=='Approved'?'Cancelled':'Not Cancelled'}"/>-->
+																											</p>
+                                                                                                        </aura:if>
+                                                                                                    </aura:set>
+                                                                                                </aura:if>
+                                                                                            </aura:set>
+                                                                                        </aura:if>
+                                                                                    </aura:set>
+                                                                                </aura:if>
+                                                                            </aura:set>
+                                                                        </aura:if>
+                                                                    </aura:set>
+                                                                </aura:if>
+                                                            </aura:set>
+                                                        </aura:if>
+                                                    </aura:set>
+                                                </aura:if>
+                                                
+                                                
+                                                <aura:set attribute="else">                                                   
+                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Ship To'}">
+                                                        <p><ui:outputText value="{!rev.newVal.New_Ship_to_Company__c}"/></p>
+                                                        <p><ui:outputText value="{!rev.newVal.New_Ship_to_Address1__c}"/></p>
+                                                        <p><ui:outputText value="{!rev.newVal.New_Ship_to_City__c}"/></p>
+                                                        <p><ui:outputText value="{!rev.newVal.New_Ship_to_State__c}"/></p>
+                                                        <p><ui:outputText value="{!rev.newVal.New_Ship_to_Country__c}"/></p>
+                                                        <p><ui:outputText value="{!rev.newVal.New_Ship_to_Postcode__c}"/></p>
+                                                        <p><ui:outputText value="{!rev.newVal.New_Bill_to_Ship_to_Address__r.Contact__c}"/></p>
+                                                        <p><ui:outputText value="{!rev.newVal.New_Ship_to_Tel__c}"/></p>
+                                                        <p><ui:outputText value="{!rev.newVal.New_Ship_to_Email__c}"/></p>
+                                                        
+                                                        <aura:set attribute="else">
+                                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Ship Date'}">
+                                                                <p><ui:outputText value="{!rev.newVal.New_Expected_Delivery_Date__c}"/></p>
+                                                                <aura:set attribute="else">
+                                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Factory Internal PO'}">
+                                                                        <p><ui:outputText class="" value="{!rev.newVal.New_Factory_Internal_PO__c}"/></p>
+                                                                        <aura:set attribute="else">
+                                                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Shipping Mark/Special Instruction'}">
+                                                                                <p><ui:outputTextArea value="{!rev.newVal.New_Shipping_Mark__c}"/></p>
+                                                                                <aura:set attribute="else">
+                                                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Forwarder/Transportation Details'}">
+                                                                                        <p><ui:outputTextArea value="{!rev.newVal.New_Forwarder_Transportation_Details__c}"/></p>
+                                                                                        <aura:set attribute="else">
+                                                                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Quantity'}">
+                                                                                                <p><ui:outputNumber value="{!rev.newVal.New_Quantity__c}"/></p>
+                                                                                                <aura:set attribute="else">
+                                                                                                    <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Cancel Line Item'}">
+                                                                                                        <p><ui:outputText value="{!rev.revOData.Status__c=='Approved'?'Cancelled':''}"/></p>
+                                                                                                        <aura:set attribute="else">
+                                                                                                            <aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Cancel Order'}">
+                                                                                                                <p><ui:outputText value="{!rev.revOData.Status__c=='Approved'?'Cancelled':''}"/></p>
+                                                                                                            </aura:if>
+                                                                                                        </aura:set>
+                                                                                                    </aura:if>
+                                                                                                </aura:set>
+                                                                                            </aura:if>
+                                                                                        </aura:set>
+                                                                                    </aura:if>
+                                                                                </aura:set>
+                                                                            </aura:if>
+                                                                        </aura:set>
+                                                                    </aura:if>
+                                                                </aura:set>
+                                                            </aura:if>
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:set>
+                                            </aura:if>                                           
+                                        </td> 
+                                        <td><aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Cancel Order'}">
+                                               {!rev.revOData.Cancel_Order_Date__c} 
+                                            </aura:if></td>
+                                        <td><aura:if isTrue="{!rev.revOData.What_to_Revise__c == 'Cancel Order'}">
+                                               {!rev.revOData.Reason_to_Cancel__c} 
+                                            </aura:if></td>
+                                    </tr>
+                                    
+                                </aura:iteration>
+                            </tbody>
+                        </aura:iteration>
+                    </table>
+                </div>
+            </div>
+            
+            <footer class="slds-modal__footer">                
+                <aura:if isTrue="{!v.isSaveRequired}">
+                    <lightning:button iconName="utility:save" class="slds-button slds-button_brand" onclick="{!c.saveReviseRequest}" label="{!$Label.c.save}"/>
+                </aura:if>
+                <lightning:button iconName="utility:close" class="slds-button slds-button_brand" onclick="{!c.closeReviseRequest}" label="{!$Label.c.Close}"/>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+    
+    <aura:if isTrue="{!v.AddressTable}">
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{!$Label.c.Select_Address}</h2>
+                </header>
+                <div class="slds-modal__content" style="height: 70vh;">
+                    <div class="slds-box slds-box-no-border slds-m-around_large">
+                        <h2 class="box-title" style="width:80px">{!$Label.c.Ship_To}</h2>
+                        <lightning:layout multipleRows="true" >
+                            
+                            <aura:iteration items="{!v.AddressList}" var="address" indexVar="row">
+                                <lightning:layoutItem size="4">
+                                    
+                                    <article class="slds-tile slds-media">
+                                        <div class="slds-media__figure">
+                                            <lightning:input onchange="{!c.onRadioChange}" type="radio" name="options" value="{!address}"/>
+                                        </div>
+                                        <div class="slds-media__body">                    
+                                            <div class="slds-tile__detail">
+                                                <dl class="slds-list_horizontal slds-wrap">
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Address}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Name}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Factory}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Factory_Name__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Street}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Address_1__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.City}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.City__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.State}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.State__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Country}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Country__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.PostCode}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Postcode__c}</dd>
+                                                    <!--<dt class="slds-item_label slds-text-color_weak slds-truncate" title="">Contact Name</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Contact__c}</dd>-->
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Contact_Number}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Tel_No__c}</dd>
+                                                    <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Contact_Email}</dt>
+                                                    <dd class="slds-item_detail slds-truncate" title="">{!address.Email_Address__c}</dd>
+                                                    
+                                                </dl>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </lightning:layoutItem >
+                            </aura:iteration>
+                        </lightning:layout>
+                    </div>
+                </div>
+                <footer class="slds-modal__footer">
+                    <lightning:button iconName="utility:save" class="slds-button slds-button_brand" onclick="{!c.SaveTableAddress}" label="{!$Label.c.save}"/>
+                    <lightning:button iconName="utility:close" class="slds-button slds-button_brand" onclick="{!c.closeTableAddress}" label="{!$Label.c.Cancel}"/>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </aura:if>
+    
+</aura:component>

@@ -1,0 +1,3 @@
+<aura:event type="COMPONENT" description="changemessage">
+ <aura:attribute name="selecttab" type="String"/>
+</aura:event>

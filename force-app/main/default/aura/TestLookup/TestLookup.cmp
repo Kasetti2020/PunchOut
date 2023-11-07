@@ -1,0 +1,325 @@
+<aura:component  Controller="TestLookupApex" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="SelectedRetailer" type="String" description="retailer Code Name"/> 
+    <aura:attribute name="SearchKeyWord" type="string"/>
+    <aura:attribute name="listOfSearchRecords" type="List" description="Use,for store the list of search records which returns from apex class"/>
+    <aura:attribute name="selectedRetailerRecord" type="Retailer_Code__c" default="{}" description="Use,for store SELECTED sObject Record"/>
+    <aura:attribute name="SearchUserKeyWord" type="string"/>
+    <aura:attribute name="listOfUserSearchRecords" type="List" description="Use,for store the list of search records which returns from apex class"/>
+    <aura:attribute name="selectedUserRecord" type="Online_Enquiry__c" default="{}" description="Use,for store SELECTED sObject Record"/>
+    
+    <aura:attribute name="selectedCompany" type="string"/>    
+    <aura:attribute name="cartFlag" type="boolean" default="false"/>
+    <aura:attribute name="accountList" type="CompanyAllocationObj[]"/> 
+    <aura:attribute name="accountListafterdelete" type="CompanyAllocationObj[]"/>
+    <aura:attribute name="variable1" type="boolean" default="true"/>
+    
+    <aura:attribute name="testList" type="List" />
+    
+    <aura:attribute name="listOfCompanies" type="List" />
+    <aura:attribute name="listOfCompaniesMap" type="Map" />
+    <aura:attribute name="indexVal" type="Integer" default="0"/>
+    <aura:attribute name="selectedCompanyList" type="String[]" />
+    <aura:attribute name="showConfirmDialog" type="boolean" default="false"/>
+    
+    <!--below attributes are used for editing functionality-->  
+    <aura:attribute name="isEdit" type="boolean" default="false"/>
+    <aura:attribute name="reuseOrdId" type="string" default="a2K9D000000LmNaUAK"/>
+    <aura:attribute name="retailerDetail" type="string" />
+    <aura:attribute name="retailerDetailListName" type="string" />
+    
+    <aura:attribute name="pagelistCmpFlag" type="boolean" default="false"/>
+    <aura:attribute name="index" type="integer" />
+    <aura:attribute name="Hidesubmit" type="Boolean" default="false" />
+    
+    <!--declare events handlers-->  
+    <aura:handler name="oRetailerdataEvent" event="c:TestLookupRetailerEvent" action="{!c.handleComponentEvent}"/>
+    
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position: fixed" alternativeText="Loading" size="large" />
+    </div>
+    <!--<table class="slds-table slds-table_bordered slds-table_cell-buffer slds-modal__header slds-page-header">
+        <tr>
+        <H1 style="text-align:center">Order Allocation Company Sequence</H1></tr>
+        <tr>
+            <td>
+                <div onmouseleave="{!c.onblur}" aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single" style="width:250px">
+                    <label class="slds-form-element__label" for="horizontal-input-id-01">Select Retailer*</label>                        
+                    <div class="slds-form-element__control">
+                        <div class="slds-input-has-icon slds-input-has-icon-|-right">
+                            <div aura:id="lookup-pill" class="slds-pill-container slds-hide">
+                                <lightning:pill class="pillSize" label="{!v.selectedRetailerRecord.Name}" name="{!v.selectedRetailerRecord.Name}" onremove="{!c.clear}"> 
+                                    <aura:set attribute="media">
+                                        <lightning:icon iconName="standard:account" size="x-small" alternativeText="close"/>
+                                    </aura:set>
+                                </lightning:pill>
+                            </div>
+                            <input type="hidden" id="errorMapFields" value=""/>                                                    
+                            <div aura:id="lookupField" class="slds-show">
+                                <lightning:icon class="slds-input__icon slds-show" iconName="standard:search" size="x-small" alternativeText="search"/>
+                                <span class="slds-icon_container  slds-combobox__input-entity-icon" title="record">
+                                    <lightning:icon class="slds-icon slds-icon slds-icon_small slds-icon-text-default" iconName="standard:account" size="x-small" alternativeText="icon"/>
+                                    <span class="slds-assistive-text"></span>
+                                </span>
+                                <ui:inputText  aura:id="searchValue" size="25"   updateOn="keyup" keyup="{!c.keyPressController}" class="slds-lookup__search-input slds-input leftPaddingClass" value="{!v.SearchKeyWord}" placeholder="search.." />
+                                <input type="hidden"  id='valueHolder'  name = "" value = ""  />                                                       
+                            </div>                                                
+                        </div>
+                        
+                        <ul style="min-height:40px;width:291px;margin-right:68px;" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-lookup__menu slds" role="listbox">
+                            <lightning:spinner class="slds-hide" variant="brand" size="small" aura:id="mySpinner"/>
+                            <center> {!v.Message}</center>
+                            
+                            <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                                <c:TestLookupRetailerData oRetailer="{!singleRec}" IconName="standard:account"  />
+                                
+                            </aura:iteration>
+                        </ul>
+                    </div>
+                    
+                </div>
+            </td><td>
+            </td> </tr></table> -->
+    
+    
+    <aura:if isTrue="{!v.variable1}">
+        
+        
+        <div style="">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" >
+                <div class="slds-modal__container" style="width:70%;font-size:11px;">
+                    
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                            
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" style="color:rgb(164, 31, 52);" class="slds-text-heading_medium slds-hyphenate">Reuse Order Allocation</h2>
+                    </header> 
+                    
+                    
+                    <div class="slds-modal__content slds-p-around_small" style="height:75vh;min-height:75vh;">
+                        <div class="slds-box slds-p-around_none slds-m-top_small1">
+                            <article class="slds-card">
+                                <div class="slds-card__header slds-grid slds-m-around_none slds-p-around_x-small">
+                                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                        <div class="slds-media__figure">
+                                            <span class="slds-icon_container slds-icon-standard-task" title="Buyer">
+                                                <lightning:icon size="x-small" iconName="standard:user" alternativeText="Event" />
+                                            </span>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <h2 class="slds-card__header-title">
+                                                <span><b style="text-decoration: underline;">{!v.retailerDetailListName}</b>- Company wise order allocation sequence</span>
+                                            </h2>
+                                        </div>
+                                        <div class="slds-no-flex">
+                                            <aura:if isTrue="{!lessthan(v.accountList.length,v.listOfCompanies.length)}">
+                                                <tr style="height:5px"></tr>
+                                                <div class="slds-float_right slds-p-bottom_small">
+                                                    
+                                                    <h3 class="slds-page-header__title" style="font-size:12px;">Add Company 
+                                                        <lightning:buttonIcon iconName="utility:add"  size="small"  variant="border-filled" alternativeText="Add" onclick="{!c.addRow}"/>
+                                                    </h3>
+                                                </div>
+                                            </aura:if>
+                                        </div>
+                                    </header>
+                                </div>
+                                
+                                <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                    <thead>
+                                        <tr class="slds-line-height_res">
+                                            <th scope="col">
+                                                <div class="slds-truncate" style="text-align: Center;" title="Allocate Sequence Number">Allocation Number</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" style="text-align: Center;" title="Order To Company">Order To Company</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" style="text-align: Center;" title="Select Region">Select Region</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" style="text-align: Center;" title="Select Sub-Region">Select Sub-Region</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" style="text-align: Center;" title="Active">Active</div>
+                                            </th>
+                                            <th scope="col">
+                                                <div class="slds-truncate" style="text-align: Center;" title="Action">Action</div>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <aura:iteration items="{!v.accountList}" var="acc" indexVar="index">
+                                            
+                                            <tr class="slds-hint-parent">
+                                                <td style="text-align: center;width:80px; vertical-align: middle;"> 
+                                                    {!index + 1}                                 
+                                                </td>
+                                                <td data-label="Allocate Number" style="text-align: center; width:350px;height:50px; vertical-align: middle;">
+                                                    <div class="slds-col slds-m-right_medium" >                                    
+                                                        
+                                                        <lightning:select name="{!index}" value="{!acc.selectedCountry}" onchange="{!c.OrderToCompany}" class="label-hidden">
+                                                            <option value="NONE" text="NONE"></option>
+                                                            <aura:iteration items="{!acc.Order_Country__c}" var="option">
+                                                                <option text="{!option.label}" value="{!option.label}" selected="{!option.selected}"/>
+                                                            </aura:iteration>
+                                                        </lightning:select>
+                                                        
+                                                        
+                                                    </div>                                
+                                                </td>
+                                                <td data-label="Allocate Number" style="text-align: center; width:200px;height:50px; vertical-align: middle;">
+                                                    <lightning:select name="region" value="{!acc.Region}" class="label-hidden">
+                                                        <option value="">Select Region</option>                                    
+                                                        <option value="Asia">Asia</option>
+                                                        <option value="Europe">Europe</option>
+                                                    </lightning:select>
+                                                    
+                                                </td>
+                                                <td style="text-align: center; width:200px;height:50px; vertical-align: middle;">
+                                                    <lightning:select name="subRegion"  value="{!acc.subRegion}" class="label-hidden">
+                                                        <option value="">Select Sub-Region</option>                                    
+                                                        <option value="Asia">Asia</option>
+                                                        <option value="Europe">Europe</option>
+                                                    </lightning:select>
+                                                    <!--  <lightning:input name="accPhone" type="phone" maxlength="10" label="Phone" value="{!acc.Phone}" />-->
+                                                </td>
+                                                <td style="text-align: center;width:90px;vertical-align: middle;padding-left: 15px;">
+                                                    <lightning:input type="checkbox" checked="{!acc.active}" name="{!v.SOrder.reuseOrd}"  value="{!acc.active}"/>
+                                                </td>
+                                                <td style="text-align: center; width:90px;vertical-align: middle;">
+                                                    <aura:if isTrue="{!v.accountList.length == index + 1}">
+                                                        <a onclick="{!c.removeRow}" data-record="{!index}" name="{!acc.selectedCountry}">
+                                                            <lightning:icon class="slds-button"  title="Delete" iconName="utility:delete" size="x-small" alternativeText="Delete"/>
+                                                            <span class="slds-assistive-text">Delete</span>
+                                                        </a>
+                                                    </aura:if>
+                                                </td>
+                                            </tr>      
+                                        </aura:iteration>
+                                        
+                                    </tbody>
+                                </table>                                
+                            </article> 
+                        </div>
+                        
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <!-- <lightning:button variant="destructive" label="Cancel" disabled="{!v.Hidesubmit}" title="Cancel" onclick="{!c.cancel}" />
+                <lightning:button variant="brand" label="Submit" disabled="{!v.Hidesubmit}" title="Submit" onclick="{!c.save}" />-->
+                        
+                        <button class="slds-button slds-button_text-destructive" onclick="{!c.cancel}">Cancel</button>
+                        <button class="slds-button slds-button_destructive" onclick="{!c.save}">Submit</button>
+                    </footer>
+                </div>
+            </section>
+        </div>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+        
+        
+        
+        
+        
+        <!-- <div class="slds-m-around-xx-large slds-modal__header" style=" border: 2px solid grey;">
+         <table style="height:30px;"> <td style="font-size: 14px;background-color:#A90533; color: white;"><b style="text-decoration: underline;">{!v.retailerDetailListName}</b>- Company wise order allocation sequence</td></table>
+        <aura:if isTrue="{!lessthan(v.accountList.length,v.listOfCompanies.length)}">
+           <tr style="height:5px"></tr>
+            <div class="slds-float_right slds-p-bottom_small">
+               
+                <h3 class="slds-page-header__title" style="font-size:12px;">Add Company 
+                    <lightning:buttonIcon iconName="utility:add"  size="small"  variant="border-filled" alternativeText="Add" onclick="{!c.addRow}"/>
+                </h3>
+            </div>
+        </aura:if>
+        <div class="container-fluid">        
+            <table class="slds-table slds-table_bordered slds-table_cell-buffer"> 
+                <thead>
+                    <tr class="slds-text-title_caps slds-line-height_reset">-->
+        <!-- <th scope="col">
+                            <div class="slds-truncate">#</div>
+                        </th> -->
+        <!-- <th scope="col">
+                            <div class="slds-truncate" style="text-align: Center;" title="Allocate Sequence Number">Allocate Number</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" style="text-align: Center;" title="Order To Company">Order To Company</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" style="text-align: Center;" title="Select Region">Select Region</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" style="text-align: Center;" title="Select Sub-Region">Select Sub-Region</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" style="text-align: Center;" title="Active">Active</div>
+                        </th>
+                        <th scope="col">
+                            <div class="slds-truncate" style="text-align: Center;" title="Action">Action</div>
+                        </th>
+                    </tr>
+                </thead>   
+                <tbody> 
+   
+                    <aura:iteration items="{!v.accountList}" var="acc" indexVar="index">
+                        <tr>
+                            <td style="text-align: center;width:80px; vertical-align: middle;"> 
+                                {!index + 1}                                 
+                            </td>
+                            <td data-label="Allocate Number" style="text-align: center; width:350px; vertical-align: middle;">
+                                <div class="slds-col slds-m-right_medium" >                                    
+                                    
+                                    <lightning:select name="{!index}" value="{!acc.selectedCountry}" onchange="{!c.OrderToCompany}">
+                                        <option value="NONE" text="NONE"></option>
+                                        <aura:iteration items="{!acc.Order_Country__c}" var="option">
+                                            <option text="{!option.label}" value="{!option.label}" selected="{!option.selected}"/>
+                                        </aura:iteration>
+                                    </lightning:select>
+                                    
+                                    
+                                </div>                                
+                            </td>
+                            <td data-label="Allocate Number" style="text-align: center; width:200px; vertical-align: middle;">
+                                <lightning:select name="region" value="{!acc.Region}">
+                                    <option value="">Select Region</option>                                    
+                                    <option value="Asia">Asia</option>
+                                    <option value="Europe">Europe</option>
+                                </lightning:select>
+                                
+                            </td>
+                            <td style="text-align: center; width:200px; vertical-align: middle;">
+                                <lightning:select name="subRegion"  value="{!acc.subRegion}">
+                                    <option value="">Select Sub-Region</option>                                    
+                                    <option value="Asia">Asia</option>
+                                    <option value="Europe">Europe</option>
+                                </lightning:select>-->
+        <!--  <lightning:input name="accPhone" type="phone" maxlength="10" label="Phone" value="{!acc.Phone}" />-->
+        <!--  </td>
+                            <td style="text-align: center;width:90px;vertical-align: middle;padding-top: 18px;padding-left: 15px;">
+                                <lightning:input type="checkbox" checked="{!acc.active}" name="{!v.SOrder.reuseOrd}"  value="{!acc.active}"/>
+                            </td>
+                            <td style="text-align: center; width:90px;vertical-align: middle;padding-top: 18px;">
+                                <aura:if isTrue="{!v.accountList.length == index + 1}">
+                                    <a onclick="{!c.removeRow}" data-record="{!index}" name="{!acc.selectedCountry}">
+                                        <lightning:icon class="slds-button"  title="Delete" iconName="utility:delete" size="x-small" alternativeText="Delete"/>
+                                        <span class="slds-assistive-text">Delete</span>
+                                    </a>
+                                </aura:if>
+                            </td>
+                        </tr>                      
+                    </aura:iteration> 
+                </tbody>
+            </table>
+            <div class="slds-align_absolute-center slds-p-top_small">
+               <lightning:button variant="destructive" label="Cancel" disabled="{!v.Hidesubmit}" title="Cancel" onclick="{!c.cancel}" />
+                <lightning:button variant="brand" label="Submit" disabled="{!v.Hidesubmit}" title="Submit" onclick="{!c.save}" />
+                
+            </div>
+        </div>
+    </div>-->
+    </aura:if>
+    <!--<aura:If isTrue="{!v.pagelistCmpFlag}">
+        <c:CompanyAllocationSequenceCustomerList/>
+    </aura:If>-->
+</aura:component>

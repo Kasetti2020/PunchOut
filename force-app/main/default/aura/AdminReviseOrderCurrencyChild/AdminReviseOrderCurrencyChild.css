@@ -1,0 +1,32 @@
+.THIS .red{
+    color:rgb(164, 31, 52);
+}
+.THIS .slds-col
+{
+    padding:4px 8px;
+}
+.THIS .bg-gray
+{
+    background:#f4f4f4;
+}
+.THIS .box-title {
+    display: flex;
+    position: relative;
+    margin-top: -26px;
+    background: white;
+    padding: 0 10px;
+    color: #a90533;
+    font-weight: bold;
+}
+.THIS .button_brand
+{
+    background:#a90533;
+    border-color:#a90533;
+}
+.THIS .customIcon div{
+    vertical-align: top !important;
+}
+
+.THIS.customIcon div{
+    vertical-align: top !important;
+}

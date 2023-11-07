@@ -1,0 +1,71 @@
+<aura:component controller="ShipmentController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doint}"/>
+    
+    <aura:attribute name="SHList" type="Object"/>
+    <aura:attribute name="page" type="integer"/>
+    <aura:attribute name="pages" type="integer"/>
+    <aura:attribute name="total" type="integer"/>
+    <aura:handler event="c:PageChange" action="{!c.pageChange}"/>    
+    <aura:attribute name="IsSpinner" type="Boolean" default="false"/> 
+    <aura:attribute name="searchText" type="String" default=""/>
+    
+    <aura:handler name="searchEvent" event="c:GlobalSearchEvent" action="{!c.handleSearchEvent}"/>
+    
+    <!--<div class="banner-bg">-->
+    <div class="content"> 
+        <div class="slds-card__header slds-grid">
+            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                <div class="slds-media__figure">
+                    <span class="slds-icon_container1" title="contact">
+                        <!--<lightning:icon iconName="standard:entitlement" size="small" alternativeText="Warning!" variant="brand"/>-->
+                        <img src="{!$Resource.MagNETIcons + '/View.png'}" width="50"/>
+                    </span>
+                </div>
+                <div class="slds-media__body">
+                    <h2 class="slds-card__header-title header slds-text-title_caps">
+                        <strong>{!$Label.c.View_Shipment}</strong> 
+                    </h2>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                    <c:GlobalSearch searchType="PrintShopViewShip"/>
+                </div>
+                <div class="slds-col slds-size_1-of-3"></div>
+                <!-- <div class="slds-no-flex">
+        <lightning:button variant="brand" label="Confirm Shipment" iconName="utility:send" iconPosition="left" onclick="{!c.ConfirmShipment}"/>
+                   </div> -->
+            </header>
+        </div>
+        <div class="slds-card__body">
+            <div class="table-scroll">
+                <table class="slds-table"> 
+                    <thead>
+                        <tr class="slds-text-title_caps slds-gray">
+                            <th><div class="slds-truncate"></div></th>
+                            <th><div class="slds-truncate">{!$Label.c.Shipment_Name}</div></th>
+                             <th><div class="slds-truncate">{!$Label.c.Retailer_Code}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.STATUS}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.Shipment_Date}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.Service_Provider}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.Consignment_No}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.Waybill_No}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.Truck_No}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.Tracking_URL}</div></th>
+                            <th><div class="slds-truncate">{!$Label.c.CREATED_DATE}</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.SHList.SHIPList}" var="var1" indexVar="index">
+                            <c:ShipChildComp SHList="{!var1}"  rowIndex="{!index}"/>                                     
+                        </aura:iteration>                                 
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <footer class="slds-card__footer footer">
+            <div class="slds-text-align_center">
+                <c:PaginationComponentForInventory page="{!v.page}" pages="{!v.pages}" total="{!v.total}" txt="{!v.searchText}"/>
+                {!V.body}
+            </div>                    
+        </footer>           
+    </div>
+</aura:component>

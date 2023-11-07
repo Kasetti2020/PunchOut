@@ -1,0 +1,54 @@
+<aura:component controller="InventoryAllocationUploadController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <!--Declare Attribute-->
+    <aura:attribute name="toggleSpinner" type="boolean" default="false"/>    
+    <aura:attribute name="currentDate" type="Date"/>
+    <aura:attribute name="today" type="Date"/>
+    <aura:attribute name="inventoryTransferForm" type="Inventory_Transfer_Form__c" default="{ 'sobjectType': 'Inventory_Transfer_Form__c' }"/>
+    
+    <!--Declare Attributes for Fetching Retailer & Based on Retailer Company Picklist Values-->
+    <aura:attribute name="selectedCompany" type="string"/>
+    <aura:attribute name="orderToCompanyList" type="String[]"/>
+    <aura:attribute name="selectedRetailer" type="string"/>
+    <aura:attribute name="retailerList" type="String[]"/>
+    <aura:attribute name="selectedRetailerSet" type="string"/>
+    
+    <!--Declare Handlers-->
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <div class="slds-modal__content slds-p-around--x-small"> 
+        <div class="slds-box slds-m-around--small1">
+            <h2 class="box-title" style="width:230px">New Inventory Transfer Form</h2>
+            <div class="slds-grid slds-wrap slds-gutters" style="margin-top:-20px;">
+                <div class="slds-col slds-size_1-of-3 slds-truncate slds-m-bottom--x-small1">
+                    <ui:inputDate aura:id="expdate" label="Transfer Date"  class="field" value="{!v.today}" displayDatePicker="false" disabled="true" required="true" />
+                </div>   
+                <div class="slds-col slds-size_1-of-3 slds-truncate slds-m-bottom--x-small1">
+                    <lightning:select value="{!v.selectedRetailer}" onchange="{!c.retailerOnChange}" label="RETAILER" required="true">
+                        <option value="Select" text="Select"></option>
+                        <aura:iteration items="{!v.retailerList}" var="option">
+                            <option text="{!option}" value="{!option}" />
+                        </aura:iteration>
+                    </lightning:select>
+                </div>   
+                <div class="slds-col slds-size_1-of-3 slds-truncate slds-m-bottom--x-small1">
+                    <lightning:select value="{!v.selectedCompany}" onchange="{!c.cmpOnChange}" label="Transfer to Company" required="true">
+                        <option value="Select" text="Select"></option>
+                        <aura:iteration items="{!v.orderToCompanyList}" var="option">
+                            <option text="{!option}" value="{!option}" />
+                        </aura:iteration>
+                    </lightning:select>
+                </div>   
+                <div class="slds-col slds-size_1-of-3 slds-truncate slds-m-bottom--x-small1">
+                    <ui:inputDate aura:id="expdate" label="Transfer Date"  class="field" value="{!v.today}" displayDatePicker="false" disabled="true" required="true" />
+                </div>   
+                <div class="slds-col slds-size_1-of-3 slds-truncate slds-m-bottom--x-small1">
+                    <lightning:input type="date" aura:id="ExpectedTimeDispatchDate" name="ExpectedDeliveryDate" label=" ETD" messageWhenValueMissing="Complete this field." value="{!v.inventoryTransferForm.ETD__c}" title="{!v.inventoryTransferForm.ETD__c}" onchange="{!c.changeETDDate}" required="true"/>
+                </div>
+                <div class="slds-col slds-size_1-of-3 slds-truncate slds-m-bottom--x-small1">
+                    <lightning:input type="date" aura:id="ExpectedTimeArrivalDate" name="ExpectedDeliveryDate" label=" ETA" messageWhenValueMissing="Complete this field." value="{!v.inventoryTransferForm.ETA__c}" title="{!v.inventoryTransferForm.ETA__c}" onchange="{!c.changeETADate}" required="true"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</aura:component>

@@ -1,0 +1,8 @@
+.THIS .slds-modal__container{
+    max-width:100% !important;
+    width:100% !important;
+}
+.THIS .slds-datepicker td
+{
+    padding:4px !important;
+}

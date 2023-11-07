@@ -1,0 +1,4 @@
+<aura:event type="COMPONENT" description="Component event" >
+    <aura:attribute type="Id" name="parentId"/> 
+    <aura:attribute type="String" name="retailerDetails"/> 
+</aura:event>

@@ -1,0 +1,78 @@
+<aura:component controller="PrintStoreIdController" implements="force:appHostable,forceCommunity:availableForAllPageTypes,force:hasRecordId" access="global" >
+    <aura:handler name="init" value="{!this}" action="{!c.doinit}"/>
+    
+    
+    
+    <aura:attribute name="recordId" type="String" />
+    <aura:attribute name="storeId" type="String" />
+    <aura:attribute name="selectedDate" type="Date" />
+    <aura:attribute name="cartonNos" type="Integer" />
+    <aura:attribute name="disablecartonNos" type="boolean" default="false"/>
+    <aura:attribute name="componentVisibility" type="boolean" default="false"/>
+    <aura:attribute name="storeIdData" type="Customer_Warehouse__c" />
+    <aura:attribute name="spinner" type="boolean" default="true"/>
+    <aura:attribute name="showMessage" type="boolean" default="false"/>
+
+
+      
+ 
+    
+    
+        <section style="height: fit-content;" >
+            <div class="slds-modal__container" style="width: auto; max-width: 400px; " >
+                <div style="box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;">
+                    <aura:if isTrue="{!v.spinner}">
+                    <lightning:spinner alternativeText="Loading" variant="brand" />
+                    </aura:if>
+
+                    <aura:if isTrue="{!v.componentVisibility}">
+              <div class="slds-modal__header" style="background-color: rgb(164, 31, 52); border-radius: 5px;">
+                <h1 id="modal-heading-01" class="slds-modal__title slds-hyphenate" style="font-size: large; color: white;"><b>Enter Carton Recieved</b></h1>
+              </div>
+              <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+    
+       
+                    <div style=" margin: auto;
+                    width: min-content;
+                    height: fit-content"  >
+                    <div style="width: max-content; padding: 2%;">
+                            
+                                <tr>
+                                    <td> <div style="width:80px "><b>Store ID :</b></div></td>
+                                    <td><div style="height:30px" class="slds-truncate"  label ="Store ID">{!v.storeIdData.Name}</div></td>
+                                </tr>
+                                <tr>
+                                    <td><div style="width:80px"><b> Store Name :</b></div></td>
+                                    <td><div style="height:30px" class="slds-truncate" label ="Store Name">{!v.storeIdData.Store_Name__c}</div></td>
+                                </tr>
+                            
+            
+                                <div style="width:250px; font-weight: bold;" >
+                                    <lightning:input type="number" disabled="{!v.disablecartonNos}" message-when-step-mismatch="Number of Box cannot be decimal values" step="1" name="input3"  min="1" label="Number of Cartons Received"  value="{!v.cartonNos}" placeholder="Enter here..."/>
+                                    <!-- <lightning:input type="date" value="{!v.selectedDate}" label="Date of Cartons Received" onchange="{!c.dateController}"/>-->
+                                </div>
+                                <div style="width:250px; font-weight: bold;">
+                                    <lightning:input type="date" aura:id="EndDateField" value="{!v.selectedDate}" label="Date of Cartons Received" placeholder="Select Date" onchange="{!c.dateController}"/>
+                                </div>
+                                <aura:if isTrue="{!v.disablecartonNos}">
+                                        <lightning:spinner alternativeText="Loading" variant="brand" />    
+                                    <aura:set attribute="else">
+                                        <div align="right"><lightning:button class="slds-m-top_small" variant="brand"  disabled="{!v.cartonNos == null || v.cartonNos.length == 0}"  label="Confirm" onclick="{!c.createTracker}"/></div>
+                                    </aura:set>
+                                </aura:if>
+                               
+                            </div>
+                        </div>
+                    
+              </div>
+            </aura:if>
+            <aura:if isTrue="{!v.showMessage}">
+                <div style="background-color: azure;"><p>If you would like to scan another Store QR code, please return to your scanning mobile App/Camera to scan another Store QR code.</p><br/>
+                <p>You can logout if no further actions will be required.</p></div>
+            </aura:if>
+            </div>
+            </div>
+          </section>
+         
+    
+    </aura:component>

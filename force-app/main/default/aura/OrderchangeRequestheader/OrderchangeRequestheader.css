@@ -1,0 +1,32 @@
+.THIS .slds-item_label
+{
+    font-size:90%;
+}
+.THIS .slds-box-no-border .uiInput--input.input
+{
+    line-height: 20px;
+    font-size: 88%;
+}
+.THIS .slds-box-no-border .uiInput--select a
+{
+    line-height: 20px;
+    font-size: 88%;
+    height: 22px;
+    min-height: 22px;
+}
+.THIS .slds-box-no-border [lightning-input_input-host] 
+{
+    color:black;
+    
+    font-size: 88%;
+}
+.THIS .slds-box-no-border [lightning-input_input-host] input
+{
+    height: 21px;
+    min-height: 21px;
+}
+.THIS .slds-datepicker td,.THIS .slds-datepicker th
+{
+    padding:2px !important;
+    font-size:90% !important;
+}

@@ -1,0 +1,16 @@
+.THIS  {
+        width: 22%;
+}
+.THIS .scrollable {
+max-height:50px;
+overflow-y: scroll;
+}
+.THIS .scrollable_y{
+    max-height:50px;
+     overflow-y: fixed;
+  
+}
+.THIS .slds-col slds-size_2-of-5{ 
+    background-color: gold;
+    
+}

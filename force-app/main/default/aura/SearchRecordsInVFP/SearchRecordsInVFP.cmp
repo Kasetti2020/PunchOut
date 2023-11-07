@@ -1,0 +1,99 @@
+<aura:component controller="GlobalSearchControllerNew" implements="forceCommunity:searchInterface,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+    <aura:attribute name="searchText" type="String" default=""/>
+    <aura:attribute name="searchType" type="String"/>
+    <aura:attribute name="SOStatus" type="String"/>
+    <aura:attribute name="Message" type="String"/>
+    <aura:attribute name="ids" type="List"/>
+    <aura:attribute name="storeid" type="Id"/>
+    <aura:attribute name="cartonDetRecordId" type="Id"/>
+    <aura:attribute name="storeidName" type="String"/>
+    <aura:attribute name="storeName" type="String"/>
+    <aura:attribute name="cartondetailsCustomerId" type="String"/>
+    <aura:attribute name="SearchKeyWord" type="string"/>
+    <aura:attribute name="listOfSearchRecords" type="List" description="Use,for store the list of search records which returns from apex class"/>
+    <aura:attribute name="selectedStoreIdRecord" type="Customer_Warehouse__c" description="Use,for store SELECTED sObject Record"/>
+    <aura:attribute name="searchpill" type="String" default=""/>
+    <aura:attribute name="disablepill" type="boolean" default="false"/>
+    <aura:attribute name="disablesaveButton" type="boolean" default="false"/>
+    <aura:attribute name="forSuccessMsg" type="boolean" default="false"/>
+    <aura:attribute name="forErrorMsg" type="boolean" default="false"/>
+    <aura:handler name="storeIddataEvent" event="c:SearchRecordsInVFPLookupResultsEvent" action="{!c.handleComponentEvent}"/>
+    
+    <aura:registerEvent name="LCtoVFRefreshEvent" type="c:LCtoVFRefresh" />
+    
+ 
+    <aura:if  isTrue ="{!v.forSuccessMsg}" >
+        <ui:message title="Confirmation" severity="confirm" closable="true">
+            Store Id Succesfully Updated.
+        </ui:message>
+    </aura:if>
+    
+    <aura:if  isTrue ="{!v.forErrorMsg}" >
+        <ui:message title="Error" severity="error" closable="true">
+            Please Select a Store Id.
+        </ui:message>
+    </aura:if>
+    
+    
+    <br/>
+    <tr style="float: left;">
+        <p>Store Id</p>
+        <div onmouseleave="{!c.onblur}" aura:id="searchRes" class="slds-form-element slds-lookup slds-is-close" data-select="single" style="width:250px;">
+            
+            <div class="slds-form-element__control"  style="text-align: right;">
+                <td style="width:250px">
+                    <div class="slds-input-has-icon slds-input-has-icon--right">
+                        <div aura:id="lookup-pill" class="slds-pill-container slds-hide" >
+                            <aura:if  isTrue ="{!v.disablepill}" >
+                                <lightning:pill class="pillSize"  label="{!v.selectedStoreIdRecord}" name="{!v.selectedStoreIdRecord}" > 
+
+                                </lightning:pill>
+                                <aura:set attribute="else">
+                                    <lightning:pill class="pillSize" label="{!v.selectedStoreIdRecord}" name="{!v.selectedStoreIdRecord}" onremove="{!c.clear}" > 
+                                       
+                                    </lightning:pill>
+                                </aura:set>
+                            </aura:if>
+                        </div>
+                        <input type="hidden" id="errorMapFields" value=""/>                                                    
+                        <div aura:id="lookupField" class="slds-show">
+                            <lightning:icon class="slds-input__icon slds-show" iconName="standard:search" size="x-small" alternativeText="search"/>
+                            <span class="slds-icon_container  slds-combobox__input-entity-icon" title="record">
+                                <lightning:icon class="slds-icon slds-icon slds-icon_small slds-icon-text-default" iconName="standard:account" size="x-small" alternativeText="icon"/>
+                                <span class="slds-assistive-text"></span>
+                            </span>
+                            <ui:inputText  aura:id="searchValue" size="25"   updateOn="keyup" keyup="{!c.keyPressController}" class="slds-lookup__search-input slds-input leftPaddingClass" value="{!v.SearchKeyWord}" placeholder="Search Store Id" />
+                            <input type="hidden"  id='valueHolder'  name = "" value = ""  />                                                       
+                        </div>                                                
+                    </div>
+                    <!--This part is for Display typehead lookup result List-->
+                    <ul style="min-height:40px;width:543px;" class="slds-listbox slds-listbox_vertical slds-dropdown slds-dropdown_fluid slds-lookup__menu slds" role="listbox">
+                        <lightning:spinner class="slds-hide" variant="brand" size="small" aura:id="mySpinner"/>
+                        <center> {!v.Message}</center>
+                        
+                        <aura:iteration items="{!v.listOfSearchRecords}" var="singleRec">
+                            <c:SearchRecordsInVFPLookupResults selectedStoreId="{!singleRec}" IconName="standard:account"  />
+                            
+                        </aura:iteration>
+                    </ul>
+                </td><td style="width:10px;"></td>
+                <td>
+                    <lightning:buttonIcon iconName="utility:edit"  alternativeText="Edit"  variant="border-filled"  onclick="{!c.OnEdit}" />
+                </td>
+            </div>
+            
+            
+        </div>
+        <tr style="height:20px"></tr>
+        <tr style="float: right;">
+            <aura:if  isTrue ="{!v.disablesaveButton}" >
+                <div>
+                    <button class="slds-button slds-button_destructive"  onclick="{!c.Save}" >Save</button>
+                </div>
+            </aura:if>
+        </tr>
+    </tr>
+    
+</aura:component>

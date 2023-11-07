@@ -1,0 +1,174 @@
+<aura:component controller="ChangeCmpOrSplitOnlineEnqController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" >
+    <!--declare aura attributes-->
+    <aura:attribute name="OEid" type="string"/>
+    <aura:attribute name="OECompany" type="string"/>
+    <aura:attribute name="OEEnquiryStatus" type="string"/>
+    <aura:attribute name="OEUpdatedOrSplit" type="string"/>
+    <aura:attribute name="OESupplierPartyCNUF" type="string"/>
+    
+    <aura:attribute name="accessToUser" type="Boolean" />
+    <aura:attribute name="wrapperObj" type="object[]"/>
+    <aura:attribute name="orderToCompanyList" type="String[]"/>
+    <aura:attribute name="selectedCompany" type="string"/>
+    <!--<aura:attribute name="splitCheck" type="Boolean" default="false"/>
+    <aura:attribute name="disableSplitQty" type="Boolean" default="true"/>-->
+    <aura:attribute name="allocateCompSplitAccess" type="Boolean" default="false"/>
+    <aura:attribute name="allocateStockBack" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <header class="slds-modal__header1" style=" border: 5px solid #6097e6">
+        <h1 class="slds-text-heading--medium" style="color:#6097e6; background-color: white;text-align: center; "><b>Change Company/Split Order</b></h1>
+    </header>
+    &nbsp;
+    
+    <aura:if isTrue="{!v.accessToUser}">
+        <aura:if isTrue="{!and(v.allocateCompSplitAccess == True,v.OEEnquiryStatus == 'New')}">
+            <aura:if isTrue="{!and(v.OEUpdatedOrSplit != 'Updated',v.OEUpdatedOrSplit != 'Split')}">
+                <div style="width:300px; margin:0 auto;">
+                <!--<div style="width:450px;padding-left:150px;">-->
+                    <lightning:select value="{!v.selectedCompany}" onchange="{!c.cmpOnChange}" label="Order to Company" required="true">
+                        <option value="Select" text="Select Order to Company"></option>
+                        <aura:iteration items="{!v.orderToCompanyList}" var="option">
+                            <option text="{!option}" value="{!option}" />
+                        </aura:iteration>
+                    </lightning:select>
+                </div>
+                &nbsp;
+                
+                <div style="width:600px; margin:0 auto;">
+                <!--<div align="center" style="padding-left:16px;">-->
+                    <lightning:layout >
+                        <lightning:layoutItem size="8" >
+                            
+                            
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="padding:0;border-radius:0;width:90%;align:center;border: 2px solid #f2f2f2;" role="grid">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">No</div></th>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">Model</div></th>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">Quantity</div></th>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">Product Family</div></th>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">Status</div></th>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">Split Order</div></th>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">Split Quantity</div></th>
+                                    </tr>
+                                </thead>
+                                <tbody>                         
+                                    <aura:iteration items="{!v.wrapperObj}" var="wrap" indexVar="index">
+                                        <tr >
+                                            <td><div align="center" class="slds-truncate">{!index + 1}</div></td>
+                                            <td><div align="center" class="slds-truncate">{!wrap.ModelName}</div></td>
+                                            <td><div align="center" class="slds-truncate">{!wrap.Quantity}</div></td>
+                                            <td><div align="center" class="slds-truncate">{!wrap.ProductFamily}</div></td>
+                                            <td><div align="center" class="slds-truncate">{!wrap.Status}</div></td>
+                                            
+                                            <td><div align="center" class="slds-truncate"><lightning:input type="checkbox" onchange="{!c.onChangeSplit}" checked="{!wrap.SplitCheck}" name="{!index}" /></div></td>
+                                            <td><div align="center" class="slds-truncate"><lightning:input type="number" name="number" value="{!wrap.SplitQuantity}" disabled="{!wrap.DisableSplitQty}" /></div></td>
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>                    
+                            </table>
+                            &nbsp;
+                            
+                            <div style="padding-left:200px;">
+                                <lightning:button label="Cancel" title="Cancel" onclick="{!c.onCancel}" class="slds-m-left_x-small"/>
+                                <lightning:button label="Submit" title="Submit" onclick="{!c.onSubmit}" class="slds-m-left_x-small" variant="brand"/>
+                            </div>
+                            
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+                <aura:set attribute="else">
+                    <header class="slds-modal__header1" style=" border: 0px solid grey">
+                        <h1 class="slds-text-heading--medium" style="color:#6097e6; background-color: white;text-align: center; "><b>Current order was already Updated/Split</b></h1>
+                    </header>
+                </aura:set>
+            </aura:if>
+            
+        </aura:if>
+
+        <aura:if isTrue="{!and(v.allocateStockBack == True,v.OEEnquiryStatus != 'Order Fully Shipped',v.OEUpdatedOrSplit == 'Updated',v.OEUpdatedOrSplit == 'Split')}">
+            <aura:if isTrue="{!v.OEEnquiryStatus != 'Order Partial Shipped'}">
+                <div style="width:300px; margin:0 auto;">
+                <!--<div style="width:450px;padding-left:150px;">-->
+                    <aura:iteration items="{!v.orderToCompanyList}" var="option" indexVar="index">
+                    <lightning:input name="Order to Company" disabled="true" value="{!option}" label="Order to Company" required="true"/>
+                    </aura:iteration>
+                </div>
+                &nbsp;
+                
+                <div style="width:600px; margin:0 auto;">
+                    <div class="slds-align_absolute-center" >
+                <!--<div align="center" style="padding-left:16px;">-->
+                    <lightning:layout >
+                        <lightning:layoutItem size="8" >
+                            
+                            <table class="slds-table slds-table_cell-buffer slds-table_bordered" style="padding:0;border-radius:0;width:90%;align:center;border: 2px solid #f2f2f2;" role="grid">
+                                <thead>
+                                    <tr>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">No</div></th>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">Model</div></th>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">Quantity</div></th>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">Product Family</div></th>
+                                        <th style="background-color:#d7e3f5"><div align="center" class="slds-truncate">Status</div></th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>                         
+                                    <aura:iteration items="{!v.wrapperObj}" var="wrap" indexVar="index">
+                                        <tr >
+                                            <td><div align="center" class="slds-truncate">{!index + 1}</div></td>
+                                            <td><div align="center" class="slds-truncate">{!wrap.ModelName}</div></td>
+                                            <td><div align="center" class="slds-truncate">{!wrap.Quantity}</div></td>
+                                            <td><div align="center" class="slds-truncate">{!wrap.ProductFamily}</div></td>
+                                            <td><div align="center" class="slds-truncate">{!wrap.Status}</div></td>
+                                            
+                                        </tr>
+                                    </aura:iteration>
+                                </tbody>                    
+                            </table>
+                        
+                            &nbsp;
+                           
+                            <center style="padding-left: 100px;width:280px">
+                              <lightning:button label="Cancel" title="Cancel" onclick="{!c.onCancel}" />
+                                <lightning:button label="Submit" title="Submit" onclick="{!c.onConfirm}"  variant="brand"/>
+                            </center>
+                        
+                        </lightning:layoutItem>
+                    </lightning:layout>
+                </div>
+            </div>
+
+            <aura:set attribute="else">
+            <aura:if isTrue="{!v.OEEnquiryStatus == 'Order Partial Shipped'}">
+                <header class="slds-modal__header1" style=" border: 0px solid grey">
+                    <h1 class="slds-text-heading--medium" style="color:#6097e6; background-color: white;text-align: center; "><b>Order is either Fully Shipped or 
+                        Partial Shipped   </b></h1>
+                </header>
+            </aura:if>
+            </aura:set>
+            </aura:if>
+
+            <aura:set attribute="else">
+            <aura:if isTrue="{!and(v.allocateStockBack == True,v.OEEnquiryStatus == 'Order Fully Shipped')}">
+                <header class="slds-modal__header1" style=" border: 0px solid grey">
+                    <h1 class="slds-text-heading--medium" style="color:#6097e6; background-color: white;text-align: center; "><b>Order is either Fully Shipped or 
+                         Partial Shipped   </b></h1>
+                </header>
+            </aura:if>
+            </aura:set>
+
+        </aura:if>
+
+        <aura:set attribute="else">
+            <aura:if isTrue="{!v.accessToUser == false}">
+                <header class="slds-modal__header1" style=" border: 0px solid grey">
+                    <h1 class="slds-text-heading--medium" style="color:#6097e6; background-color: white;text-align: center; "><b>Only 'Mainetti System Administrator' Profile, 
+                        'Administrator Role' and Your Company does not have access to this function</b></h1>
+                </header>
+            </aura:if>
+        </aura:set>
+    </aura:if>
+    
+</aura:component>

@@ -1,0 +1,89 @@
+<aura:component >
+    <!--Handler-->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    
+    <aura:attribute name="viewisfabricModal" type="Boolean" default="true"/>
+    <aura:attribute name="lstcmpname" type="List"/>
+    <aura:attribute name="lstfabname" type="List"/>
+    <aura:attribute name="selectedArray" type="List"/>
+    <aura:attribute name="selectedArray1" type="List"/>
+    <aura:attribute name="selectedval" type="List" default="[]"/>
+    <aura:attribute name="viewedSelectedArray" type="List" default="[]"/>
+    <aura:attribute name="deletedCLLIIdList" type="List"/>
+    <aura:attribute name="FabricSelectedData" type="List"/>
+    <aura:attribute name="Displayfabval" type="boolean" default="false"/>
+    <aura:registerEvent name="changeTabColorFabricComponent" type="c:changeTabColor"/> 
+    <aura:registerEvent name="loadMyEvent" type="c:LogoEvent"/>
+    
+    <aura:method name="getSelectedData" action="{!c.bindFabricData}" 
+                 access="public"></aura:method>
+    
+    <aura:method name="viewSelectedData" action="{!c.viewbindFabricData}" 
+                 access="public"></aura:method>
+    
+    <aura:method name="clearSelectedData" action="{!c.clearData}" 
+                 access="public">
+        <aura:attribute name="CloneORClear" type="String"/> 
+    </aura:method>
+    
+    <!-- fab component name-->
+    <aura:attribute name="objInfo" type="Fabric_Component__c" default="{sobjectType : 'Fabric_Component__c'}" />
+    <!-- fab component name end -->
+    <div class="slds-grid slds-gutters slds-p-horizontal_medium">
+        <div class="slds-col slds-size_1-of-5">
+            <lightning:select label="{!$Label.c.Component}"  aura:id="component" >
+                <option value="">{!$Label.c.None}</option>
+                <aura:iteration items="{!v.lstcmpname}" var="value" indexVar="key" >
+                    <option value="{!value}"> {!value}</option>
+                </aura:iteration>
+            </lightning:select>
+            
+        </div>
+        <div class="slds-col slds-size_1-of-5">
+            <lightning:select label="{!$Label.c.FABRIC}" aura:id="fabric">
+                <option value="">{!$Label.c.None}</option>
+                <aura:iteration items="{!v.lstfabname}" var="value">           
+                    <option value="{!value}"> {!value}</option>
+                </aura:iteration>
+            </lightning:select>
+        </div>
+        <div class="slds-col slds-size_1-of-6">
+            <div class="slds-grid">
+                <div class="slds-col">
+                    <lightning:input type="number"  aura:id="compval" name="input1" label="{!$Label.c.Enter_a_Value}"  maxlength="3" max="100" />
+                </div>
+                <div class="slds-col slds-p-top_x-large slds-p-left_none">
+                    <label>%</label>
+                </div>
+            </div>
+        </div>
+        <div class="slds-col slds-size_1-of-4 slds-p-top_large">
+            <lightning:button variant="brand" label="{!$Label.c.Add}" class="" onclick="{!c.addFabric}" />
+        </div>
+        
+    </div>
+    <br/>
+    <aura:if isTrue="{!v.Displayfabval}">
+        <div class="slds-box slds-p-around_none slds-m-left_medium slds-m-bottom_medium" style="width:61.4%;">	
+            <table class="slds-table slds-table_bordered1 slds-table_cell-buffer"> 
+                <tr>
+                    <th>{!$Label.c.Component}</th>
+                    <th>{!$Label.c.Material_Name}</th>
+                    <th>{!$Label.c.Value}</th>
+                    <th style="width:1%;">{!$Label.c.Action}</th>
+                </tr>
+                <aura:iteration items="{!v.selectedArray}" var="val" indexVar="index">
+                    <tr> 
+                        <td >{!val.Component}</td>
+                        <td >{!val.Fabric}</td>
+                        <td >{!val.value} %</td>
+                        <td> 
+                            <lightning:buttonIcon iconName="utility:close" size="medium" onclick="{!c.removeRow}" name="{!index}" variant="bare" alternativeText="{!$Label.c.Remove}" title="{!$Label.c.Remove}" iconClass="dark"/>
+                            </td>
+                    </tr>
+                </aura:iteration>				
+            </table>
+        </div>
+    </aura:if>
+    
+</aura:component>

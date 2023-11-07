@@ -1,0 +1,7 @@
+.THIS .input-qty{
+ box-shadow: rgb(0, 112, 210) 0px 0px 3px !important;
+    border-color: rgb(21, 137, 238) !important;
+    background:lightyellow !important;
+    color:black !important;
+    text-align:right;
+}

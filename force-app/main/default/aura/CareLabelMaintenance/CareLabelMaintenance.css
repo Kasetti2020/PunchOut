@@ -1,0 +1,89 @@
+.THIS a:active
+{
+    color:#a90533 !important;
+}
+.THIS .slds-card__header
+{
+    background:#f4f4f4 !important;
+    padding:.75rem !important;
+}
+.THIS a:focus
+{
+    color:#a90533 !important;
+    text-decoration:none !important;
+}
+.THIS .slds-vertical-tabs__nav-item.slds-is-active{
+    color:#a90533 !important;
+    text-decoration:none !important;
+}
+.THIS .slds-card__header-title
+{
+    color:#a90533 !important;
+}
+.THIS .slds-button_brand
+{
+    background:rgb(164, 31, 52);
+    border-color:rgb(164, 31, 52);
+}
+.THIS .slds-button_brand:hover
+{
+    background:#791726;
+    border-color:rgb(164, 31, 52);
+}
+.THIS .slds-button--brand
+{
+    background:rgb(164, 31, 52);
+    border-color:rgb(164, 31, 52);
+}
+.THIS .slds-button--brand:hover
+{
+    background:#791726;
+    border-color:rgb(164, 31, 52);
+}
+.THIS .slds-button--brand:focus
+{
+    background:rgb(164, 31, 52);
+    border-color:rgb(164, 31, 52);
+}
+.THIS .slds-button--brand:active
+{
+    background:rgb(164, 31, 52);
+    border-color:rgb(164, 31, 52);
+}
+.THIS .slds-button_brand:active
+{
+    background:rgb(164, 31, 52);
+    border-color:rgb(164, 31, 52);
+}
+.THIS th
+{
+    background:#fafaf9 !important;
+    border-bottom:1px solid rgb(217, 219, 221);
+    text-transform:uppercase !important;
+}
+.THIS .box-title
+{
+    display: flex;
+    position: absolute;
+    margin-top: -25px;
+    background: white;
+    padding: 0 10px;
+    color:#a90533;
+}
+.THIS .slds-checkbox_faux
+{
+    border:1px solid !important;
+}
+.THIS .hide-label label
+{
+    display:none !important;
+    
+}
+.THIS .hide-label .slds-form-element__control
+{
+    padding-left:0 !important;
+}
+.THIS.slds-vertical-tabs
+{
+    overflow:visible !important;
+}

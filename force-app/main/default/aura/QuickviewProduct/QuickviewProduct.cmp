@@ -1,0 +1,183 @@
+<aura:component controller="CatalogOrderController"  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <!--Handler -->
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <!--Script
+    <ltng:require scripts='/resource/MagnifierNew/magnifier/script.js' afterScriptsLoaded="{!c.magnify}" />-->
+    <!--Declare Attributes-->
+    <aura:attribute name="completeWrap" type="list" />   
+    <aura:attribute name="isSelectAll" type="boolean" default="false"/>
+    <aura:attribute name="isShipcmp" type="boolean" default="false"/>
+    <!--Retailer Attributes-->
+    <aura:attribute name="SelectedRetailer" type="String" /> 
+    <aura:attribute name="SelectedRetailercode" type="String" /> 
+    <!--Customer Id Attributes-->
+    <aura:attribute name="onselectcustomeid" type="String" /> 
+    <!--Product Attributes-->
+    <aura:attribute name="quickviewprod" type="Boolean" />
+    <aura:attribute name="selectedTab" type="String" />
+    <aura:attribute name="LabelQuickview" type="Boolean" />
+    
+    
+    <aura:attribute name="quickviewedIndex" type="Integer"/>
+    <aura:attribute name="quickviewedProduct" type="Object"/>
+    <aura:attribute name="proImgURL" type="String" />
+    <aura:attribute name="proAdditionImgURL" type="List" />
+    <!-- SHOW LOADING SPINNER--> 
+    <lightning:spinner variant="brand" size="large" aura:id="Id_spinner" class="slds-hide" />
+    <div style="">
+        <section role="dialog" tabindex="-1" aria-label="Meaningful description of the modal content" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header slds-modal__header_empty">      
+                </header>
+                <div class="slds-modal__content">
+                    <div class="slds-grid slds-m-vertical_small">
+                        <div class="slds-col slds-col-1">
+                            <!--2.1 Showing multiple view of product  Additional Images start--> 
+                            <aura:iteration items="{!v.quickviewedProduct.tempMap}" var="tempValue" indexVar="key">
+                                <aura:if isTrue="{!tempValue.key == v.quickviewedProduct.selectedColor}">                                     
+                                <div class="{!tempValue.value.proImgURL==null ? 'slds-hide' : 'additional-img'}" > 
+                                    <img id="myProimage" class="additional-img" src="{!tempValue.value.proImgURL}" onclick="{!c.changeImage}"/>
+                                    <aura:if isTrue="{!tempValue.value.proAdditionalImgURL}">
+                                    <aura:iteration items="{!tempValue.value.proAdditionalImgURL}" var="tempAddValue" indexVar="addKey">
+                                   		 <img id="{!'myAdditionalimage-'+addKey}" class="additional-img" src="{!tempAddValue}" onclick="{!c.changeImage}"/>
+                                    </aura:iteration>
+                                   </aura:if>                                   
+                                </div> 
+                                </aura:if>
+                            </aura:iteration>
+                             <!--2.1 Showing multiple view of product  Additional Images end--> 
+                        </div>
+                        
+                        <div class="slds-col slds-col-2">
+                            <aura:iteration items="{!v.quickviewedProduct.tempMap}" var="tempValue" indexVar="key">
+                                <aura:if isTrue="{!tempValue.key == v.quickviewedProduct.selectedColor}">
+                                    
+                                    <aura:if isTrue="{!tempValue.value.proImgURL}">
+                                        <div class="img-zoom-container">
+                                            <div class="img-zoom-container-inner" onmouseenter="{!c.magnify}" onmouseleave="{!c.magnifyleave}">
+                                                <img id="myimage" class="myimage" src="{!tempValue.value.proImgURL}"/>
+                                            </div>
+                                            <div id="myresult" class="img-zoom-result" aura:id="myresult" style="display:none;"></div>
+                                        </div>
+                                        <aura:set attribute="else">
+                                            <div class="img-zoom-container">
+                                                <div class="img-zoom-container-inner">
+                                                    <img id="myimage" class="myimage" src="{!$Resource.NoImageContent}"/>
+                                                </div>
+                                            </div>
+                                        </aura:set>
+                                    </aura:if>
+                                </aura:if>
+                            </aura:iteration>
+                        </div>
+                        <div class="slds-col slds-col-3 slds-p-around_medium">
+                            <h2 class="slds-carousel__content-title"> {!v.quickviewedProduct.Name}
+                            </h2>
+                            <button class="slds-button slds-button_icon slds-button_icon-inverse" title="{!$Label.c.Close}" style="background:rgb(164,31,52);border-radius:25px;float:right;padding:3px;margin-top:-25px;" onclick="{!c.close}">
+                                <lightning:icon class="white" iconName="utility:close" size="x-small" alternativeText="{!$Label.c.Approved}" />
+                                <span class="slds-assistive-text">{!$Label.c.Close}</span>
+                            </button>
+                            <hr class="slds-m-vertical_x-small"/>
+                            <aura:iteration items="{!v.quickviewedProduct.tempMap}" var="tempValue" indexVar="key">
+                                <aura:if isTrue="{!tempValue.key == v.quickviewedProduct.selectedColor}">
+                                    <div class="slds-p-vertical_x-small">                 
+                                        <p class="dimgrey">{!tempValue.value.proddescription}</p>
+                                        <p class="dimgrey">{!tempValue.value.proddescription2}</p>
+                                         <aura:if isTrue="{!v.selectedTab=='MCare'}">
+                                             <p class="dimgrey">{!tempValue.value.proddescription3}</p>
+                                                    </aura:if>
+                                       
+               <aura:if isTrue="{!tempValue.value.showPrice}">
+                                             
+                            <aura:if isTrue="{!v.selectedTab=='MCare'}">
+   							<p class="price slds-truncate" >
+							<b>UOM Price : </b><!--<lightning:formattedNumber value="{!tempValue.value.uomPrice}" /> -->
+							<aura:if isTrue="{!tempValue.value.currencyType!='NA'}">
+							<lightning:formattedNumber value="{!tempValue.value.uomPrice}" style="currency" currencyCode="{!tempValue.value.currencyType}"/>
+							<aura:set attribute="else">
+									<b>{!$Label.c.UOM_Price} <lightning:formattedNumber value="{!tempValue.value.uomPrice}" /></b>
+							</aura:set>
+							</aura:if>
+						</p>
+						<aura:set attribute="else">
+    					<p class="price slds-truncate" >
+						<b>{!$Label.c.Price_100} </b><!--<lightning:formattedNumber value="{!tempValue.value.proPrice}" /> -->
+						<aura:if isTrue="{!tempValue.value.currencyType!='NA'}">
+						<lightning:formattedNumber value="{!tempValue.value.proPrice}" style="currency" currencyCode="{!tempValue.value.currencyType}"/>
+						<aura:set attribute="else">
+							<b>{!$Label.c.Price_100} <lightning:formattedNumber value="{!tempValue.value.proPrice}" /></b>
+							</aura:set>
+							</aura:if>
+						</p>
+   			 		</aura:set>
+ 				 </aura:if> 
+          </aura:if>
+                                        <!--aura:if isTrue="{!tempValue.value.showPrice}">
+                                            <p class="price"><b>
+                                                <ui:outputCurrency value="{!tempValue.value.proPrice}"/></b>
+                                            </p>
+                                        </aura:if-->
+                                        <aura:if isTrue="{!tempValue.value.fullboxQty}">
+                                            <p><b>{!$Label.c.Box_Quantity} </b>{!tempValue.value.boxquantity}</p>
+                                        </aura:if>
+                                        <p><b>{!$Label.c.Customer_Ref_Model} </b>{!tempValue.value.custRefModel}</p>
+                                        {!tempValue.productfamily}
+                                    </div>
+                                    <aura:if isTrue="{!v.selectedTab!='Labels &amp; Tickets'}">
+                                        
+                                        <div class="slds-grid slds-m-bottom_x-small">
+                                            <aura:if isTrue="{!v.selectedTab=='MCare'}">
+                                            <div class="slds-col">  
+                                                  <div class="slds-box slds-box_xx-small slds-form-element__control slds-grow slds-m-right_xx-small slds-m-top_xxx-small">
+                                                        <ui:outputText value="{!tempValue.value.UomOrder}"/>
+                                                  </div>
+                                             </div>
+                                            </aura:if>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <aura:if isTrue="{!v.selectedTab=='Hanger Business'}">
+                                                    <div class="color selected-color-icon">
+                                                        <ul>
+                                                            <li><a class='{!tempValue.key}' id='{!tempValue.key}' title="{!tempValue.key}" href="" name="{!ind}" onclick='{!c.colorChange}'></a></li>
+                                                        </ul>
+                                                    </div>
+                                                </aura:if>
+                                                <lightning:input variant="label-hidden" class="input-qty" type="number" name="input5" placeholder="{!$Label.c.Quantity}" required="true" value="{!tempValue.quantity}" disabled="{!tempValue.value.addedToCart}"/>
+                                            </div>
+                                            <div class="slds-col slds-size_1-of-2">
+                                                <button class="{!tempValue.value.addedToCart ? 'slds-button slds-button_destructive slds-button_red slds-button_red-disabled':'slds-button slds-button_destructive slds-button_red'}"  data-record="{!ind+' '+key}" onclick="{!c.saveproddata}" disabled="{!tempValue.value.addedToCart}"> {!tempValue.value.addedToCart ? $Label.c.Added_Cart :$Label.c.ADD_TO_CART}</button>
+                                            </div>
+                                        </div>
+                                        <aura:set attribute="else"> 
+                                            <aura:if isTrue="{!tempValue.value.vardataproduct=='No'}">
+                                                <div class="slds-grid slds-m-bottom_x-small">
+                                                    <lightning:input variant="label-hidden" class="input-qty" type="number" name="input5" placeholder="{!$Label.c.Quantity}" required="true" value="{!tempValue.quantity}" disabled="{!tempValue.value.addedToCart}" />
+                                                    <div class="slds-col slds-size_1-of-2">
+                                                        <button class="{!tempValue.value.addedToCart ? 'slds-button slds-button_destructive slds-button_red slds-button_red-disabled':'slds-button slds-button_destructive slds-button_red'}"  data-record="{!ind+' '+key}" onclick="{!c.saveproddata}" disabled="{!tempValue.value.addedToCart}"> {!tempValue.value.addedToCart ? $Label.c.Added_Cart :$Label.c.ADD_TO_CART}</button>
+                                                    </div>
+                                                </div>
+                                                
+                                            </aura:if>
+                                        </aura:set>
+                                    </aura:if>
+                                </aura:if>
+                            </aura:iteration>
+                            
+                            <aura:iteration items="{!v.quickviewedProduct.tempMap}" var="tempValue" indexVar="key">
+                                
+                                <aura:if isTrue="{!v.selectedTab=='Hanger Business'}">
+                                    <div class="color">
+                                        <ul>
+                                            <li><a class='{!tempValue.key}' id='{!tempValue.key}' title="{!tempValue.key}" href="" name="{!ind}" onclick='{!c.colorChange}'></a></li>
+                                        </ul>
+                                    </div>
+                                </aura:if>
+                            </aura:iteration>
+                        </div>
+                    </div>
+                </div> 
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </div>  
+</aura:component>

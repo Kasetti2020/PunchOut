@@ -1,0 +1,91 @@
+<aura:component  Controller="CareLabelOrder" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <aura:attribute name="viewisFreetextmodal" type="boolean"/> 
+    <aura:attribute name="freeTextId" type="String"/> 
+    <aura:attribute name="StyleNumber" type="String"/> 
+    <aura:attribute name="RNNumber" type="String"/> 
+    <aura:attribute name="LotNumber" type="String"/>
+    <aura:attribute name="careinstruct" type="String"/>
+    <aura:attribute name="SupplierNumber" type="String"/>
+    <aura:attribute name="LabellingCode" type="String"/>
+    <aura:attribute name="PackagingCode" type="String"/>
+    <aura:attribute name="SeasonMonth" type="String"/>
+    <aura:attribute name="SeasonYear" type="String"/>
+     <aura:attribute name="ItemNumber" type="String"/>
+    <aura:attribute name="freetextData" type="Map"/>
+    <aura:attribute name="viewFreetextData" type="Map"/>
+    <aura:attribute name="FreeText" type="List"/>
+    
+     <aura:registerEvent name="loadMyEvent" type="c:LogoEvent"/>
+    <!--ItemMaster-->
+
+    
+    <aura:attribute name="itemMaster" type="Item_Master__c"/>
+
+    <aura:method name="getSelectedData" action="{!c.FreetextData}" 
+                 access="public"></aura:method>
+    <aura:method name="viewSelectedData" action="{!c.viewFreetextData}" 
+                 access="public"></aura:method>
+    
+    <aura:method name="clearSelectedData" action="{!c.clearData}" 
+                 access="public">
+        <aura:attribute name="CloneORClear" type="String"/> 
+    </aura:method>
+    
+    <aura:registerEvent name="changeTabColorFreeText" type="c:changeTabColor"/>
+
+    
+    <div class="slds-grid slds-gutters slds-wrap slds-p-horizontal_medium">
+        <aura:If isTrue="{!v.itemMaster.Style_Number__c}">
+            <div class="slds-col slds-size_1-of-4"> 
+                <lightning:input label="{!$Label.c.Style_Number}" aura:id="StyleNumber" type="text" name="StyleNumber"  value="{!v.StyleNumber}" onblur="{!c.onblurFreeText}" required="true"/>  
+            </div>      
+        </aura:If>
+        <aura:If isTrue="{!v.itemMaster.RN_Number__c}">
+            <div class="slds-col slds-size_1-of-4">
+                <lightning:input label="{!$Label.c.RN_Number}" aura:id="RNNumber" name="RN Number" type="text" value="{!v.RNNumber}"  onblur="{!c.onblurFreeText}" required="true"/>
+            </div>
+        </aura:If>
+        <aura:If isTrue="{!v.itemMaster.Lot_Number__c}">
+            <div class="slds-col slds-size_1-of-4">
+                <lightning:input label="{!$Label.c.Lot_Number}" aura:id="LotNumber" name="Lot Number" type="text" value="{!v.LotNumber}"  onblur="{!c.onblurFreeText}" required="true"/> 
+            </div>
+        </aura:If>
+        
+        <aura:If isTrue="{!v.itemMaster.Supplier_Number__c}">
+            <div class="slds-col slds-size_1-of-4">
+                <lightning:input label="{!$Label.c.Supplier_Number}" aura:id="SupplierNumber" name="Supplier Number" type="text" value="{!v.SupplierNumber}"  onblur="{!c.onblurFreeText}" required="true"/> 
+            </div>
+        </aura:If>
+         <aura:If isTrue="{!v.itemMaster.Labelling_Code__c}">
+            <div class="slds-col slds-size_1-of-4">
+                <lightning:input label="{!$Label.c.Labelling_Code}" aura:id="LabellingCode" name="Labelling Code" type="text" value="{!v.LabellingCode}"  onblur="{!c.onblurFreeText}" required="true"/> 
+            </div>
+        </aura:If>
+        <aura:If isTrue="{!v.itemMaster.Packaging_Code__c}">
+            <div class="slds-col slds-size_1-of-4">
+                <lightning:input label="{!$Label.c.Packaging_Code}" aura:id="PackagingCode" name="Packaging Code" type="text" value="{!v.PackagingCode}"  onblur="{!c.onblurFreeText}" required="true"/> 
+            </div>
+        </aura:If>
+         <aura:If isTrue="{!v.itemMaster.Season_Month__c}">
+            <div class="slds-col">
+                <lightning:input label="{!$Label.c.Season_Month}" aura:id="SeasonMonth" name="Season Month" type="text" value="{!v.SeasonMonth}"  onblur="{!c.onblurFreeText}" required="true"/> 
+            </div>
+        </aura:If>
+        <aura:If isTrue="{!v.itemMaster.Season_Year__c}">
+            <div class="slds-col slds-size_1-of-4">
+                <lightning:input label="{!$Label.c.Season_Year}" aura:id="SeasonYear" name="Season Year" type="text" value="{!v.SeasonYear}"  onblur="{!c.onblurFreeText}" required="true"/> 
+            </div>
+        </aura:If>
+        <aura:If isTrue="{!v.itemMaster.Item_Number__c}">
+            <div class="slds-col slds-size_1-of-4">
+                <lightning:input label="{!$Label.c.Item_Number}" aura:id="ItemNumber" name="Item Number" type="text" value="{!v.ItemNumber}"  onblur="{!c.onblurFreeText}" required="true"/> 
+            </div>
+        </aura:If>
+        <aura:If isTrue="{!v.itemMaster.Care_Instruction__c}">
+            <div class="slds-col slds-size_1-of-4">
+                <lightning:textarea label="{!$Label.c.Care_instructions}" aura:id="careinstruct" name="Care Instructions" value="{!v.careinstruct}" onblur="{!c.onblurFreeText}" required="true"/>
+            </div>     
+        </aura:If>
+    </div>         
+ 
+</aura:component>

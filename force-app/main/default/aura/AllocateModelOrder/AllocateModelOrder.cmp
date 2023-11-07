@@ -1,0 +1,295 @@
+<aura:component Controller="AllocateModel" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+    <aura:attribute name="selectedCompany" type="string"/>   
+    <aura:attribute name="selectedUserCompany" type="string"/>   
+    <aura:attribute name="relatedModelList" type="object"/>
+    <aura:attribute name="RetailerDataList" type="AllocateModel[]" default ="[]"/>
+    
+    
+    <aura:attribute name="listOfCompanies" type="List" />
+    <aura:attribute name="listOfCompaniesMap" type="Map" />
+    <aura:attribute name="indexVal" type="Integer"/>
+    <aura:attribute name="selectedCompanyList" type="String[]" />
+    <aura:attribute name="showConfirmDialog" type="boolean" default="false"/>
+    
+    <aura:attribute name="lstOfRecordType1" type="List" />
+    <aura:attribute name="retailerList" type="String[]"/>
+    <aura:attribute name="selectedRetailer" type="string"/>
+    <aura:attribute name="defaultvalue" type="string"/>
+    <aura:attribute name="OrdertoMainettiCompany" type="String"/>
+    <aura:attribute name="today" type="Date" />
+    <aura:attribute name="ArrivalDate" type="Date" />
+    <aura:attribute name="DispatchDate" type="Date" />
+    <aura:attribute name="ContainerNo" type="String" />
+    <aura:attribute name="SealNo" type="String" />
+    <aura:attribute name="PoNo" type="String" />
+    <aura:attribute name="ifModelAvailable" type="boolean" default="false"/>
+    <aura:attribute name="ifModelchecked" type="boolean" default="true"/>
+    <aura:attribute name="disable" type="boolean" default="false"/>
+    <aura:attribute name="IsRetailerSelected" type="boolean" default="false"/>
+    <aura:attribute name="IsCompanySelected" type="boolean" default="false"/>
+    <aura:attribute name="IsRetailerDefault" type="boolean" default="false"/>
+    <aura:attribute name="Ind" type="integer" />
+    
+    
+    <div class="slds-hide" aura:id="spinner">
+        <lightning:spinner style="position: fixed" alternativeText="Loading" size="large" />
+    </div>
+    
+    
+    <div style="">
+        <section  class="slds-modal_large" >
+            <div class="slds-modal__container" style="width:80%;font-size:11px;overflow-y: hidden !important;">
+                <header class="slds-modal__header" style="padding-bottom:-15px;background-color:rgb(164, 31, 52);">
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate" style="color:White;">Inventory Model Allocation Form</h2>
+                </header>
+                <header class="slds-modal__header">
+                    <h4 class="slds-card__header-title" style ="font-size: 1em">
+                        <tr style ="width:280px;vertical-align:center;;text-align: left;">
+                            
+                            <!--To Select the retailer -->
+                            <div class="slds-col slds-m-right_medium"  style="width:220px" > 
+                                <b> <lightning:select value="{!v.selectedRetailer}" onchange="{!c.retailerOnChange}" aura:id="a_opt" label=" Select Retailer" required="true">
+                                    <aura:if  isTrue ="{!v.IsRetailerDefault}" >
+                                        <option value="Select" text="Select Retailer"></option>
+                                        <aura:iteration items="{!v.retailerList}" var="option">
+                                            <option text="{!option}" value="{!option}" selected="{!v.selectedRetailer == option}" />
+                                        </aura:iteration>
+                                        
+                                        <aura:set attribute="else">
+                                            <option value="Select Retailer" text="Select Retailer"></option>
+                                            <aura:iteration items="{!v.retailerList}" var="option">
+                                                <option text="{!option}" value="{!option}" />
+                                            </aura:iteration>
+                                        </aura:set>
+                                    </aura:if>
+                                    </lightning:select></b>
+                            </div>                      
+                            
+                            <!-- To select the Allocation from company -->
+                            <div class="slds-col slds-m-right_medium"  style="width:220px;horizontal-align:left;text-align: left;" >                                    
+                                <b> <Lightning:select aura:id="selectid1" label="Allocate From Company"  value="{!v.selectedUserCompany}" onchange="{!c.ShowUserAllocatedCmp}"  required="true">
+                                    <option value="Select" text="Select"></option>
+                                    <aura:iteration items="{!v.lstOfRecordType1}" var="fields">                            
+                                        <!--<ui:inputSelectOption text="{!fields}" label="{!fields.Company__c}"  />-->
+                                        <option value="{!fields.Company__c}" text="{!fields.Company__c}"></option>
+                                    </aura:iteration>
+                                    </Lightning:select></b>     
+                                
+                            </div>            
+                        </tr>
+                        
+                        <tr style ="width:280px;vertical-align:center;text-align: left;">
+                            <aura:if  isTrue ="{!v.IsCompanySelected}" >
+                                
+                                <!-- Select the Allocation to company -->
+                                <div class="slds-col slds-m-right_medium"  style="width:233px;text-align: left;">                                                               
+                                    <b> <lightning:select name="select1"  value="{!v.selectedCompany}" label="Allocate To Company" onchange="{!c.OrderToCompany}"  required="true">
+                                        <option value="Select" text="Select"></option>
+                                        <aura:iteration items="{!v.listOfCompanies}" var="fld" >
+                                            <option value="{!fld}" text="{!fld}"></option>
+                                        </aura:iteration>
+                                        </lightning:select></b>
+                                    
+                                </div>
+                              <td>
+                                    <div style="width:233px">
+                                        <b><lightning:input type="date" aura:id="AllocationDate" value="{!v.today}" label=" Allocation Date" name="date" autocomplete="off" disabled="true" /></b>                            
+                                    </div>                    
+                                </td>
+                                
+                            </aura:if>
+                            <tr style="height:15px;"></tr>
+                            <tr>
+                                <div class="slds-col slds-m-bottom_medium">
+                                    <aura:if  isTrue ="{!v.disable}" > 
+                                        <button class="slds-button slds-button_red1" onclick="{!c.GetAllModel}">Get Inventory</button>
+                                    </aura:if>
+                                    
+                                </div>
+                            </tr>
+                       </tr>
+                        <aura:if  isTrue ="{!v.IsCompanySelected}" >
+                            <tr style ="width:280px;vertical-align:center;">
+                                <td>
+                                    <div style="width:220px">
+                                        <b><lightning:input type="date" aura:id="ETD" value="{!v.DispatchDate}" label="Estimated Date For Dispatch" name="date" autocomplete="off" onchange="{!c.DispatchdateController}"  required="true"/></b>                            
+                                    </div>                    
+                                </td>
+                                <tr>
+                                   <td>
+                                        <div style="width:220px">
+                                            <b><lightning:input type="date" aura:id="ETA" value="{!v.ArrivalDate}" label="Estimated Date For Arrival" name="date" autocomplete="off"  onchange="{!c.ArrivaldateController}"  required="true"/></b>                            
+                                        </div>                    
+                                    </td></tr>
+                                
+                            </tr>
+                            <tr style ="width:250px;vertical-align:center;">
+                                <td>
+                                    <div style="width:220px">
+                                        <b><lightning:input type="text" aura:id="PoNo" value="{!v.PoNo}" label="PO No" /></b>                            
+                                    </div>                    
+                                </td>
+                            </tr>
+                        </aura:if>
+                    </h4>
+                    
+                </header> 
+                
+                <aura:if  isTrue ="{!v.ifModelAvailable}" >
+                    <div class="slds-modal__content slds-p-around_small" style="height:35vh;min-height:35vh;">
+                        <div class="slds-box slds-p-around_none slds-m-top_small1">
+                            <article class="slds-card">
+                                <div class="slds-card__header slds-grid slds-m-around_none slds-p-around_x-small">
+                                    <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                        <div class="slds-media__figure">
+                                            <span class="" title=" Inventory Model List">
+                                                <lightning:icon size="small" iconName="utility:list" alternativeText="Event" />
+                                            </span>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <h2 class="slds-card__header-title">
+                                                <span>Inventory Model</span>
+                                            </h2>
+                                        </div>
+                                    </header>
+                                </div>
+                                
+                                <!--Displays the list of Models Starts-->  
+                                <aura:If isTrue="{!greaterthan(v.relatedModelList.length,0)}">
+                                    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                        <thead>
+                                            <tr class="slds-line-height_reset">
+                                                <th class="" scope="col" >
+                                                    <div class="slds-truncate" title="Model Name">Model Name</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Color">Color</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Print">Print</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Uploaded Quantity">Uploaded Quantity</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Available Quantity">Total Available Quantity</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Transfer Quantity"> Transfer Quantity</div>
+                                                </th>
+                                                <th class="" scope="col">
+                                                    <div class="slds-truncate" title="Remaining Quantity">Remaining Quantity</div>
+                                                </th>
+                                                <th scope="col">
+                                                    <div class="slds-truncate"  title="Select">Select</div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            
+                                            <aura:iteration items="{!v.relatedModelList}" var="IndModelData" indexVar="Ind">
+                                                
+                                                <tr class="slds-hint-parent" style="text-align: center;">
+                                                    
+                                                    <td data-label="Model Name">
+                                                        
+                                                        <ui:inputText value="{!IndModelData.ModelName}" disabled="true" />
+                                                    </td>
+                                                    
+                                                    
+                                                    <td data-label="Model Name">
+                                                        
+                                                        <ui:inputText value="{!IndModelData.color}" disabled="true" />
+                                                    </td>
+                                                    <td data-label="Model Name">
+                                                        <ui:inputText value="{!IndModelData.Sizer}" disabled="true" />
+                                                    </td>
+                                                    <td data-label="Model Name">
+                                                        
+                                                        <ui:inputText value="{!IndModelData.AvailableQuantity}" disabled="true" />
+                                                    </td>
+                                                    
+                                                    <td data-label="Model Name">
+                                                        
+                                                        <ui:inputText value="{!IndModelData.AvailableQuantity}" disabled="true" />
+                                                    </td>
+                                                    <td data-label="Model Name"  Style="vertical-align: middle;padding-bottom:22px">
+                                                        <!-- <ui:inputText value="{!IndModelData.TransferQuantity}" placeholder="Enter The Quantity" name="{!Ind}" keyup="{!c.qtyEntered}" />-->
+                                                        <td style="padding:0px;border-width:0px;margin:0px;" > <lightning:helptext content="Please Select the checkBox to Enter the Transfer Quantity" /></td>
+                                                        <td style="padding:0px;border-width:0px;margin:0px;" >   <lightning:input type="number" name="{!Ind}" value="{!IndModelData.TransferQuantity}" onchange="{!c.qtyEntered}"  placeholder="Enter The Quantity"  disabled="{!(not(IndModelData.FlagCheck))}"/>
+                                                        </td>
+                                                    </td>
+                                                    <td data-label="Model Name">
+                                                        
+                                                        <ui:inputText value="{!IndModelData.RemainingQuantity}" disabled="true" />
+                                                    </td>             
+                                                    
+                                                    <td style="text-align: center;width:90px;vertical-align: middle;">
+                                                        <lightning:input type="checkbox"  name="{}" checked="{!IndModelData.FlagCheck}" value="{!IndModelData.FlagCheck}" onchange="{!c.modelIsChecked}"/>
+                                                    </td>
+                                                </tr>
+                                            </aura:iteration>
+                                            <!--Displays the list of Models Ends-->  
+                                            
+                                            
+                                        </tbody>
+                                    </table>  
+                                    <aura:set attribute="else">
+                                        <tr><td></td>
+                                            <td class="">
+                                                <tr align="center">
+                                                    <!--<td style="width:660px"></td>-->
+                                                    <div style="width:200px">
+                                                        <p>No Records Found...</p></div></tr>
+                                                <tr style ="height:5px"></tr>
+                                            </td>
+                                        </tr>
+                                    </aura:set>
+                                </aura:If>
+                            </article> 
+                        </div>
+                        
+                    </div>
+                </aura:if>
+                <aura:if  isTrue ="{!v.ifModelchecked}" >
+                    <footer class="slds-modal__footer">
+                        <!-- <button class="slds-button slds-button_neutral" onclick="{!c.CloseModal}" disabled="{!(not(v.ifModelAvailable))}">Cancel</button>-->
+                        <button class="slds-button slds-button_red" onclick="{!c.SaveAllocatedModel}" >Confirm Order</button>
+                    </footer>
+                </aura:if>
+            </div>
+        </section>
+    </div>
+    
+    <!-- COnfirmation Pop-up Starts -->
+    <aura:if isTrue="{!v.showConfirmDialog}">
+        <!--Modal Box Start-->
+        <div role="dialog" class="slds-modal slds-fade-in-open ">
+            <div class="slds-modal__container">
+                <!--Modal Box Header Start-->
+                <header class="slds-modal__header">
+                    <h1 class="slds-text-heading--medium">Confirmation</h1>
+                </header>
+                <!--Modal Box Header End-->
+                
+                <!--Modal Box Content Start-->
+                <div class="slds-modal__content slds-p-around--medium">
+                    <center><b>Are you sure you want to Confirm this Order?</b></center>
+                </div>
+                <!--Modal Box Content End-->
+                
+                <!--Modal Box Button Start-->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_text-destructive" onclick='{!c.handleConfirmDialogNo}'>Cancel</button>
+                    <button class="slds-button slds-button_destructive" onclick="{!c.handleConfirmDialogYes}" >Confirm</button>
+                </footer>
+                <!--Modal Box Button End-->
+            </div>
+            <!-- COnfirmation Pop-up Ends -->
+        </div>
+        <div class="slds-backdrop slds-backdrop--open"></div>            
+    </aura:if>
+    <!--<div class="slds-backdrop slds-backdrop_open"></div>-->
+</aura:component>
