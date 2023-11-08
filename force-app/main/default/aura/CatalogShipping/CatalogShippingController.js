@@ -4,7 +4,7 @@
        // var spinner = component.find('spinner');
         //$A.util.toggleClass(spinner, "slds-hide");
         helper.toGetcustomerData(component, event,helper);  
-        
+         helper.punchOutmethod(component, event,helper);  
     },
     reloadPage : function(component, event,helper)
     {

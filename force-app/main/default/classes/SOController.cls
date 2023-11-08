@@ -5601,4 +5601,14 @@ system.debug('Regwrap>>'+Regwrap);
     {
         CareLabelOrder.deletedCLLI(deletedCLLIList);
     }
+    
+    
+    //Added by Mahadevaprasad  on 07/11/2023 Starts
+     @AuraEnabled
+    public static String punchOutMethod(string buyerCookie) {
+        PunchOut_Request__c punch=[select id,Operation__c,BuyerCookie__c from PunchOut_Request__c where BuyerCookie__c=:buyerCookie];
+        System.debug('Operation'+punch.Operation__c);
+        return punch.Operation__c;
+    }   
+    
 }

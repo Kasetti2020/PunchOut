@@ -18,6 +18,10 @@
     <aura:attribute name="isOpen" type="boolean" default="false"/>
     <aura:attribute name="showremarks" type="boolean" default="false"/>
     
+    <aura:attribute name="isOperation" type="boolean" default="false"/>
+    
+    
+    
     <!--Added by Raghu on 12/11/2021-->
     <aura:attribute name="TotalOrderAmmount" type="Decimal"/>
     <aura:attribute name="renderTotalAmmount" type="Boolean" default="true"/>
@@ -141,7 +145,9 @@
                                     
                                 </th> </aura:if>
                             <th class="slds-text-align_center" scope="col" style="width:5%;">
+                                
                                 <div class="slds-truncate" title="Action">{!$Label.c.Action}</div>
+                                    
                             </th>
                         </tr>
                     </thead>
@@ -171,7 +177,7 @@
                                 </td>
                                 <td data-label="Close Date" >
                                     <aura:if isTrue="{!cartDetail.fullboxQty}">
-                                        <lightning:input type="number" name="{!ind}" value="{!cartDetail.Quantity}" onchange="{!c.CalculateBoxQty}"	/>
+                                        <lightning:input type="number" name="{!ind}" value="{!cartDetail.Quantity}" onchange="{!c.CalculateBoxQty}" disabled="{!c.isOperation}"	/>
                                         <aura:set attribute="else">
                                             <lightning:input type="number" aura:id="myInput" name="{!ind}" value="{!cartDetail.Quantity}"  onchange="{!c.CalculateBoxQty}"/>
                                         </aura:set>
@@ -183,13 +189,16 @@
                                     </td>
                                 </aura:if>
                                 <aura:if isTrue="{!v.showremarks}">
+                                   
                                     <td data-label="Close Date" >
                                         <lightning:textarea name="{!ind}" class="text-area" value="{!cartDetail.Remarks}" onchange="{!c.updateRemarks}"/>
                                     </td>
+                                        
                                 </aura:if>
                                  <td data-label="Amount" style="text-align:center;">
+                                      <aura:if isTrue="{!v.isOperation}">
                                     <lightning:buttonIcon name="{!ind}" iconName="utility:delete" size="large" variant="bare" onclick="{!c.deleteProduct}" alternativeText="{!$Label.c.Remove}" />
-                                    
+                                    </aura:if>
                                 </td>
                             </tr>
                         </aura:iteration>
@@ -209,22 +218,26 @@
                     </tbody>
                 </table>
                 <div class="slds-grid">
+                    <aura:if isTrue="{!v.isOperation}">
                     <div class="slds-col">
                         <lightning:button class="slds-button slds-button_brand slds-m-top_medium" iconName="utility:shopping_bag" variant="CONTINUE SHOPPING" label="{!$Label.c.CONTINUE_SHOPPING}" title="{!$Label.c.CONTINUE_SHOPPING}" onclick="{! c.BacktoCatalog}"/>
                     </div>
+                        </aura:if>
                     <div class="slds-col">                        
                         <aura:if isTrue="{!v.PlaceorderBtn}">
                             <h3 class="slds-p-top_large"><b style="color:rgb(164, 31, 52);">{!$Label.c.Please_click_Update_Cart_to_proceed}</b></h3>
                         </aura:if>                        
                     </div>
                     <div class="slds-col slds-text-align_right">
-                       <!-- <lightning:button class="slds-button slds-button_brand slds-m-top_medium" iconName="utility:clear" variant="base" label="{!$Label.c.CLEAR_CART}" title="{!$Label.c.CLEAR_CART}" disabled="{! !v.HideButtons}" onclick="{! c.ClearItems }"/> -->
+                        <aura:If isTrue="{!v.isOperation}">
+                      <lightning:button class="slds-button slds-button_brand slds-m-top_medium" iconName="utility:clear" variant="base" label="{!$Label.c.CLEAR_CART}" title="{!$Label.c.CLEAR_CART}" disabled="{! !v.HideButtons}" onclick="{! c.ClearItems }"/>
                         <aura:If isTrue="{!v.DisplayCartDetail.length>0}">
                             <aura:If isTrue="{!v.HideButtons}">
                                 <lightning:button class="slds-button slds-button_brand slds-m-top_medium" iconName="utility:record_update" variant="UPDATE CART" label="{!$Label.c.UPDATE_CART}" title="{!$Label.c.UPDATE_CART}" onclick="{! c.UpdateCart}"/>
                                 <lightning:button class="{!v.PlaceorderBtn==true?'slds-button slds-button_brand slds-m-top_medium slds-button_disabled':'slds-button slds-button_brand slds-m-top_medium '}" aura:id="placeorder" disabled="{!v.PlaceorderBtn}" iconName="utility:cart" variant="PLACE ORDER" label="{!$Label.c.PLACE_ORDER}" title="{!$Label.c.PLACE_ORDER}" onclick="{! c.placeOrders }" />
                             </aura:If>   
                         </aura:If>
+                            </aura:If>
                     </div>
                     
                 </div>

@@ -8,6 +8,8 @@
 		<members>XMLgenerate</members>
 		<members>CatalogOrderController</members>
 		<members>SOController</members>
+		<members>PunchOutLoginCXMLParse</members>
+		<members>PunchOutOrderCXMLParse</members>
 		<name>ApexClass</name>
 		
 	</types>

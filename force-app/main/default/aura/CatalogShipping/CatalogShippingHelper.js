@@ -68,7 +68,57 @@
             }
         });
         $A.enqueueAction(action1);
+        
+      
+        
     },
+    // Added by mahadevaprasad on 07/11/2023 starts
+    punchOutmethod:function(component, event,helper){
+         //alert('punchOut');
+        var action = component.get("c.punchOutMethod");
+        action.setParams({ buyerCookie : '550bce3e592023b2e7b015307f965133' });
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                
+               // alert("From server: " + response.getReturnValue());
+                var resultvalue=response.getReturnValue();
+                if(resultvalue=='create'){
+                    component.set('v.isOperation',true);
+                   
+                } else  if(resultvalue=='view'){
+                    component.set('v.isOperation',true);
+                     
+                }
+                else  if(resultvalue=='inspect'){
+                    component.set('v.isOperation',false);
+                   
+                    
+                }
+                  
+                
+            }
+            else if (state === "INCOMPLETE") {
+                // do something
+            }
+                else if (state === "ERROR") {
+                    var errors = response.getError();
+                    if (errors) {
+                        if (errors[0] && errors[0].message) {
+                            console.log("Error message: " + 
+                                        errors[0].message);
+                        }
+                    } else {
+                        console.log("Unknown error");
+                    }
+                }
+        });
+        
+        
+        $A.enqueueAction(action);
+        
+    },
+    // Added by mahadevaprasad on 07/11/2023 ends
     toDeleteProductCart:function(component, event,helper,index) {
         var CartDisplay =component.get('v.DisplayCartDetail');
         //On delete set the correct value to total Order Amount Added By Raghu On 12/11/2021 starts
