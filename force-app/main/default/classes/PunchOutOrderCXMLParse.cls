@@ -39,16 +39,40 @@ public class PunchOutOrderCXMLParse {
         public String state { get; set; }
         public String postalCode { get; set; }
         public String country { get; set; }
+         public String name { get; set; }
+        public String deliverTo { get; set; }
+        
+    }
+    public class TelephoneNumber {
+        public string countryCode { get; set; }
+        public string areaOrCityCode{ get; set; }
+        public string numberValue{ get; set; }
+        public string isoCountryCode{ get; set; }
+    }
+     public class Phone {
+        public string name { get; set; }
+        public TelephoneNumber telephoneNumber{ get; set; }
+    }
+    public class Fax {
+        public string name { get; set; }
+        public TelephoneNumber telephoneNumber{ get; set; }
     }
     
     public class Address {
         public String addressID { get; set; }
-        public String name { get; set; }
+        public string isoCountryCode { get; set;}
+        public string name { get; set; }
+        public string email { get; set; }
         public PostalAddress postalAddress { get; set; }
+        public Phone phone { get; set; }
+        public Fax fax { get; set; }
     }
     
+     
     public class ShipTo {
         public Address address { get; set; }
+        
+        
     }
     
     public class Extrinsic {
@@ -66,7 +90,8 @@ public class PunchOutOrderCXMLParse {
     }
     
     public class UnitPrice {
-        public Money money { get; set; }
+        public string money { get; set; }
+        public string currencyValue { get; set; }
     }
     
     public class ItemDetail {
@@ -97,10 +122,15 @@ public class PunchOutOrderCXMLParse {
         public Charge charge { get; set; }
     }
     
+    public class ItemID {
+        public string supplierPartID { get; set; }
+        public string supplierPartAuxiliaryID { get; set; }
+    }
     public class ItemOut {
         public String quantity { get; set; }
         public ItemDetail itemDetail { get; set; }
         public Distribution distribution { get; set; }
+        public ItemID itemID { get; set; }
     }
     
     public class OrderRequestHeader {
@@ -211,6 +241,7 @@ public class PunchOutOrderCXMLParse {
                 itemOut.quantity = extrinsicNode.getAttribute('quantity', null);
                 System.debug('quantity><><'+extrinsicNode.getChildElement('ItemDetail', null));
                 itemOut.itemDetail = parseItemDetail(extrinsicNode.getChildElement('ItemDetail', null));
+                itemOut.ItemID = parseItemID(extrinsicNode.getChildElement('ItemID', null));
                 itemOut.distribution = parseDistribution(extrinsicNode.getChildElement('Distribution', null));
                 
                 
@@ -250,13 +281,43 @@ public class PunchOutOrderCXMLParse {
     public static Address parseAddress(Dom.XmlNode addressNode) {
         Address address = new Address();
         address.addressID = addressNode.getAttribute('addressID', null);
+        address.isoCountryCode = addressNode.getAttribute('isoCountryCode', null);
         address.name = addressNode.getChildElement('Name', null).getText();
+        address.email = addressNode.getChildElement('Email', null).getText();
         address.postalAddress = parsePostalAddress(addressNode.getChildElement('PostalAddress', null));
+        address.Phone = parsePhone(addressNode.getChildElement('Phone', null));
+        address.Fax = parseFax(addressNode.getChildElement('Fax', null));
         return address;
     }
     
+     public static Phone parsePhone(Dom.XmlNode postalPhone) {
+        Phone phone = new Phone();
+         phone.TelephoneNumber = parseTelephoneNumber(postalPhone.getChildElement('TelephoneNumber', null));
+       
+        return phone;
+    }
+    public static Fax parseFax(Dom.XmlNode postalFax) {
+        Fax fax = new Fax();
+         fax.TelephoneNumber = parseTelephoneNumber(postalFax.getChildElement('TelephoneNumber', null));
+       
+        return fax;
+    }
+     public static TelephoneNumber parseTelephoneNumber(Dom.XmlNode postalTelephoneNumber) {
+        TelephoneNumber telephoneNumber = new TelephoneNumber();
+         telephoneNumber.countryCode = postalTelephoneNumber.getChildElement('CountryCode', null).getText();
+          telephoneNumber.areaOrCityCode = postalTelephoneNumber.getChildElement('AreaOrCityCode', null).getText();
+       telephoneNumber.numberValue = postalTelephoneNumber.getChildElement('Number', null).getText();
+       Dom.XmlNode countryCodeNode = postalTelephoneNumber.getChildElement('CountryCode', null);
+         telephoneNumber.isoCountryCode = countryCodeNode.getAttribute('isoCountryCode', null);
+        return telephoneNumber;
+    }
+    
+    
+    
     public static PostalAddress parsePostalAddress(Dom.XmlNode postalAddressNode) {
         PostalAddress postalAddress = new PostalAddress();
+        postalAddress.name = postalAddressNode.getAttribute('Name', null);
+        //postalAddress.deliverTo = postalAddressNode.getChildElement('DeliverTo', null).getText();
         postalAddress.street = postalAddressNode.getChildElement('Street', null).getText();
         postalAddress.city = postalAddressNode.getChildElement('City', null).getText();
         postalAddress.state = postalAddressNode.getChildElement('State', null).getText();
@@ -265,10 +326,14 @@ public class PunchOutOrderCXMLParse {
         return postalAddress;
     }
     
+   
+    
+    
+    
     public static ItemDetail parseItemDetail(Dom.XmlNode itemDetailNode) {
         ItemDetail itemDetail = new ItemDetail();
         System.debug('itemDetailNode><>>'+itemDetailNode);
-        // itemDetail.unitPrice = parseUnitPrice(itemDetailNode.getChildElement('UnitPrice', null));
+        itemDetail.unitPrice = parseUnitPrice(itemDetailNode.getChildElement('UnitPrice', null));
         System.debug('UnitOfMeasure<><>'+itemDetailNode.getChildElement('UnitOfMeasure', null).getText());
         itemDetail.unitOfMeasure = itemDetailNode.getChildElement('UnitOfMeasure', null).getText();
         itemDetail.classification = itemDetailNode.getChildElement('Classification', null).getAttribute('domain', null);
@@ -276,14 +341,35 @@ public class PunchOutOrderCXMLParse {
         itemDetail.url = itemDetailNode.getChildElement('URL', null).getText();
         itemDetail.extrinsics = new List<Extrinsic>();
         
-        for (Dom.XmlNode extrinsicNode : itemDetailNode.getChildElement('Extrinsic', null).getChildElements()) {
+        for (Dom.XmlNode extrinsicNode : itemDetailNode.getChildElements()) {
             Extrinsic extrinsic = new Extrinsic();
+            if(extrinsicNode.getAttribute('name', null)!=null){
             extrinsic.name = extrinsicNode.getAttribute('name', null);
             extrinsic.value = extrinsicNode.getText();
             itemDetail.extrinsics.add(extrinsic);
+            }
         }
         
         return itemDetail;
+    }
+     public static UnitPrice parseunitPrice(Dom.XmlNode unitPriceNode) {
+        UnitPrice fr=new UnitPrice();
+        
+       Dom.XmlNode moneynode=unitPriceNode.getChildElement('Money', null);
+        fr.money = unitPriceNode.getChildElement('Money', null).getText();
+          fr.currencyValue = moneynode.getAttribute('currency', null);
+        
+        return fr;
+    }
+    
+    
+    
+    
+     public static ItemID parseItemID(Dom.XmlNode itemIDNode) {
+        ItemID item = new ItemID();
+        item.supplierPartAuxiliaryID = itemIDNode.getChildElement('SupplierPartAuxiliaryID', null).getText();
+        item.supplierPartID = itemIDNode.getChildElement('SupplierPartID', null).getText();
+        return item;
     }
     
     public static Distribution parseDistribution(Dom.XmlNode distributionNode) {
