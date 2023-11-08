@@ -114,6 +114,8 @@ public class PunchOutLoginCXMLParse {
         Dom.XmlNode cxmlNode = doc.getRootElement();
         CXML cxml = new CXML();
         
+        
+        
         cxml.payloadID = cxmlNode.getAttribute('payloadID', null);
         cxml.timestamp = cxmlNode.getAttribute('timestamp', null);
         /////1)checking Header node And Response node Value
@@ -142,12 +144,12 @@ public class PunchOutLoginCXMLParse {
                 cxml.request.punchOutSetupRequest = parsePunchOutSetupRequest(requestNode.getChildElement('PunchOutSetupRequest', null));
                 
                 
-                System.debug('cxml><>>>'+cxml);
+                System.debug('PunchOutLoginCXMLParse><>>>'+cxml);
                 PunchOutLoginCXMLParse.xmlLoginMethod(cxml);
                 
             }
             else if(requestNode.getChildElement('OrderRequest', null)!=null){
-                
+                PunchOutOrderCXMLParse.parseCXML(cxmlData);
             }
             
         }
@@ -173,7 +175,7 @@ public class PunchOutLoginCXMLParse {
             cxml.Response.Status.PunchOutSetupResponse.StartPage.url= startPage.getChildElement('URL', null).getText();
         }
         ///////////finale Wrapper class
-        System.debug('cxml><>>>'+cxml);
+        System.debug('PunchOutLoginCXMLParse><>>>'+cxml);
         
         
         return cxml;

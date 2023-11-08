@@ -156,7 +156,7 @@ public class PunchOutOrderCXMLParse {
         Dom.XmlNode requestNode = cxmlNode.getChildElement('Request', null);
         cxml.request = new Request();
         cxml.request.orderRequest = parseOrderRequest(requestNode.getChildElement('OrderRequest', null));
-        system.debug('cxml<><><'+cxml);
+        system.debug('PunchOutOrderCXMLParse<><><'+cxml);
         return cxml;
     }
     
