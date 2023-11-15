@@ -1,8 +1,8 @@
-<aura:component controller="SOController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+<aura:component controller="SOController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global" >
     
     <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
      <aura:registerEvent name="CloseLogoEvent" type="c:CloseLogo"/>
-    
+     <aura:attribute name="pageReference" type="Object"/>
     <aura:attribute name="SelectedRetailerName" type="String" /> 
     <aura:attribute name="SelectedRetailer" type="String" />  
     <aura:attribute name="parentcmp" type="Boolean" default="false"/>
@@ -10,6 +10,7 @@
     <aura:attribute name="HideButtons" type="Boolean" default="true"/>
     <aura:attribute name="Shipcmp" type="Boolean" default="true"/>
     <aura:attribute name="DisplayCustDetail" type="String"/>
+    <aura:attribute name="recordId" type="String"/>
     <aura:attribute name="DisplayCartDetail" type="list"/>
     <aura:attribute name="ImgIndex" type="Integer" />
     <aura:attribute name="ImgSrc" type="Integer" />
@@ -20,6 +21,7 @@
     
     <aura:attribute name="isOperation" type="boolean" default="false"/>
     
+    <ui:inputText aura:id="articleURL"/>
     
     
     <!--Added by Raghu on 12/11/2021-->

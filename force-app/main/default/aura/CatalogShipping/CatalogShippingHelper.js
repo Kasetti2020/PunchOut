@@ -75,18 +75,22 @@
     // Added by mahadevaprasad on 07/11/2023 starts
     punchOutmethod:function(component, event,helper){
          //alert('punchOut');
+         var currentUrl = window.location.href;
+        var sParameterName = currentUrl.split('=');
+        alert(sParameterName[1]);
         var action = component.get("c.punchOutMethod");
-        action.setParams({ buyerCookie : '550bce3e592023b2e7b015307f965133' });
+        action.setParams({ recordId : sParameterName[1] });
         action.setCallback(this, function(response) {
             var state = response.getState();
             if (state === "SUCCESS") {
                 
                // alert("From server: " + response.getReturnValue());
                 var resultvalue=response.getReturnValue();
+                alert(resultvalue);
                 if(resultvalue=='create'){
                     component.set('v.isOperation',true);
                    
-                } else  if(resultvalue=='view'){
+                } else  if(resultvalue=='edit'){
                     component.set('v.isOperation',true);
                      
                 }

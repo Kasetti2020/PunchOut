@@ -107,10 +107,10 @@ public class PunchOutLoginCXMLParse {
     }
     
     
-    public static CXML parseCXML(String cxmlData) {
+    public static string parseCXML(String cxmlData) {
         Dom.Document doc = new Dom.Document();
         doc.load(cxmlData);
-        
+        string returnXml;
         Dom.XmlNode cxmlNode = doc.getRootElement();
         CXML cxml = new CXML();
         
@@ -145,8 +145,9 @@ public class PunchOutLoginCXMLParse {
                 
                 
                 System.debug('PunchOutLoginCXMLParse><>>>'+cxml);
-                PunchOutLoginCXMLParse.xmlLoginMethod(cxml);
+              returnXml= PunchOutLoginCXMLParse.xmlLoginMethod(cxml);
                 
+               
             }
             else if(requestNode.getChildElement('OrderRequest', null)!=null){
                 PunchOutOrderCXMLParse.parseCXML(cxmlData);
@@ -177,8 +178,8 @@ public class PunchOutLoginCXMLParse {
         ///////////finale Wrapper class
         System.debug('PunchOutLoginCXMLParse><>>>'+cxml);
         
-        
-        return cxml;
+        return  returnXml;
+       // return cxml;
     }
     //////////From Node ////////
     public static fromNode parseFrom(Dom.XmlNode credentialNode) {
@@ -226,10 +227,10 @@ public class PunchOutLoginCXMLParse {
             for (Dom.XmlNode extrinsicNode : extrinsicsNode) {
                 Extrinsic extrinsic = new Extrinsic();
                 if(extrinsicNode.getAttribute('name', null)!=null){
-                System.debug('extrinsicNode><>>>'+extrinsicNode.getAttribute('name', null));
-                extrinsic.name = extrinsicNode.getAttribute('name', null);
-                extrinsic.value = extrinsicNode.getText();
-                punchOutSetupRequest.extrinsics.add(extrinsic);
+                    System.debug('extrinsicNode><>>>'+extrinsicNode.getAttribute('name', null));
+                    extrinsic.name = extrinsicNode.getAttribute('name', null);
+                    extrinsic.value = extrinsicNode.getText();
+                    punchOutSetupRequest.extrinsics.add(extrinsic);
                 }
             }
         }
@@ -271,29 +272,67 @@ public class PunchOutLoginCXMLParse {
     }
     
     /////creating PunchOut_Request__c Record 
-    public static void xmlLoginMethod(CXML cxml){
+    public static string xmlLoginMethod(CXML cxml){
         System.debug(cxml);
         /////From Wrapper class 
         string buyerCookie=cxml.request.PunchOutSetupRequest.buyerCookie;
         string operation=cxml.request.PunchOutSetupRequest.operation;
         string timeStamp=cxml.timestamp;
         string payloadID=cxml.payloadID;
-        list<PunchOut_Request__c> punchOut=[select Id,BuyerCookie__c,Operation__c From PunchOut_Request__c Where BuyerCookie__c=:buyerCookie];
-       
+        list<PunchOut_Request__c> punchOut=[select Id,payloadID__c,Operation__c From PunchOut_Request__c Where payloadID__c=:payloadID];
+        String redirectURL;
         ////when punchOut size is Equal to zero
+        PunchOut_Request__c rqt=new PunchOut_Request__c();
         if(punchOut.size()==0){
-            PunchOut_Request__c rqt=new PunchOut_Request__c();
+            
             rqt.BuyerCookie__c=buyerCookie;
             rqt.TimeStamp__c=timeStamp;
             rqt.payloadID__c=payloadID;
             rqt.Operation__c=operation;
             insert rqt;
+             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQKk5Cl7UJ27vaz8Gq06kIqb4Rnc1BJQwKDhLAkBuyzTfSI6CQ0HCUhJdTeVqMHeRMOb8_G2uyQjSga6Ce7ElT9ocGXfT&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
         }else if(punchOut.size()>0){
-             punchOut[0].Operation__c=operation;
+            punchOut[0].Operation__c=operation;
             update punchOut;
+             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQKk5Cl7UJ27vaz8Gq06kIqb4Rnc1BJQwKDhLAkBuyzTfSI6CQ0HCUhJdTeVqMHeRMOb8_G2uyQjSga6Ce7ElT9ocGXfT&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
         }
         
+        String clientId = '3MVG9N6eDmZRVJOkogIaHQibQG8ckzH2p_YFtzzezrkLFIiIUhbmltIEaIC10eLeL6SdP7Co8ZxGOgqa.3C_T';
+        String clientSecret = 'BD9E2C6243CB53A94A7B2E0849B79B5F24933517D1C48BBF819CFF251DDCBC21';
+        String username = 'YOUR_SALESFORCE_USERNAME';
+        String password = 'YOUR_SALESFORCE_PASSWORD';
+        String securityToken = 'YOUR_SECURITY_TOKEN';
         
+        //String accessToken = PunchOutLoginCXMLParse.getAccessToken(clientId, clientSecret, username, password, securityToken);
+           
+        String returnSetupResp =  PunchOutCXMLgenerate.xmlResponseGenerator(redirectURL, payloadID, timeStamp);
+        System.debug('returnSetupResp::'+returnSetupResp);
+        return returnSetupResp;
+    }
+    
+    
+     public static String getAccessToken(String clientId, String clientSecret, String username, String password, String securityToken) {
+        String endpoint = 'https://login.salesforce.com/services/oauth2/token';
+        String requestBody = 'grant_type=password' +
+                             '&client_id=' + clientId +
+                             '&client_secret=' + clientSecret +
+                             '&username=' + username +
+                             '&password=' + password + securityToken;
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint(endpoint);
+        req.setMethod('POST');
+        req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+        req.setBody(requestBody);
+        Http http = new Http();
+        HttpResponse res = http.send(req);
+        if (res.getStatusCode() == 200) {
+            Map<String, Object> responseMap = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
+            return (String) responseMap.get('access_token');
+        } else {
+            // Handle error
+            System.debug('Error getting access token: ' + res.getBody());
+            return null;
+        }
     }
     
 }

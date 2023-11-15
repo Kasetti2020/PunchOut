@@ -5,6 +5,8 @@
         //$A.util.toggleClass(spinner, "slds-hide");
         helper.toGetcustomerData(component, event,helper);  
          helper.punchOutmethod(component, event,helper);  
+           
+        // alert(component.get("v.recordId"));
     },
     reloadPage : function(component, event,helper)
     {
