@@ -89,6 +89,8 @@
                         return;
                     }            
                 }  
+         var currentUrl = window.location.href;
+        var sParameterName = currentUrl.split('=');
         var PricebookData = productData.tempMap[indexarr[1]].value.priceBookId;
         var actionsave = component.get("c.saveSO");
         actionsave.setParams({ 
@@ -99,7 +101,8 @@
             priceByCurr : currency,
             custRefModel : custRefModel,
             selectedCurrency:component.get("v.selectedCurrency"),
-            searchedCurrency:component.get("v.searchedCurrency")
+            searchedCurrency:component.get("v.searchedCurrency"),
+            panchoutRqtID:sParameterName
         });
         actionsave.setCallback(this, function(response) 
                                {

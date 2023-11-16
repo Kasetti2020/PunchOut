@@ -253,7 +253,8 @@ CurrCode = ResCurr[0];
         try
         {
             //contact contactid=UtilityClass.getCurrentUserContact();
-            for(Sales_Order_Line_Items__c soli:[select id,name,Colour__c,Quantity__c,Added_As_a_Label__c,Products__c,Price_Specification_Book_Product__r.id from Sales_Order_Line_Items__c where Sales_Order__r.Retailer_Code1__c=:retailerCode AND Sales_Order__r.RecordType.Name='Cart' AND Sales_Order__r.Supplier__c=:contactid.Customer_Information__c])
+            // for(Sales_Order_Line_Items__c soli:[select id,name,Colour__c,Quantity__c,Added_As_a_Label__c,Products__c,Price_Specification_Book_Product__r.id from Sales_Order_Line_Items__c where Sales_Order__r.Retailer_Code1__c=:retailerCode AND Sales_Order__r.RecordType.Name='Cart' AND Sales_Order__r.Supplier__c=:contactid.Customer_Information__c])
+            for(Base_Order_Detail__c soli:[select id,name,Colour__c,Quantity__c,Added_As_a_Label__c,Products__c,Price_Specification_Book_Product__r.id from Base_Order_Detail__c where Base_Order__r.Retailer_Code1__c=:retailerCode AND Base_Order__r.RecordType.Name='Cart' AND Base_Order__r.Supplier__c=:contactid.Customer_Information__c])
             {
                 if(soli.Added_As_a_Label__c)
                     addedaslabelData.put(soli.Price_Specification_Book_Product__r.id,soli.Colour__c);
@@ -1014,19 +1015,20 @@ CurrCode = ResCurr[0];
     
     // code to save SO and SOLI(Cart record type) by chandana 
     @AuraEnabled
-    public static string saveSO(id customerData,id retailercode, string quantity,id priceBookProId,id priceByCurr,string custRefModel,string selectedCurrency,String searchedCurrency)
+    public static string saveSO(id customerData,id retailercode, string quantity,id priceBookProId,id priceByCurr,string custRefModel,string selectedCurrency,String searchedCurrency,Id panchoutRqtID)
     {
         system.debug('customerData==='+customerData);
         system.debug('retailerData==='+retailercode);
         system.debug('priceBookProId==='+priceBookProId);
         system.debug('quantity==='+quantity);
          system.debug('priceByCurr==='+priceByCurr);
+        system.debug('panchoutRqtID==='+panchoutRqtID);
         String res = SOController.saveCart(customerData,retailercode,quantity,priceBookProId,priceByCurr,custRefModel,selectedCurrency,searchedCurrency);
         return res;
     } 
     
       @AuraEnabled
-    public static string saveSOMcare(id customerData,id retailercode, string quantity,id priceBookProId,id priceByCurr,string custRefModel,string selectedCurrency)
+    public static string saveSOMcare(id customerData,id retailercode, string quantity,id priceBookProId,id priceByCurr,string custRefModel,string selectedCurrency )
     {
         /*system.debug('customerData==='+customerData);
         system.debug('retailerData==='+retailercode);

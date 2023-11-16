@@ -187,6 +187,7 @@ public class PunchOutOrderCXMLParse {
         cxml.request = new Request();
         cxml.request.orderRequest = parseOrderRequest(requestNode.getChildElement('OrderRequest', null));
         system.debug('PunchOutOrderCXMLParse<><><'+cxml);
+        PunchOutOrderCXMLParse.baseOrderCreation(cxml);
         return cxml;
     }
     
@@ -399,4 +400,19 @@ public class PunchOutOrderCXMLParse {
         charge.money = parseMoney(chargeNode.getChildElement('Money', null));
         return charge;
     }
+    
+      public static void BaseOrderCreation(CXML cxml) {
+       Base_Order__c base=new Base_Order__c();
+          base.Start_Process__c=true;
+          base.Processing_Status__c='Draft';
+          base.Processing_Status__c='Order Confirmed';
+          base.Retailer_code__c='Saver';
+          base.CustomerParty_Name__c=cxml.request.OrderRequest.itemOutList[0].ItemID.supplierPartID;
+          base.SupplierParty_CNUF__c=cxml.request.OrderRequest.itemOutList[0].ItemID.supplierPartAuxiliaryID;
+          for(ItemOut item: cxml.request.OrderRequest.itemOutList){
+              
+          }
+    }
+    
+    
 }

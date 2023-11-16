@@ -35,13 +35,13 @@
     toCheckSORetailer: function(component, event,helper,custInfoId) 
     {
         var action = component.get('c.checkRetailerInSO');
-        alert(JSON.stringify(custInfoId));
+       // alert(JSON.stringify(custInfoId));
         action.setParams({ 
             "customerid": custInfoId
         });
         action.setCallback(this, function(actionResult) {
             var status=actionResult.getState();
-            alert(status);
+          //  alert(status);
             if(status==="SUCCESS")
             {
                 var response = actionResult.getReturnValue();

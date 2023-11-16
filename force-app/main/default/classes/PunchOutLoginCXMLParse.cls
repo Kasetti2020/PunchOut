@@ -290,11 +290,11 @@ public class PunchOutLoginCXMLParse {
             rqt.payloadID__c=payloadID;
             rqt.Operation__c=operation;
             insert rqt;
-             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQKk5Cl7UJ27vaz8Gq06kIqb4Rnc1BJQwKDhLAkBuyzTfSI6CQ0HCUhJdTeVqMHeRMOb8_G2uyQjSga6Ce7ElT9ocGXfT&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
+             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQFoV8D8pIytmmOCVy.umV_4pY1hX1rTzKoM_yO.9FNdVhV0weSEBca9pALtR0PCO.thFBKcM.Z7gEQK9._wBxo.6RgEp&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
         }else if(punchOut.size()>0){
             punchOut[0].Operation__c=operation;
             update punchOut;
-             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQKk5Cl7UJ27vaz8Gq06kIqb4Rnc1BJQwKDhLAkBuyzTfSI6CQ0HCUhJdTeVqMHeRMOb8_G2uyQjSga6Ce7ElT9ocGXfT&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
+             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQFoV8D8pIytmmOCVy.umV_4pY1hX1rTzKoM_yO.9FNdVhV0weSEBca9pALtR0PCO.thFBKcM.Z7gEQK9._wBxo.6RgEp&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
         }
         
         String clientId = '3MVG9N6eDmZRVJOkogIaHQibQG8ckzH2p_YFtzzezrkLFIiIUhbmltIEaIC10eLeL6SdP7Co8ZxGOgqa.3C_T';

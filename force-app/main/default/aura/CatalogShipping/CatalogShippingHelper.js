@@ -77,7 +77,8 @@
          //alert('punchOut');
          var currentUrl = window.location.href;
         var sParameterName = currentUrl.split('=');
-        alert(sParameterName[1]);
+        //component.set('v.recordId',sParameterName);
+        //alert(sParameterName[1]);
         var action = component.get("c.punchOutMethod");
         action.setParams({ recordId : sParameterName[1] });
         action.setCallback(this, function(response) {
@@ -86,7 +87,7 @@
                 
                // alert("From server: " + response.getReturnValue());
                 var resultvalue=response.getReturnValue();
-                alert(resultvalue);
+               // alert(resultvalue);
                 if(resultvalue=='create'){
                     component.set('v.isOperation',true);
                    
