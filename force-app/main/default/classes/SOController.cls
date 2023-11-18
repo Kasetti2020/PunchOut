@@ -20,7 +20,7 @@ public without sharing class SOController
     } 
     //save the cart value by creating MG and MGLI with "CART" record type
     @AuraEnabled
-    public static string saveCart(id customerData,id retailercode, string quantity,id priceBookProId,id priceByCurr,string custRefModel,string selectedCurrency,String searchedCurrency)
+    public static string saveCart(id customerData,id retailercode, string quantity,id priceBookProId,id priceByCurr,string custRefModel,string selectedCurrency,String searchedCurrency,Id panoutId)
     {
         system.debug('customerData==='+customerData);
         system.debug('retailerData==='+retailercode);
@@ -88,10 +88,13 @@ public without sharing class SOController
             Base_Order__c So=new Base_Order__c();
             So.Supplier__c = customerData;
             So.Supplier_Contact__c = loggedInContact.Id;
+            So.PunchOut_Request__c=panoutId;
            // So.RecordtypeId = CartRecordType;
             So.Retailer_Code1__c = retailercode;
             So.PunchOut_Status__c = 'Product Added';
           //Ma  So.OrderSource__c = 'Catalog Order';
+           So.SupplierParty_CNUF__c = 'SupplierParty';
+            So.CustomerParty_Name__c = 'CustomerParty';
             So.Vertical__c = prodData.Product_Unique_ID__r.Business_Vertical__c;
             So.Company__c = prodData.Order_to_Company__c;
             if(priceproductbycurrency!=null){
@@ -884,28 +887,32 @@ public without sharing class SOController
     {
         system.debug('soliId>>'+ soliId);
         system.debug('soId>>'+ soId);
-        Sales_Order_Line_Items__c soliObject = new Sales_Order_Line_Items__c();
+        //Ma Sales_Order_Line_Items__c soliObject = new Sales_Order_Line_Items__c();
+        Base_Order_Detail__c soliObject = new Base_Order_Detail__c();
         soliObject.Id = soliId;
         
         delete soliObject;        
         
-        list<Sales_Order_Line_Items__c> remainingrec = [select id,name,Products__c,Products__r.Name,BOX_QTY__c,Size__c,Sales_Order__r.RecordType.Name,Sales_Order__c,Sales_Order__r.Retailer_Code1__c,Quantity__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Price_Specification_Book_Product__r.Name,Full_Box_Order__c,Added_As_a_Label__c,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c, Price_Specification_Book_Product__r.MOQ__c,Price_Specification_Book_Product__r.UOM_Price__c,CurrencyIsoCode  from Sales_Order_Line_Items__c where Sales_Order__r.RecordType.Name ='Cart' AND Sales_Order__c=:soId];
+        //Ma list<Sales_Order_Line_Items__c> remainingrec = [select id,name,Products__c,Products__r.Name,BOX_QTY__c,Size__c,Sales_Order__r.RecordType.Name,Sales_Order__c,Sales_Order__r.Retailer_Code1__c,Quantity__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Price_Specification_Book_Product__r.Name,Full_Box_Order__c,Added_As_a_Label__c,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c, Price_Specification_Book_Product__r.MOQ__c,Price_Specification_Book_Product__r.UOM_Price__c,CurrencyIsoCode  from Sales_Order_Line_Items__c where Sales_Order__r.RecordType.Name ='Cart' AND Sales_Order__c=:soId];
         //system.debug('remainingrec>>'+ remainingrec);
+        list<Base_Order_Detail__c> remainingrec = [select id,name,Products__c,Products__r.Name,BOX_QTY__c,Size__c,Base_Order__r.RecordType.Name,Base_Order__c,Base_Order__r.Retailer_Code1__c,Quantity__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Price_Specification_Book_Product__r.Name,Full_Box_Order__c,Added_As_a_Label__c,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c, Price_Specification_Book_Product__r.MOQ__c,Price_Specification_Book_Product__r.UOM_Price__c,CurrencyIsoCode  from Base_Order_Detail__c where  Base_Order__c=:soId];
         list<SOLIWrapper> prodwrapList = new list<SOLIWrapper>();
         
         if(remainingrec.size()==0)
         {
-            Sales_Order__c SOToDelete = new Sales_Order__c();
+           //Ma Sales_Order__c SOToDelete = new Sales_Order__c();
+            Base_Order__c SOToDelete = new Base_Order__c();
             SOToDelete.id= soId;
             delete SOToDelete;
         }
-        for(Sales_Order_Line_Items__c SOLI:remainingrec)
+        //Ma for(Sales_Order_Line_Items__c SOLI:remainingrec)
+         for(Base_Order_Detail__c SOLI:remainingrec)
         {
             if(SOLI.Added_As_a_Label__c==false)
             {
                 SOLIWrapper productobj = new SOLIWrapper();
                 productobj.id = SOLI.id;
-                productobj.SOid = SOLI.Sales_Order__c;
+                productobj.SOid = SOLI.Base_Order__c;
                 productobj.Name=SOLI.Products__r.Name;
                 productobj.Quantity=SOLI.Quantity__c;
                 productobj.Color=SOLI.Colour__c;
@@ -952,10 +959,15 @@ public without sharing class SOController
     }
     //Added by seema 
     @AuraEnabled
-    public static List<Sales_Order_Line_Items__c> checkLengthAddAndCloneDataToDelete(string customerid)    
+    public static Base_Order__c checkLengthAddAndCloneDataToDelete(string customerid)    
     {
-        List<Sales_Order_Line_Items__c> soli=[select id,Added_As_a_Label__c,Sales_Order__r.Supplier__c from Sales_Order_Line_Items__c where Added_As_a_Label__c=true And Sales_Order__r.Supplier__c=:customerid];
+        
+        Base_Order__c soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where  Supplier__c=:customerid];
+       //Ma List<Sales_Order_Line_Items__c> soli=[select id,Added_As_a_Label__c,Sales_Order__r.Supplier__c from Sales_Order_Line_Items__c where Added_As_a_Label__c=true And Sales_Order__r.Supplier__c=:customerid];
         system.debug('soli>>>>.'+soli);
+        soli.PunchOut_Status__c='Punched Out';
+        Update soli;
+         punchoutcxmlgenerate.cxmlOutPutCreate(soli.Id);
         return soli;
     }   
     @AuraEnabled

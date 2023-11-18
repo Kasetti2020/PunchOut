@@ -402,16 +402,45 @@ public class PunchOutOrderCXMLParse {
     }
     
       public static void BaseOrderCreation(CXML cxml) {
-       Base_Order__c base=new Base_Order__c();
-          base.Start_Process__c=true;
-          base.Processing_Status__c='Draft';
-          base.Processing_Status__c='Order Confirmed';
-          base.Retailer_code__c='Saver';
+      /* Base_Order__c base=new Base_Order__c();
+          base.Start_Process__c=false;
+         
           base.CustomerParty_Name__c=cxml.request.OrderRequest.itemOutList[0].ItemID.supplierPartID;
           base.SupplierParty_CNUF__c=cxml.request.OrderRequest.itemOutList[0].ItemID.supplierPartAuxiliaryID;
+          insert base;
+          list<Base_Order_Detail__c> baseLineList=new list<Base_Order_Detail__c>();
           for(ItemOut item: cxml.request.OrderRequest.itemOutList){
               
+              Base_Order_Detail__c  baseLine=new Base_Order_Detail__c();
+              baseLine.Base_Order__c=base.Id;
+              baseLine.Quantity__c=item.quantity;
+              baseLine.Ordered_Quantity__c = Integer.valueOf(item.quantity);
+              baseLine.Supply_Quantity__c =item.quantity;
+              baseLine.Supply_Quantity_num__c = Integer.valueOf(item.quantity);
+              baseLine.Remaining_Qty__c = Integer.valueOf(item.quantity);
+              baseLine.Size__c=item.ItemDetail.classification;
+               baseLine.Colour__c=item.ItemDetail.unitOfMeasure;
+               baseLine.print__c=item.ItemDetail.manufacturerName;
+              baseLineList.add(baseLine);
           }
+          insert baseLineList;
+          System.debug('base><><>'+base.Id);
+          Base_Order__c baseupdate=new Base_Order__c();
+          baseupdate.Id=base.Id;
+          baseupdate.Start_Process__c=true;
+           baseupdate.Processing_Status__c='Draft';
+          baseupdate.PunchOut_Status__c='Order Confirmed';
+          baseupdate.Retailer_code__c='Saver';
+          update baseupdate;
+*/
+       Base_Order__c baseupdate=[select id,Start_Process__c,Processing_Status__c,Retailer_code__c,PunchOut_Request__r.payloadID__c from Base_Order__c where PunchOut_Request__r.payloadID__c =:cxml.payloadID ];
+          baseupdate.Start_Process__c=true;
+           baseupdate.Processing_Status__c='Draft';
+          baseupdate.PunchOut_Status__c='Order Confirmed';
+          baseupdate.Retailer_code__c='Saver';
+          Update baseupdate;
+          
+          
     }
     
     

@@ -38,6 +38,21 @@ public class PunchOutOrderCreation {
                 salesLineList.add(soli);
             }
             insert salesLineList;
+            Base_Order__c base=[select id,PunchOut_Request__c from Base_Order__c Where Id=:BaseOrList[0].Id];
+            PunchOut_Request__c punch =[select id,TimeStamp__c,payloadID__c,BuyerCookie__c from PunchOut_Request__c where Id=:base.PunchOut_Request__c ];
+            
+            BaseOrList[0].TimeStamp__c=punch.TimeStamp__c;
+            BaseOrList[0].payloadID__c=punch.payloadID__c;
+            BaseOrList[0].BuyerCookie__c=punch.BuyerCookie__c;
+            BaseOrList[0].TimeStamp__c=punch.TimeStamp__c;
+            BaseOrList[0].Processing_Status__c='Success';
+            try {
+                Update BaseOrList;
+                
+                delete punch;
+            } catch(DmlException e) {
+                System.debug('The following exception has occurred: ' + e.getMessage());
+            }
         }
     }
     

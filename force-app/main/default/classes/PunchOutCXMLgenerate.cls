@@ -74,8 +74,11 @@ public class PunchOutCXMLgenerate {
         Dom.XmlNode documentReference  = orderRequestHeader.addChildElement('DocumentReference ', null, null);
         documentReference.setAttribute('payloadID',payloadID );
     }
-    
-    public static void cxmlOutPutCreate(){
+
+    //////////// Cxml Generate 
+    public static void cxmlOutPutCreate(String whereID){
+        
+        Base_Order__c punch=[select Id,PunchOut_Request__r.payloadID__c,PunchOut_Request__r.TimeStamp__c From Base_Order__c where Id=: whereID ];
         // Create a new XML document
         Dom.Document doc = new Dom.Document();
         SYstem.debug('doc:'+doc);
@@ -83,8 +86,8 @@ public class PunchOutCXMLgenerate {
         // Create the root element
         Dom.XmlNode root = doc.createRootElement('cXML', null, null);
         // Add the payloadID and timestamp attributes to the root element
-        root.setAttribute('payloadID', '958074737352@www.xyz3Demo.com');
-        root.setAttribute('timestamp', '2000-06-14T12:59:09-07:00');
+        root.setAttribute('payloadID', punch.PunchOut_Request__r.payloadID__c);
+        root.setAttribute('timestamp', punch.PunchOut_Request__r.TimeStamp__c);
         
         // Create the Header element
         Dom.XmlNode header = root.addChildElement('Header', null, null);
@@ -137,7 +140,7 @@ public class PunchOutCXMLgenerate {
         punchOutValue.put(varData.XML_FIeld_E__c,varData.Object_Field_E__c);
         
         System.debug('punchOutValue><>>>>'+punchOutValue);
-        string  whereID='a1C9D000000drycUAA';
+       // string  whereID='a1C9D000000drycUAA';
         String lineItemValues = 'SELECT  ' +varData.Object_Name_A__c+'.'+varData.Object_Field_A__c+','+varData.Object_Name_B__c+'.'+varData.Object_Field_B__c+','+varData.Object_Field_C__c+','+varData.Object_Field_D__c+','+varData.Object_Field_E__c+' FROM '+varData.Object_Name_E__c+' Where '+varData.Object_Name_A__c+'.'+'id=:whereID';
         // lineItemValues ='SELECT  Base_Order__r.CustomerParty_Name__c , Base_Order__r.SupplierParty_CNUF__c,Item_Description__c,PurchaseOrderLine_unitCode__c,PurchaseOrderLine_Amount__c FROM Base_Order_Detail__c';
         System.debug('lineItemValues><>>>>'+lineItemValues);
@@ -186,17 +189,19 @@ public class PunchOutCXMLgenerate {
         
         
         
-        
+       
         // Serialize the document to a string
         String xmlString = doc.toXmlString();
-        System.debug(xmlString);
-        Http http = new Http();
+       //  PunchOutOrderMessageController.getStringList(xmlString);
+        System.debug('xmlString><>>>>>>'+xmlString);
+        
+          Http http = new Http();
         HttpRequest request = new HttpRequest();
-        request.setEndpoint('https://webhook.site/b1165467-0b4d-4098-8649-6c591d3c7212');
+        request.setEndpoint('https://webhook.site/4a7d4c3b-1ff6-43bb-b4b0-d14cce50effc');
         request.setMethod('POST');
         request.setHeader('Content-Type', 'application/Xml');
         request.setBody(xmlString);
-        HttpResponse response = http.send(request);
+           
     }
     
     

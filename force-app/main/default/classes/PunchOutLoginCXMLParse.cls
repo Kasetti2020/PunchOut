@@ -279,6 +279,9 @@ public class PunchOutLoginCXMLParse {
         string operation=cxml.request.PunchOutSetupRequest.operation;
         string timeStamp=cxml.timestamp;
         string payloadID=cxml.payloadID;
+        string clientSecret=cxml.header.sender.credential.sharedSecret;
+        string clientId=cxml.header.sender.credential.identity;
+        string accessToken=PunchOutLoginCXMLParse.getAccessToken(clientId,clientSecret);
         list<PunchOut_Request__c> punchOut=[select Id,payloadID__c,Operation__c From PunchOut_Request__c Where payloadID__c=:payloadID];
         String redirectURL;
         ////when punchOut size is Equal to zero
@@ -290,49 +293,58 @@ public class PunchOutLoginCXMLParse {
             rqt.payloadID__c=payloadID;
             rqt.Operation__c=operation;
             insert rqt;
-             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQFoV8D8pIytmmOCVy.umV_4pY1hX1rTzKoM_yO.9FNdVhV0weSEBca9pALtR0PCO.thFBKcM.Z7gEQK9._wBxo.6RgEp&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
+             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
         }else if(punchOut.size()>0){
             punchOut[0].Operation__c=operation;
             update punchOut;
-             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQFoV8D8pIytmmOCVy.umV_4pY1hX1rTzKoM_yO.9FNdVhV0weSEBca9pALtR0PCO.thFBKcM.Z7gEQK9._wBxo.6RgEp&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
+             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
         }
         
-        String clientId = '3MVG9N6eDmZRVJOkogIaHQibQG8ckzH2p_YFtzzezrkLFIiIUhbmltIEaIC10eLeL6SdP7Co8ZxGOgqa.3C_T';
-        String clientSecret = 'BD9E2C6243CB53A94A7B2E0849B79B5F24933517D1C48BBF819CFF251DDCBC21';
-        String username = 'YOUR_SALESFORCE_USERNAME';
-        String password = 'YOUR_SALESFORCE_PASSWORD';
-        String securityToken = 'YOUR_SECURITY_TOKEN';
-        
-        //String accessToken = PunchOutLoginCXMLParse.getAccessToken(clientId, clientSecret, username, password, securityToken);
-           
+       
         String returnSetupResp =  PunchOutCXMLgenerate.xmlResponseGenerator(redirectURL, payloadID, timeStamp);
         System.debug('returnSetupResp::'+returnSetupResp);
         return returnSetupResp;
     }
     
     
-     public static String getAccessToken(String clientId, String clientSecret, String username, String password, String securityToken) {
-        String endpoint = 'https://login.salesforce.com/services/oauth2/token';
-        String requestBody = 'grant_type=password' +
-                             '&client_id=' + clientId +
-                             '&client_secret=' + clientSecret +
-                             '&username=' + username +
-                             '&password=' + password + securityToken;
-        HttpRequest req = new HttpRequest();
-        req.setEndpoint(endpoint);
-        req.setMethod('POST');
-        req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-        req.setBody(requestBody);
+    public static string getAccessToken(String clientId, String clientSecret) {
+        String USERNAME = 'crm.support@mainetti.com.lightsand';
+  		 String PASSWORD = 'kasetti555' ;
+    
+        HttpRequest request = new HttpRequest();
+        request.setEndpoint('https://test.salesforce.com/services/oauth2/token');
+        request.setMethod('POST');
+        request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+        request.setBody('grant_type=password' +
+            '&client_id=' + EncodingUtil.urlEncode(clientId, 'UTF-8') +
+            '&client_secret=' + EncodingUtil.urlEncode(clientSecret, 'UTF-8') +
+            '&username=' + EncodingUtil.urlEncode(USERNAME, 'UTF-8') +
+            '&password=' + EncodingUtil.urlEncode(PASSWORD, 'UTF-8'));
+
         Http http = new Http();
-        HttpResponse res = http.send(req);
-        if (res.getStatusCode() == 200) {
-            Map<String, Object> responseMap = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
-            return (String) responseMap.get('access_token');
+        HttpResponse response = http.send(request);
+		System.debug( response.getStatusCode());
+        System.debug( response.getBody());
+       System.debug(UserInfo.getOrganizationId().substring(0, 15) + ' ' +  UserInfo.getSessionId().substring(15));
+        if (response.getStatusCode() == 200) {
+            Map<String, Object> authResult = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+           // String accessToken = (String) authResult.get('access_token');
+            String access =UserInfo.getOrganizationId().substring(0, 15) +' '+ UserInfo.getSessionId().substring(15);
+            System.debug('access><><'+access);
+            System.debug(UserInfo.getOrganizationId().substring(0, 15) +''+ UserInfo.getSessionId().substring(15));
+            List<String> res = access.split(' ');
+            System.debug(res[0]);
+            System.debug(res[1]);
+            string accessToken=res[0]+res[1];
+            System.debug('accessToken><><'+accessToken);
+             //string redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?';
+           // System.debug(redirectURL);
+            return accessToken;
         } else {
-            // Handle error
-            System.debug('Error getting access token: ' + res.getBody());
+            // Handle authentication error
+            System.debug('Authentication error: ' + response.getBody());
             return null;
         }
+        
     }
-    
 }

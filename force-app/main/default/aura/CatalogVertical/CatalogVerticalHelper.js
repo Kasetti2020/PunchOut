@@ -93,6 +93,9 @@
         var sParameterName = currentUrl.split('=');
         var PricebookData = productData.tempMap[indexarr[1]].value.priceBookId;
         var actionsave = component.get("c.saveSO");
+       var newVal = sParameterName[1]+'T'+component.get("v.searchedCurrency");
+        //alert(newVal);
+        
         actionsave.setParams({ 
             customerData : custid,
             retailercode : retailercode,
@@ -102,7 +105,7 @@
             custRefModel : custRefModel,
             selectedCurrency:component.get("v.selectedCurrency"),
             searchedCurrency:component.get("v.searchedCurrency"),
-            panchoutRqtID:sParameterName
+            panoutId:sParameterName[1]
         });
         actionsave.setCallback(this, function(response) 
                                {
