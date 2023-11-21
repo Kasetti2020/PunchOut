@@ -965,9 +965,11 @@ public without sharing class SOController
         Base_Order__c soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where  Supplier__c=:customerid];
        //Ma List<Sales_Order_Line_Items__c> soli=[select id,Added_As_a_Label__c,Sales_Order__r.Supplier__c from Sales_Order_Line_Items__c where Added_As_a_Label__c=true And Sales_Order__r.Supplier__c=:customerid];
         system.debug('soli>>>>.'+soli);
+        punchoutcxmlgenerate.cxmlOutPutCreate(soli.Id);
         soli.PunchOut_Status__c='Punched Out';
         Update soli;
-         punchoutcxmlgenerate.cxmlOutPutCreate(soli.Id);
+         
+        
         return soli;
     }   
     @AuraEnabled

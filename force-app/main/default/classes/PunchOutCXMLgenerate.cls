@@ -25,6 +25,35 @@ public class PunchOutCXMLgenerate {
         //return '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd"><cXML xml:lang="en-US" payloadID="1655760397.690501.31608925@punchoutconnect.net" timestamp="2022-06-20T16:26:37-05:00"><Response><Status code="200" text="success"></Status><PunchOutSetupResponse><StartPage><URL>https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQL9ZMYhruB7Vni2IIjWQspnqmQdozLwVoZgtfGXeCOSBGQvIl5AMBOFVaUalW26gbioWF1OecAXArn3wIirX_6H2bL7v</URL></StartPage></PunchOutSetupResponse></Response></cXML>';
       return xmlString;
     }
+    
+    
+    ///error in cxml 
+     public static String xmlError(string resPonseData,string payloadID,string timestamp,string code,string text){
+        Dom.Document doc = new Dom.Document();
+        SYstem.debug('doc:'+doc);
+        
+        // Create the root element
+        Dom.XmlNode root = doc.createRootElement('cXML', null, null);
+        // Add the payloadID and timestamp attributes to the root element
+        root.setAttribute('payloadID',payloadID );
+        root.setAttribute('timestamp',timestamp );
+        Dom.XmlNode header = root.addChildElement('Response', null, null);
+        
+        
+        Dom.XmlNode fromCredential = header.addChildElement('Status ', null, null);
+        fromCredential.setAttribute('code', code);
+        fromCredential.setAttribute('text', text);
+        fromCredential.setAttribute(' xml:lang', 'en-US');
+         fromCredential.addTextNode(resPonseData);
+      
+        String xmlString = doc.toXmlString();
+        System.debug('xmlstring==> ' + xmlString);
+        //return '<?xml version="1.0" encoding="utf-16"?><!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd"><cXML xml:lang="en-US" payloadID="635143174550687417@clientsite.com" timestamp="2013-09-09T14:57:35-05:00">   <Response>     <Status code="200" text="success" />    <PunchoutSetupResponse>      <StartPage>      <URL>https://www.ClientSite.com/Punchout/        punchoutsessionrequest.isch?ps=e82d0d33-9fee-45fe-9d87-a23400a4218d</URL>      </StartPage>    </PunchoutSetupResponse>    </Response></cXML>';
+        //return '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE cXML SYSTEM "http://xml.cxml.org/schemas/cXML/1.2.014/cXML.dtd"><cXML xml:lang="en-US" payloadID="1655760397.690501.31608925@punchoutconnect.net" timestamp="2022-06-20T16:26:37-05:00"><Response><Status code="200" text="success"></Status><PunchOutSetupResponse><StartPage><URL>https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQL9ZMYhruB7Vni2IIjWQspnqmQdozLwVoZgtfGXeCOSBGQvIl5AMBOFVaUalW26gbioWF1OecAXArn3wIirX_6H2bL7v</URL></StartPage></PunchOutSetupResponse></Response></cXML>';
+      return xmlString;
+    }
+    
+    //For cancelled Orders Cxml Generate
     public static void CancelledOrders(string  orderDate,string orderID,string payloadID){
           // Create a new XML document
         Dom.Document doc = new Dom.Document();
@@ -87,7 +116,7 @@ public class PunchOutCXMLgenerate {
         Dom.XmlNode root = doc.createRootElement('cXML', null, null);
         // Add the payloadID and timestamp attributes to the root element
         root.setAttribute('payloadID', punch.PunchOut_Request__r.payloadID__c);
-        root.setAttribute('timestamp', punch.PunchOut_Request__r.TimeStamp__c);
+        root.setAttribute('timestamp', String.ValueofGmt(punch.PunchOut_Request__r.TimeStamp__c));
         
         // Create the Header element
         Dom.XmlNode header = root.addChildElement('Header', null, null);
@@ -193,15 +222,20 @@ public class PunchOutCXMLgenerate {
         // Serialize the document to a string
         String xmlString = doc.toXmlString();
        //  PunchOutOrderMessageController.getStringList(xmlString);
+        String endPointURL = 'https://webhook.site/da7a4afb-6b7b-4459-8825-df031fb32843';
+        //String modifiedJsonString = '123:123';
+        Http http = new Http();
+        HttpRequest request = new HttpRequest();
+        request.setEndpoint(endPointURL);
+        request.setMethod('POST');
+        request.setHeader('Content-Type', 'application/json');
+        request.setBody(xmlString);
+        HttpResponse response = http.send(request);
+        System.debug('responseStatusCode: '+response.getStatusCode());
+        System.debug('responseBody: '+response.getBody());
         System.debug('xmlString><>>>>>>'+xmlString);
         
-          Http http = new Http();
-        HttpRequest request = new HttpRequest();
-        request.setEndpoint('https://webhook.site/4a7d4c3b-1ff6-43bb-b4b0-d14cce50effc');
-        request.setMethod('POST');
-        request.setHeader('Content-Type', 'application/Xml');
-        request.setBody(xmlString);
-           
+       //return xmlString;
     }
     
     
