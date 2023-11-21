@@ -109,7 +109,7 @@
             custRefModel : custRefModel,
             selectedCurrency:component.get("v.selectedCurrency"),
             searchedCurrency:component.get("v.searchedCurrency"),
-            panoutId:storedRecordId
+            panoutId:'a2jHz0000006jR1IAI'
         });
         actionsave.setCallback(this, function(response) 
                                {

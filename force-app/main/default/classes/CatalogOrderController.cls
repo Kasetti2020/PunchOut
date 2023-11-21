@@ -249,7 +249,7 @@ CurrCode = ResCurr[0];
         Map<Id,String> addToCartData=new Map<Id,String>();
         Map<Id,String> addedaslabelData=new Map<Id,String>();
         Map<Id,Decimal> addToCartQuantity=new Map<Id,Decimal>();
-        Map<Id,String> prodIdaddedColorListMap=new Map<Id,String>(); 
+        Map<Id,String> prodIdaddedColorListMap=new Map<Id,String>();
         try
         {
             //contact contactid=UtilityClass.getCurrentUserContact();
@@ -952,10 +952,11 @@ CurrCode = ResCurr[0];
     
     //Store Sales Order Based on Retailer.
     @AuraEnabled
-    public static Sales_Order__c checkRetailerInSO(String customerid)
+    public static Base_Order__c checkRetailerInSO(String customerid)
     {
-        Sales_Order__c cartSO=UtilityClass.getSORecordAsCart(customerid);
-        system.debug('c'+cartSO);
+        //ma Sales_Order__c cartSO=UtilityClass.getSORecordAsBaseCart(customerid);
+        Base_Order__c cartSO=UtilityClass.getSORecordAsBaseCart(customerid);
+        system.debug('cartSO'+cartSO);
         if(cartSO.Id != null)
         {
             return cartSO;
@@ -1015,16 +1016,16 @@ CurrCode = ResCurr[0];
     
     // code to save SO and SOLI(Cart record type) by chandana 
     @AuraEnabled
-    public static string saveSO(id customerData,id retailercode, string quantity,id priceBookProId,id priceByCurr,string custRefModel,string selectedCurrency,String searchedCurrency,Id panchoutRqtID)
+    public static string saveSO(id customerData,id retailercode, string quantity,id priceBookProId,id priceByCurr,string custRefModel,string selectedCurrency,String searchedCurrency,Id panoutId)
     {
         system.debug('customerData==='+customerData);
         system.debug('retailerData==='+retailercode);
         system.debug('priceBookProId==='+priceBookProId);
         system.debug('quantity==='+quantity);
          system.debug('priceByCurr==='+priceByCurr);
-        system.debug('panchoutRqtID==='+panchoutRqtID);
-        String res = SOController.saveCart(customerData,retailercode,quantity,priceBookProId,priceByCurr,custRefModel,selectedCurrency,searchedCurrency);
-        return res;
+        
+        String res = SOController.saveCart(customerData,retailercode,quantity,priceBookProId,priceByCurr,custRefModel,selectedCurrency,searchedCurrency,panoutId);
+        return 'res';
     } 
     
       @AuraEnabled

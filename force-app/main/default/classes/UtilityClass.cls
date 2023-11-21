@@ -52,6 +52,8 @@ public without sharing class UtilityClass
     @AuraEnabled
     public static Sales_Order__c getSORecordAsCart(Id customerInfo)
     {
+
+      
         List<Sales_Order__c> cartSo = [select id,name, CurrencyIsoCode, OrderSource__c, Retailer__r.name, Retailer_Code1__c,Retailer_Code1__r.Name,Retailer_Code1__r.Market_Segment__c, Vertical__c, Company__c,Supplier__r.Name,Supplier_Contact__c,Supplier_Contact__r.Name,Supplier_Contact__r.Email,Sales_Order_Number_For_Report__c,Retailer_Code2__c,Supplier1__c from Sales_Order__c where Supplier__c  =: customerInfo AND recordtype.name='Cart' limit 1];
         if(cartSo.size()==1)
         {
@@ -59,7 +61,27 @@ public without sharing class UtilityClass
         }
         else
         {
-            Sales_Order__c emptySO = new Sales_Order__c();
+             Sales_Order__c emptySO = new Sales_Order__c();
+            //Base_Order__c emptySO = new Base_Order__c();
+            
+            return emptySO;
+        }
+    }
+     @AuraEnabled
+    public static Base_Order__c getSORecordAsBaseCart(Id customerInfo)
+    {
+
+        List<Base_Order__c> cartSo = [select id,name, CurrencyIsoCode, OrderSource__c, Retailer_Code1__c,Retailer_Code1__r.Name,Retailer_Code1__r.Market_Segment__c, Vertical__c, Company__c,Supplier__r.Name,Supplier_Contact__c,Supplier_Contact__r.Name,Supplier_Contact__r.Email from Base_Order__c where Supplier__c  =: customerInfo AND recordtype.name='Cart' limit 1];
+        //ma List<Sales_Order__c> cartSo = [select id,name, CurrencyIsoCode, OrderSource__c, Retailer__r.name, Retailer_Code1__c,Retailer_Code1__r.Name,Retailer_Code1__r.Market_Segment__c, Vertical__c, Company__c,Supplier__r.Name,Supplier_Contact__c,Supplier_Contact__r.Name,Supplier_Contact__r.Email,Sales_Order_Number_For_Report__c,Retailer_Code2__c,Supplier1__c from Sales_Order__c where Supplier__c  =: customerInfo AND recordtype.name='Cart' limit 1];
+        if(cartSo.size()==1)
+        {
+            return cartSo[0];
+        }
+        else
+        {
+            //ma Sales_Order__c emptySO = new Sales_Order__c();
+            Base_Order__c emptySO = new Base_Order__c();
+            
             return emptySO;
         }
     }

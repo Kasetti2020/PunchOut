@@ -958,7 +958,7 @@ public without sharing class SOController
         
     }
     //Added by seema 
-    @AuraEnabled
+  /*Ma @AuraEnabled
     public static Base_Order__c checkLengthAddAndCloneDataToDelete(string customerid)    
     {
         
@@ -971,7 +971,22 @@ public without sharing class SOController
          
         
         return soli;
-    }   
+    }  */ 
+
+    @AuraEnabled
+    public static string checkLengthAddAndCloneDataToDelete(string customerid)    
+    {
+        
+        Base_Order__c soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where  Supplier__c=:customerid];
+       //Ma List<Sales_Order_Line_Items__c> soli=[select id,Added_As_a_Label__c,Sales_Order__r.Supplier__c from Sales_Order_Line_Items__c where Added_As_a_Label__c=true And Sales_Order__r.Supplier__c=:customerid];
+        system.debug('soli>>>>.'+soli);
+       string cxmlValue= punchoutcxmlgenerate.cxmlOutPutCreate(soli.Id);
+        soli.PunchOut_Status__c='Punched Out';
+        Update soli;
+         
+        
+        return cxmlValue;
+    }
     @AuraEnabled
     public static void checkAddAndCloneDataToDelete(string customerid)    
     {

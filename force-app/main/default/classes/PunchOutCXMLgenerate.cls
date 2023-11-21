@@ -105,7 +105,7 @@ public class PunchOutCXMLgenerate {
     }
 
     //////////// Cxml Generate 
-    public static void cxmlOutPutCreate(String whereID){
+    public static string cxmlOutPutCreate(String whereID){
         
         Base_Order__c punch=[select Id,PunchOut_Request__r.payloadID__c,PunchOut_Request__r.TimeStamp__c From Base_Order__c where Id=: whereID ];
         // Create a new XML document
@@ -235,7 +235,7 @@ public class PunchOutCXMLgenerate {
         System.debug('responseBody: '+response.getBody());
         System.debug('xmlString><>>>>>>'+xmlString);
         
-       //return xmlString;
+       return xmlString;
     }
     
     

@@ -19,10 +19,12 @@
     <aura:attribute name="isOpen" type="boolean" default="false"/>
     <aura:attribute name="showremarks" type="boolean" default="false"/>
     
-    <aura:attribute name="isOperation" type="boolean" default="false"/>
+    <aura:attribute name="isOperation" type="boolean" default="true"/>
     
     <ui:inputText aura:id="articleURL"/>
     
+    <!--VisulaForcePage-->
+    <aura:attribute name="myParam" type="String" />
     
     <!--Added by Raghu on 12/11/2021-->
     <aura:attribute name="TotalOrderAmmount" type="Decimal"/>

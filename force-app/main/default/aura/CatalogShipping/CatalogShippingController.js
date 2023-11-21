@@ -53,7 +53,8 @@
         //helper.CalBoxQty(component, event,helper);
         var custid =component.get("v.DisplayCustDetail");
        
-        helper.checkingAddAndCloneData(component,event,helper,custid); 
+       // helper.checkingAddAndCloneData(component,event,helper,custid);
+        helper.checkingOpenVisualForcePage(component,event,helper,custid); 
     },
     BacktoCatalog : function(component, event,helper) {
         component.set("v.parentcmp",true);

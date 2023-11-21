@@ -88,6 +88,7 @@
                // alert("From server: " + response.getReturnValue());
                 var resultvalue=response.getReturnValue();
                // alert(resultvalue);
+                //component.set('v.isOperation',true)
                 if(resultvalue=='create'){
                     component.set('v.isOperation',true);
                    
@@ -416,6 +417,37 @@
         })
         $A.enqueueAction(AddandCloneData);
     },
+    
+    /////Added By Mahadevaprasad R
+    checkingOpenVisualForcePage:function(component,event,helper,custid) 
+    { 
+        
+        alert(custid);
+        var AddandCloneData=component.get('c.checkLengthAddAndCloneDataToDelete');
+        AddandCloneData.setParams({
+            "customerid": custid
+        });
+        AddandCloneData.setCallback(this, function(response) {
+            var state = response.getState();
+            if(state === 'SUCCESS'){
+                
+               var myParamValue = response.getReturnValue();
+        console.log('checkingAddAndCloneData>>'+myParamValue);
+        // Construct the URL with the parameter
+        var vfPageUrl = '/apex/MyVisualforcePage?myParam=' + encodeURIComponent('myParamValue');
+
+        // Navigate to the Visualforce page
+        window.location.href = vfPageUrl;
+
+            }
+            else if(state === 'ERROR'){
+                alert('ERROR OCCURED.'+JSON.stringify(response.getError()));
+            }
+        })
+        $A.enqueueAction(AddandCloneData);
+    },
+    
+    ////ended by Mahadevaprasad R
     confirmdata:function(component,event,helper,custid)
     {
         //alert('confirmdata');
