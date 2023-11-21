@@ -1,6 +1,6 @@
 <aura:component controller="CatalogOrderController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
     <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
-       
+       <aura:attribute name="recordId" type="String"/>
     <!--LogoGenerator-->
     <aura:handler name="loadMyEvent"  event="c:LogoEvent" action="{!c.getValueFromApplicationEvent}"/>
      <aura:handler name="CloseLogoEvent"  event="c:CloseLogo" action="{!c.hideLogoGeneration}"/>

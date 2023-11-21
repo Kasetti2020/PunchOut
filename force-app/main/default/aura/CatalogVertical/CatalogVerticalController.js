@@ -2,6 +2,8 @@
     doInit : function(component, event,helper) 
     { 
        // alert('completeWrap????'+JSON.stringify(component.get("v.completeWrap")));
+        //var retrievedValue = window.sessionStorage.getItem("key");
+        //alert(retrievedValue);
     },
     //event for handling sizer family
     handleCatalogEvent:function(component, event, helper){

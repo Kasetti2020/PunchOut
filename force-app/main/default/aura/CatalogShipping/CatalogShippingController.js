@@ -5,6 +5,8 @@
         //$A.util.toggleClass(spinner, "slds-hide");
         helper.toGetcustomerData(component, event,helper);  
          helper.punchOutmethod(component, event,helper);  
+       // var retrievedValue = window.sessionStorage.getItem("key");
+        //alert(retrievedValue);
            
         // alert(component.get("v.recordId"));
     },

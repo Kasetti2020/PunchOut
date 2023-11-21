@@ -337,21 +337,22 @@ public class PunchOutLoginCXMLParse {
         String redirectURL;
         ////when punchOut size is Equal to zero
         PunchOut_Request__c rqt=new PunchOut_Request__c();
-        String accesstoken = getAccessToken('11','22','23');
+        String accesstoken = getAccessToken('','','');
         if(punchOut.size()==0){
             
             rqt.BuyerCookie__c=buyerCookie;
-            rqt.TimeStamp__c=DateTime.parse(timeStamp);
+            rqt.TimeStamp__c=DateTime.Valueof(timeStamp.replace('T', ' '));
             rqt.payloadID__c=payloadID;
             rqt.Operation__c=operation;
             //insert rqt;
             
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accesstoken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
-            //redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQGEs9UsKhD23li0dZUPAtZSQy9q0XS1BDWfyOeVZ_R0QP2YUgp1_95cEHMwheuw5I83xOCNUjlMUtlltizOMFDLmDIJ_&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
+            //redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQM3A74pUkLyNhe43SIbo3Pl4fNatTNCd8Ikt_G6n.5G__eh13d6pv3i.7VC26iEzaDlQ9w.atDECBvDZNYnIkT._VKVl&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
         }else if(punchOut.size()>0){
             punchOut[0].Operation__c=operation;
-            update punchOut;
+            //update punchOut;
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accesstoken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
+            //redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQM3A74pUkLyNhe43SIbo3Pl4fNatTNCd8Ikt_G6n.5G__eh13d6pv3i.7VC26iEzaDlQ9w.atDECBvDZNYnIkT._VKVl&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
         }
         
         
@@ -367,7 +368,24 @@ public class PunchOutLoginCXMLParse {
         String ClientId1 = '3MVG9N6eDmZRVJOkogIaHQibQG8ckzH2p_YFtzzezrkLFIiIUhbmltIEaIC10eLeL6SdP7Co8ZxGOgqa.3C_T';
         String ClientSecret2 = 'BD9E2C6243CB53A94A7B2E0849B79B5F24933517D1C48BBF819CFF251DDCBC21';
         
+        String endpoint  = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory?response_type=code&client_id='+
+                           ClientId1 + '&redirect_uri=https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/oauth2/callback';                         
+        
         HttpRequest request = new HttpRequest();
+        request.setEndpoint(endpoint);
+        request.setMethod('GET');
+        //request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
+              
+        Http http = new Http();
+        HttpResponse response = http.send(request);
+        System.debug( 'Status<><>>>'+response.getStatusCode());
+        System.debug( 'Body><>>'+response.getBody());
+        
+        return 'Success';
+        
+        
+        
+        /*HttpRequest request = new HttpRequest();
         request.setEndpoint('https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/services/oauth2/token');
         request.setMethod('POST');
         request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -394,7 +412,7 @@ public class PunchOutLoginCXMLParse {
             //return null;
         }
         
-        return accesstoken;
+        return accesstoken;*/
         /*System.debug('clientId><><'+clientId);
         System.debug('clientSecret><><'+clientSecret);
         List<String> names  = UserNameAndPassWord.split('#');

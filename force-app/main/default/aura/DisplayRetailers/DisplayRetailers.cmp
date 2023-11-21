@@ -41,7 +41,7 @@
                     <lightning:icon class="slds-icon" iconName="standard:user" alternativeText="{!$Label.c.Doc_image}" /> {!$Label.c.Retailer} </h2>
             </header>
             <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                <div class="slds-truncate" style="color:#16325c;font-weight:bold;">{!$Label.c.Retailer_Code_Please_select_a_Retailer}</div>
+                <!-- <div class="slds-truncate" style="color:#16325c;font-weight:bold;">{!$Label.c.Retailer_Code_Please_select_a_Retailer}</div> -->
                 
                 <aura:iteration items="{!v.RoList}" var="retail" >
                     <aura:if isTrue="{!retail.Online_Enquiry__c}">

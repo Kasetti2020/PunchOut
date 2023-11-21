@@ -249,7 +249,7 @@ CurrCode = ResCurr[0];
         Map<Id,String> addToCartData=new Map<Id,String>();
         Map<Id,String> addedaslabelData=new Map<Id,String>();
         Map<Id,Decimal> addToCartQuantity=new Map<Id,Decimal>();
-        Map<Id,String> prodIdaddedColorListMap=new Map<Id,String>();
+        Map<Id,String> prodIdaddedColorListMap=new Map<Id,String>(); 
         try
         {
             //contact contactid=UtilityClass.getCurrentUserContact();
@@ -955,7 +955,7 @@ CurrCode = ResCurr[0];
     public static Sales_Order__c checkRetailerInSO(String customerid)
     {
         Sales_Order__c cartSO=UtilityClass.getSORecordAsCart(customerid);
-        system.debug('cartSO'+cartSO);
+        system.debug('c'+cartSO);
         if(cartSO.Id != null)
         {
             return cartSO;

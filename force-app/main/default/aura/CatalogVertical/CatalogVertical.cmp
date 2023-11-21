@@ -1,5 +1,6 @@
 <aura:component controller="CatalogOrderController"  implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
     <aura:handler name="init" action="{!c.doInit}" value="{!this}"/>
+      <aura:attribute name="recordId" type="String"/>
     <!--Declare Attributes-->
     <aura:attribute name="completeWrap" type="object" /> 
     <aura:attribute name="selectedCompany" type="String"/>

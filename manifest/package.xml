@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
 	<types>
-		
 		<members>PunchOutCXMLgenerate</members>
 		<members>PunchOutLoginCXMLParse</members>
 		<members>PunchOutOrderCXMLParse</members>
+		<members>PunchOutOrderCreation</members>
 		<members>PunchOutWebService</members>
 		<members>SOController</members>
-		<members>PunchOutOrderCreation</members>
+		<members>UtilityClass</members>
+		<members>UtilityClassTest</members>
 		<name>ApexClass</name>
 	</types>
 	<types>
