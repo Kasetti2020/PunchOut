@@ -434,10 +434,13 @@
                var myParamValue = response.getReturnValue();
         console.log('checkingAddAndCloneData>>'+myParamValue);
         // Construct the URL with the parameter
-        var vfPageUrl = '/apex/MyVisualforcePage?myParam=' + encodeURIComponent('myParamValue');
+       // var vfPageUrl = '/apex/MyVisualforcePage?myParam=' + encodeURIComponent(myParamValue);
 
         // Navigate to the Visualforce page
-        window.location.href = vfPageUrl;
+       // window.location.href = vfPageUrl;
+        var urlString = window.location.href;
+                        var CommunityBaseURL = urlString.substring(0, urlString.indexOf("/s/"));
+                        window.location = CommunityBaseURL+'/s/punchoutpage?myParam='+ encodeURIComponent(myParamValue);
 
             }
             else if(state === 'ERROR'){

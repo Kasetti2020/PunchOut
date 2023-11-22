@@ -1,0 +1,74 @@
+td, th {
+    border-bottom: 1px solid rgb(1, 1, 1);
+    } 
+    .slds-modal__header{
+      width: 100%; 
+    }
+     
+    .radio-group-container {
+      display: flex;
+      flex-direction: row; /* Horizontal layout */
+      align-items: center; /* Center items vertically (optional) */
+  }
+      .table-body{
+          margin: 3px 0px 2px 0px;
+          border: 1px solid rgb(214, 214, 214);
+          margin-top: 5Px;
+          height: auto;
+          width:100%;
+          }
+          .table-header{
+            /* z-index: 99999999; */
+            position: sticky;
+            background-color: rgb(214, 214, 214);
+            }
+            .Main2{
+              width: 100%;
+              margin: -4px 0px 2px 0px;
+              /* margin-left: 0.5%; */
+              padding-left: 25%;
+              padding-right: 25%;
+            
+            }.button{
+              margin-left: 90%;
+              margin-bottom: -15px;
+            }
+            thead th {
+              background-color: hsl(0, 1%, 45%); /* Change this to your desired background color */
+              color: #e4dddd; /* Change this to your desired font color */
+              /* Add other styling properties as needed */
+            }
+            
+            .datatable{
+              /* width: 700px; */
+               padding-left: 25%;
+               padding-right: 25%; 
+            }
+
+            .slds-modal_medium{
+              width: 700px;
+              position: center;
+              padding-left: 650px;
+            }
+            lightning-textarea{
+             /* height: 200px ; */
+             --sds-c-textarea-sizing-min-height:200px;
+            }
+
+            .horizontal-radio-group {
+              margin-top: 20px;
+              margin-left: 50px;
+              display: flex;
+          }
+      
+          .radio-button {
+              margin-right: 20px; /* Adjust spacing between radio buttons as needed */
+          }
+
+         lightning-spinner{
+          margin-top:25%;
+          margin-bottom: 25%;
+          max-width: 800px;
+          max-height: 700px;
+          /* color: rgba(0, 0, 0, 0); */
+         }

@@ -1,24 +1,36 @@
 ({
     
-    init : function(component, event, helper) {  
-       let ref = component.get('v.pageReference');
-      //  alert(JSON.stringify(ref));
+   /* doInit : function(component, event, helper) {
+        
+        let ref = component.get('v.pageReference');    
         let param1 = ref.state.c__param1;
-      //  alert('param1456784>>'+param1);
         let param2 = ref.state.c__param2;
-//alert('param2>>'+param2);
-         let param3 = ref.state.c__param3;
-    //   alert('param3>>'+param3);
+        alert('param1');
+        //Assigning the data back to an attribute
+        component.set( 'v.param1', param1);
+        component.set( 'v.param2', param2);
+    },*/
+    
+    init : function(component, event, helper) {  
+    
+       let ref = component.get('v.pageReference');    
+         alert('ref>>>>'+JSON.stringify(ref));
+        let param1 = ref.state.c__service;
+        let param2 = ref.state.c__country;
+        let param3 = ref.state.c__result;
+        alert('param1>>'+param1);
+        alert('param2>>>>>'+param2);
+        alert('param3>>>>>'+param3);
         //Assigning the data back to an attribute
         component.set( 'v.servType', param1);
-        component.set( 'v.counrty', param2);
-        component.set( 'v.radioButtonValue', param3);
-        
+        component.set( 'v.country', param2);
+        component.set( 'v.sericetypeId', param3);
 
+             
             },
             
             
-             
+            
             myControllerMethod: function(component, event, helper) {
             helper.callmyControllerMethod(component, event, helper);
             },
@@ -37,11 +49,14 @@
             handleChange2 : function(component, event, helper){
             var selField = event.target.id;
             var selectedValue = event.getSource().get("v.value");
+              //  alert('selectedValue>>>'+selectedValue);
             component.set("v.SelectedObj",selectedValue); 
             },
             handleChildObjName : function(component, event, helper){
             var selectedField = event.target.id;
+               // alert('selectedField>>>'+JSON.stringify(selectedField));
             var childObjValue = event.getSource().get("v.value");
+              //  alert('childObjValue>>'+childObjValue);
             component.set("v.SelChildObjName",childObjValue); 
             },
             
@@ -53,6 +68,8 @@
             
             saveHandler:function(component, event, helper) {
             helper.callsaveHandler(component,event,helper);  
+          //  alert('Before call redirect');
+            //helper.callnavigateToParentComponent(component,event,helper);
             },
             
             activeButton:function(component, event, helper) {
@@ -127,8 +144,13 @@
         var records = component.get("v.selectedLeads");
         helper.deltingCheckboxAccounts(component, event,helper,records);
     },
+        handleClick: function(component, event, helper){
+            helper.callnavigateToParentComponent(component,event,helper);
+    },
     
     navigateToParentComponent:function(component, event, helper) {
+      //  alert('Inside Close Button');
+       
         helper.callnavigateToParentComponent(component,event,helper);
     },
     
@@ -161,4 +183,7 @@
         var parentComponent = component.get("v.parent");                         
         parentComponent.greetingMethod();
     },
+      navigateToSecondSlide: function (component, event, helper) {
+        component.set("v.mapPage", true);
+    }
 })

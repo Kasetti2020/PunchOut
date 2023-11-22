@@ -1,0 +1,113 @@
+<template>
+    <div class="slds-align_absolute-center">
+        <div class="Main">
+            <template if:true={InsertJosnData}>
+                <template if:true={showmyspinner}>
+                    <div class="outerBox spinner">
+                        <lightning-spinner variant="brand" size="medium"></lightning-spinner>
+                    </div>
+                </template>
+                <div class="yo">
+                    <div class="slds-align_absolute-center">
+                        <lightning-card>
+                            <div class="slds-p-top_low slds-p-bottom_low">
+                                <div class="slds-align_absolute-center">
+                                    <div class="abc">
+                                        <h6><b><u>IMPORTING JSON DATA</u></b></h6>
+                                    </div>
+                                </div>
+                                <div class="slds-modal__content slds-p-around_medium">
+                                    <div class="slds-grid slds-gutters slds-p-right_xx-small slds-p-horizontal_x-large">
+                                        <div class="slds-col">
+                                            <lightning-input name="select" label="Country Code :" value='Germany'
+                                                required="true" style="width: 250px;" disabled="true"></lightning-input>
+                                        </div>
+                                        <div class="slds-col">
+                                            <lightning-input name="select" label="Service Type :" value='Sales Order Request'
+                                                required="true" style="width: 250px;" disabled="true"></lightning-input>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="box">
+                                    <div class="box2">
+                                        <div class="slds-m-horizontal_medium">
+                                            <div class="area">
+                                                <h5><b><u>INSERT JSON DATA</u></b></h5>
+                                                <lightning-textarea type="String" value={record} onchange={activeButton}
+                                                    required="true"></lightning-textarea>
+                                            </div>
+                                        </div>
+                                        <div class="buttonsprev">
+                                           <!-- <lightning-button label="Close" onclick={navigateToParentComponent}
+                                                variant="destructive"></lightning-button>&nbsp;&nbsp; -->
+                                            <lightning-button label="Next" onclick={myControllerMethod} disabled={disabled}
+                                                variant="destructive"></lightning-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </lightning-card>
+                    </div>
+                </div>
+            </template>
+            <template if:true={mapPage}>
+                <template if:true={showmyspinner}>
+                    <div class="outerBox spinner">
+                        <lightning-spinner variant="brand" size="medium"></lightning-spinner>
+                    </div>
+                </template>
+                <div>
+                    <div class="yo2">
+                        <lightning-card>
+                            <div class="slds-align_absolute-center">
+                                <div class="abc">
+                                    <h6><b><u>MAPPING JSON FIELDS WITH OBJECT FIELDS</u></b></h6>
+                                </div>
+                            </div>
+                            <div class="box3">
+                                <div class="box8">
+                                    <div class="slds-m-horizontal_low">
+                                        <div class="slds-grid slds-p-top_low">
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large">
+                                                <h5><b><u>Json Fields</u></b></h5>
+                                            </div>
+                                            <!-- <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large">
+                                                <h5><b><u>Base Order</u></b></h5>
+                                            </div>
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large">
+                                                <h5><b><u>Base Order Detail</u></b></h5>
+                                            </div>
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large">
+                                                <h5><b><u>Select Fields</u></b></h5>
+                                            </div> -->
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large">
+                                                <h5><b><u>Sales Order</u></b></h5>
+                                            </div>
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large">
+                                                <h5><b><u>Sales Order Line Item</u></b></h5>
+                                            </div>
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large">
+                                                <h5><b><u>Select Fields</u></b></h5>
+                                            </div>
+                                        </div>
+                                
+                                       
+                                        <template for:each={storejson} for:item="item" for:index="row">
+                                           <c-child-lwc key={item.Id}  item={item} row={row} storejson={storejson}></c-child-lwc>
+                                        </template>
+                                    </div>
+                                    <div class="buttonss">
+                                        <div class="slds-align_absolute-center">
+                                            <lightning-button label="Previous" onclick={previousPage} variant="destructive"></lightning-button>&nbsp;&nbsp;
+                                            <lightning-button label="Save" onclick={saveHandler} variant="destructive"></lightning-button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </lightning-card>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

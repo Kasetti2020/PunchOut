@@ -1,0 +1,22 @@
+<aura:component description="LightningFlow"  implements="lightning:isUrlAddressable,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
+    <!-- <aura:attribute name="mainettiERP" type="boolean" default="false"/> -->
+    
+    <aura:attribute name="inputValue1" type="String"/>
+    <aura:attribute name="inputValue2" type="String"/>
+    <aura:method name="greetingMethod" action="{!c.backToLwc}" access="public" />
+    <aura:attribute name="jsonSample" type="string" />
+    
+    <aura:attribute name="serviceRecId" type="Id"/>
+    <aura:attribute name="actionName" type="String"/>
+   
+    
+    <!-- <aura:if isTrue="{!v.mainettiERP}"> -->
+    <div aura:id="passaura" class="slds-hide">
+        
+        <c:PassJsonDataCloneForOutput parent="{!this}" servType="{!v.inputValue1}" counrty="{!v.inputValue2}" record="{!v.jsonSample}" actionNameVar="{!v.actionName}" serviceRecordId="{!v.serviceRecId}" ></c:PassJsonDataCloneForOutput>
+    </div>
+    <div aura:id="servicelwc" class="slds-show">
+        <c:mainettiServiceType  onvaluechangeForOutPut="{!c.getValueFromLwc}" onpassJson="{!c.getValueFromLwc2}"></c:mainettiServiceType>
+    </div>
+    
+</aura:component>

@@ -295,9 +295,9 @@ public class PunchOutLoginCXMLParse {
         
         list<Base_Order__c> base=[select Id,PunchOut_Request__c from Base_Order__c where PunchOut_Request__c=:punchOutId And PunchOut_Status__c='Product Added'];
         
-        delete base;
+        //delete base;
 
-		delete  punch;      
+		//delete  punch;      
         System.debug(cxml);
         String returnSetupResp;
         /////From Wrapper class 
@@ -337,7 +337,7 @@ public class PunchOutLoginCXMLParse {
         String redirectURL;
         ////when punchOut size is Equal to zero
         PunchOut_Request__c rqt=new PunchOut_Request__c();
-        String accesstoken = getAccessToken('','','');
+        String accesstoken = getAccessToken1('','','');
         if(punchOut.size()==0){
             
             rqt.BuyerCookie__c=buyerCookie;
@@ -362,10 +362,27 @@ public class PunchOutLoginCXMLParse {
     }
     
     
-    public static string getAccessToken(String clientId, String clientSecret,string UserNameAndPassWord) {
+    public static string getAccessToken1(String clientId, String clientSecret,string UserNameAndPassWord) {
+        
+        Auth.JWT jwt = new Auth.JWT();
+        jwt.setSub('magnetv20@mainetti.com');
+        jwt.setAud('https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory'); 
+        jwt.setIss('3MVG9N6eDmZRVJOkogIaHQibQG3Kxu.3E32SkEsZqJKUIjsuxUe.yrCNjHPXBeHR91gWPfhtVcx3rkxYOpSMm');
+        
+        //Create the object that signs the JWT bearer token
+        Auth.JWS jws = new Auth.JWS(jwt,'salesforcemainetti');
+        String token = jws.getCompactSerialization();
+        String tokenEndpoint ='https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/services/oauth2/token';
+        
+        Auth.JWTBearerTokenExchange bearer = new Auth.JWTBearerTokenExchange(tokenEndpoint, jws);
+        
+        //Get the access token
+        String accessToken = bearer.getAccessToken();
+        system.debug('Access Token-->'+accessToken);
+        return accessToken;
         
         
-        String ClientId1 = '3MVG9N6eDmZRVJOkogIaHQibQG8ckzH2p_YFtzzezrkLFIiIUhbmltIEaIC10eLeL6SdP7Co8ZxGOgqa.3C_T';
+        /*String ClientId1 = '3MVG9N6eDmZRVJOkogIaHQibQG8ckzH2p_YFtzzezrkLFIiIUhbmltIEaIC10eLeL6SdP7Co8ZxGOgqa.3C_T';
         String ClientSecret2 = 'BD9E2C6243CB53A94A7B2E0849B79B5F24933517D1C48BBF819CFF251DDCBC21';
         
         String endpoint  = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory?response_type=code&client_id='+
@@ -381,7 +398,7 @@ public class PunchOutLoginCXMLParse {
         System.debug( 'Status<><>>>'+response.getStatusCode());
         System.debug( 'Body><>>'+response.getBody());
         
-        return 'Success';
+        return 'Success';*/
         
         
         

@@ -1,10 +1,20 @@
 .THIS.margin {
     margin-top:5px
 }
+.THIS.header {
+        background-color: red;
+}
+.THIS.myModal .lds-page-header__name-title{
+ background: #e22319; 
+} 
 
 
 
 .THIS .card{
+    height:800px;
+    width:800px;
+}
+.THIS .lightningCard1{
     height:800px;
     width:800px;
 }
@@ -141,9 +151,6 @@
     background-color:#eee
    }
     
-.THIS .movebutton {
-    margin-left :80px ;
-}
   
    .THIS .outer-div {
     position: relative;
@@ -170,30 +177,33 @@
     margin-top:20px;
 } 
 .THIS .box2{
-    margin-bottom:20px;
+    margin-bottom:100px;
 }
 .THIS .area{
     --sds-c-textarea-sizing-min-height:300px;
     }
     .THIS .buttonsprev{
         margin-top:20px;
-        margin-left:330px;
+        margin-left:320px;
     }
     .THIS .yo1{
         margin-top:10px;
         width:730px;
     }
     .THIS .abc{
-        background-color: white;
+        background-color: white; 
     }
+    .THIS .my-card-container {
+    margin: 40px;
+    padding: 40px;
+}
     .THIS .box8 { 
-       margin-top:15px;
+        margin-top:15px;
         width:800px;
-        margin-bottom:20px;
+        margin-bottom:180px;
     }
     .THIS .hhh {  
         margin-top:23px;
-        padding-left: 50px;
     } 
     .THIS .buttons{
         margin-top:40px;
@@ -201,17 +211,31 @@
     }
     .THIS .yo2{
         margin-top:10px;
-        width:1510px;
+        width:860px;
+    }
+        .THIS .yo3{
+        margin-top:10px;
+        width:860px;
     }
     .THIS .abcde{
         margin-left:200px;
     }
     .THIS .buttonss{
-        margin-top:15px;
-        margin-left:660px;
+        margin-top:30px;
+        margin-left:370px;
     }
-    
-  
+        .THIS .sencondButton{
+        margin-top:30px;
+       margin-left:-350px;
+
+    }
+    .THIS .HomeButton{
+       margin-left:-260px;
+    }
+    .THIS .HomeButton1{
+       margin-left:-220px;
+    }
+   
     .THIS .area1{
         --sds-c-textarea-sizing-min-height:100px;
         }

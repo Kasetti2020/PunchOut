@@ -1,0 +1,100 @@
+<template>
+<lightning-card>
+<div class="slds-align_absolute-center"  style="width:800px;">
+<div class="yo2" >
+    <div class="slds-align_absolute-center">
+        <div class="abc">
+            <h6><b><u>MAPPING JSON FIELDS WITH OBJECT FIELDS</u></b></h6>
+        </div>
+    </div>
+    <br/>
+    <div class="box3" >
+        <div class="box8" >
+            <div class="slds-m-horizontal_low">
+                <div class="slds-grid slds-p-top_low">
+                    <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large">
+                        <h5><b><u>Json Fields</u></b></h5>
+                    </div>
+                    <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                        <h5><b><u>Sales Order</u></b></h5>
+                    </div>
+                    <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                        <h5><b><u>Sales Order Line Item</u></b></h5>
+                    </div>
+                    <div class="slds-size_1-of-5 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                        <h5><b><u>Select Fields</u></b></h5>
+                    </div>
+                    <div class="slds-size_1-of-5 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                        <h5><b><u>Mandatory Fields</u></b></h5>
+                    </div>
+                    <!-- Add more headings as needed -->
+                </div>
+                </div>
+            </div>
+                   
+         
+            <template for:each={storejson} for:item="item" isdisabled={isdisabled}  for:index="row"> 
+                    <!-- <template if:true={areDetailsVisible}> -->
+            <!-- <c-childcmp item={item} key={item.Name} id={item.Name} data-index={row} forobjectfieldnames={forobjectfieldnames} showtoast={ShowToastEvent} storejson={storejson} isdisabled={isdisabled}></c-childcmp> -->
+            
+            <div key={item.ObjectNames1__c} class="slds-grid slds-p-top_low">
+            <div class="slds-grid slds-p-top_low">
+                <div class="slds-size_2-of-8 slds-p-left_xx-small slds-p-horizontal_x-large " >
+                    <lightning-input disabled= "true" value={item.Name} type="text" maxsize="10" placeholder="Enter Json Fields" ></lightning-input>
+                </div>
+                <div  class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
+                    <lightning-combobox
+                    name={objects}
+                    disabled={isdisabled}
+                    value={item.ObjectNames1__c}
+                    options={statusOptions}
+                    onchange={handleStatusChange}>
+                </lightning-combobox>
+                </div>
+                <div  class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
+                    <lightning-combobox
+                    name={objects}
+                    disabled={isdisabled}
+                    value={item.ChildObjectName1__c}
+                    options={statusOptionschild}
+                    onchange={handleStatusChange}>
+                </lightning-combobox>                           
+                 </div>
+                <div id={item} class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large " >
+                    <lightning-combobox
+                    name={objects}
+                    disabled={isdisabled}
+                    value={item.SF_Object1_Field_Name__c}
+                    options={forobjectfieldnames}
+                    onchange={handleStatusChange} onmouseover={clickOptions} >
+                </lightning-combobox>             
+                </div>
+                <div class="hhh ">
+                        <lightning-input checked={item.Mandatory_Field__c}    disabled={isdisabled}        
+                        value={item.Mandatory_Field__c}  type="checkbox"></lightning-input>
+                    </div>
+        </div>
+        <br/>
+        <br/>
+    </div>
+        </template>
+            <br/>
+    </div>
+    <br/>
+
+    <div class="slds-align_absolute-center">
+        <template if:true={savebutton}>
+        <lightning-button label="Save" onclick={SaveHandler}  variant="Destructive"></lightning-button>
+    </template>
+        <template if:true={editandback}>
+        <lightning-button label="Edit" onclick={editpagebutton}   variant="Destructive"></lightning-button>&nbsp;&nbsp;
+        <lightning-button label="Back" onclick={backbutton}   variant="Destructive"></lightning-button>
+        </template>
+        </div>
+
+    <template if:true={calllwcchildforback}>
+        <c-mainetti-Service-Type item={childitem} key={childitem} id={childitem} data-index={row}></c-mainetti-Service-Type>
+    </template>
+    </div>
+</div></div></lightning-card>
+</template>

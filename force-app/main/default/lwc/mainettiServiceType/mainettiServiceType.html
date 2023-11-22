@@ -1,0 +1,106 @@
+<template>
+   <template if:true={showParent}>
+    <div style="padding-left: 25%;padding-right: 25%;">
+      
+       <header class="slds-modal__header" style="background-color: rgb(255, 238, 235);" >
+          <h1 slot="title" style="font-weight:bold;align-content: center;">ERP COUNTRY SERVICE DETAILS</h1>
+          <div class="slds-grid slds-grid_align-end">
+            <div class="slds-col">
+               <lightning-button label="Delete Service" onclick={deleteSelectedRows} variant="destructive" class={deleteButtonClass} ></lightning-button>
+            </div>
+            <div class="slds-col">
+               &nbsp;&nbsp;<lightning-button variant="Destructive" label="Add Service" onclick={showModalPopup} ></lightning-button>
+               </div>
+          </div>
+       </header>  
+    </div>
+  
+      <template if:true={accList} >
+         <div class="datatable">
+          <lightning-datatable  key-field="Id" data={data} columns={columns} 
+                show-row-number-column="true" onrowaction={callRowAction} onrowselection={getSelectedIdAction} >
+            </lightning-datatable>
+         </div>
+      </template>
+      <template if:true={error}>
+          {error}
+      </template>
+   </template>
+  
+
+
+   <template if:true={isShowModal}> 
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+       <div class="slds-modal__container">
+      <lightning-spinner if:true={showSpinner}></lightning-spinner>
+          <header class="slds-modal__header">
+             <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Select ERP Country and Service</h2>
+          </header>
+             <div class="slds-modal__content slds-p-around_medium">
+                <div class="slds-grid slds-gutters slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                   <div class="slds-col">
+                     <!-- <lightning-record-edit-form object-api-name="Partner__c">
+
+                        <div class="slds-col">
+                           <lightning-input-field field-name="Country__c" placeholder="-Select One-" value={value} onchange={handleCountryCodeChange}> </lightning-input-field>
+                        </div>
+                        </lightning-record-edit-form> -->
+                     <lightning-combobox label="ERP Country :" placeholder="-Select One-" value={value} options={countryOptions} onchange={handleCountryCodeChange}></lightning-combobox>
+                   </div>
+                   <div class="slds-col">
+                      <lightning-combobox label="Service Type :" placeholder="-Select One-" options={options} onchange={handleServiceTypeChange}></lightning-combobox>
+                   </div>
+                   <div class="slds-col">
+                     <lightning-combobox label=" CXML or JSON:" placeholder="-Select One-" options={radioCXmlOptions} onchange={handleCXmlOptions}></lightning-combobox>
+                  </div>
+                      <template if:true={isAddService}>
+                         <lightning-input label="Service Type :" placeholder="-Enter Service Type-" type="text" onchange={handleServiceTypeChange}></lightning-input>
+                      </template>
+                  </div> 
+                  <div class="radio-group-container">
+                     <div class="horizontal-radio-group">
+                         <template for:each={radiOptions} for:item="option">
+                             <label key={option.value} class="radio-button">
+                                 <input type="radio" name="radioGroup" value={option.value} onchange={handleRadioChange} />
+                                 {option.label}
+                             </label>
+                         </template>
+                     </div>
+                 </div>
+             </div>
+
+         <footer class="slds-modal__footer">
+             <lightning-button variant="Destructive" label="Cancel" title="Cancel" onclick={hideModalPopup} ></lightning-button>&nbsp;&nbsp;
+             <lightning-button variant="Destructive" label="Next" title="Next" onclick={navigateToAura} ></lightning-button>
+         </footer>
+       </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+   <!-- </lightning-spinner>   -->
+   </template>
+
+<template if:true={isShowChild}>
+      <c-mainetti-json-_-e-r-p  counrty={CountryCode_Value} servtype={serviceType_Value} ></c-mainetti-json-_-e-r-p>
+   </template>
+   
+   <!-- <template if:true={isShowInputJson}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_medium" aria-modal="true">
+               <div class="slds-modal__container">
+                   <div class="slds-modal__header">
+                       <slot name="headercontent"><strong> INPUT JSON-DATA</strong></slot>
+                   </div>
+                   <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1"> 
+                     <lightning-textarea type="string" value={InputJson}></lightning-textarea>
+                  </div>
+           <footer class="slds-modal__footer">
+            <lightning-button variant="Destructive" label="Close" title="close" onclick={hideInputpopup} ></lightning-button>&nbsp;&nbsp;
+
+            <lightning-button variant="Destructive" label="Edit" title="Edit" onclick={editToAuraMapPage} ></lightning-button>
+
+           </footer>
+         </div>
+      </section>
+      <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+     </template> -->
+
+</template>

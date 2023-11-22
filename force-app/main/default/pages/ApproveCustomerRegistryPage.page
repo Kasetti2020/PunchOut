@@ -1,0 +1,28 @@
+<apex:page standardController="Customer_Registry__c" showHeader="false" sidebar="false">
+    
+    <div align="center" draggable="false" >
+        <br/><br/>
+        <body onload="moveTo(0,0); resizeTo(1400,1200);">
+            <apex:includeLightning />
+            <div id="CompDiv"/>
+            <script>
+            $Lightning.use("c:customObjectEditApp", function() {
+             var attributes = {
+            "CloseCurrentWindow1" : "true"
+            };
+             
+                var compName = 'c:ActivateCustomer';
+                $Lightning.createComponent(compName,
+                                           { 
+                                               "recordId" : "{!$CurrentPage.parameters.id}",
+                                               "CloseCurrentWindow" : "true"
+                                           },
+                                           "CompDiv",
+                                           function(cmp) {
+                                               console.log('Component created from VF Page');
+                                           });
+            });
+            </script>
+        </body>
+    </div>
+</apex:page>

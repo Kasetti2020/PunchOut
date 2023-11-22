@@ -1,0 +1,17 @@
+<apex:page Controller="PunchOutOrderMessageController" >
+    <apex:repeat var="case" value="{!StringList}"/> 
+        <h1>
+            hello
+    </h1>
+   <form id="cxml_form" method="POST" action="https://servicerest-xml-137b1767f8f8.herokuapp.com/xml-parser">
+       <input type="hidden" name="cXML-urlencoded" value="{!StringList}"/>
+       
+</form>
+ <script type="text/javascript">
+    document.getElementById('cxml_form').submit()
+    </script>
+        
+    
+    
+    
+</apex:page>

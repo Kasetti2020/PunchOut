@@ -1,142 +1,29 @@
-<aura:component  description="LightningFlow" implements="lightning:isUrlAddressable,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" 
-                access="global" controller="PassJsonDataController">
+<aura:component description="LightningFlow"
+    implements="lightning:isUrlAddressable,force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction"
+    access="global"
+    controller="PassJsonDataControllerForOutPut">
     
     <aura:handler name="init" value="{! this }" action="{! c.init }"/>
-  <lightning:navigation aura:id="navService"/>
-
-    <!-- <aura:registerEvent name="MainettiJSON" type="c:MainettiJSON" />  -->
-    <aura:attribute name="parent" type="Aura.Component"/>
-    <aura:attribute name="servType" type="String" />
-    <aura:attribute name="counrty" type="String" />
-    <aura:attribute name="serviceRecordId" type="Id"/>
-    <aura:attribute name="actionNameVar" type="string"/>
-    <aura:attribute name="SelChildObjName" type="string"/>
-    
-    
-      
-    <aura:attribute name="lookUpObj" type="List" />
-    <aura:attribute name="lookupObjFields" type="List" />
-    <aura:attribute name="SelObj" type="String"/>
-    <aura:attribute name="SelectedObj" type="String"/>
-    
-    <aura:attribute name="allField" type="List" />
-    <aura:attribute name="getAllField" type="List" />
-    
-    <aura:attribute name="allObject" type="List" />
-    <aura:attribute name="getAllObject" type="List" />
-    
-    <aura:attribute name="allChildObj" type="List" />
-    <aura:attribute name="allChildObject" type="List" />
-    
-    <aura:attribute name="outputComp" type="Aura.Component"/>
-    <aura:attribute name="radioButtonValue" type="string"/>
-    
-    <aura:attribute name="record" type="String" />
-    <aura:attribute name="records" type="String"/>
-    <aura:attribute name="storejson" type="JF_SF_Field_Mapping__c[]"/>
-    <aura:attribute name="serviceremoveZerofromkeyType" type="String"/>
-    
-    <aura:attribute name="objectOptions" type="List" />
-    <aura:attribute name="selectedValue" type="String" default="" />
-    <aura:attribute name="mapPage" type="boolean" default="false"/> 
-    <aura:attribute name="spinner" type="boolean" default="false"/>
-    <aura:attribute name="jsonParse" type="case[]"/>
-    <aura:attribute name="requiredfield" type="case[]"/>
-    
-    <aura:attribute  name="InsertJosnData" type="Boolean" default="true"/>
-    <aura:attribute  name="ServiceTypedetails1" type="Boolean" default="false"/>
-    <aura:attribute  name="PostmanLink" type="Boolean" default="false"/>
-    <aura:attribute name="recordName" type="String"/>
-    <aura:attribute name="ButtonShow" type="boolean" default="false"/>
-    <aura:attribute name="columns" type="List"/> 
-    <aura:attribute name="data" type="Object"/> 
-    <aura:attribute name="showDeleteBox" type="boolean" default="false"/>
-    <aura:attribute name="selectedLeads" type="List"/>
     <aura:attribute name="ServiceTypeEdit" type="Boolean" default="false"/>
     <aura:attribute name="PreviousValid" type="Boolean" default="false"/>
-    <aura:attribute name="showmyspinner" type="Boolean" default="false" />
-    <aura:attribute name="selectedRowsCount" type="Integer" default="0"/>
-    <aura:attribute name="current" default="s" type="String"/>
-    <aura:attribute name="validateprogressbar" type="Boolean" default="false" />
-    <aura:attribute name="validateprogressbarpage" type="Boolean" default="false" />
-    <aura:attribute name="validateprogressbarforfinal" type="Boolean" default="false" />
-    <aura:attribute name="showProgressBar" type="Boolean" default="true" />
-    
-    <aura:attribute  name="mapPageForPreview" type="Boolean" default="false"/>
-    
+     <aura:attribute name="allField" type="List" />
+    <aura:attribute name="allObject" type="List" />
+     <aura:attribute name="storejson" type="JF_SF_Field_Mapping__c[]" />
+    <aura:attribute name="getAllObject" type="List" />
+    <aura:attribute name="getAllField" type="List" />
+    <aura:attribute name="allChildObject" type="List" />
+     <aura:attribute name="allChildObj" type="List" />
+    <aura:attribute name="EditPage" type="Boolean" default="true"/>
+    <aura:attribute name="UpdateRecordPage" type="Boolean" default="false"/>
     <aura:attribute name="calllwcforback" type="Boolean" default="false"/>
+    <aura:attribute name="SelChildObjName" type="string"/>
+    <aura:attribute name="SelectedObj" type="String"/>
+    <aura:attribute name="ServiceTypeId" type="String"/>
+    <aura:attribute name="showmyspinner" type="Boolean" default="false" />
     
-    
-<aura:method name="greetingMethod" action="{!c.getMessage}" access="public">
-	<aura:attribute name="GreetingParam" type="String" default="Hello"/> 
-	<aura:attribute name="PersonNameParam" type="String" default="John"/> 
-</aura:method>    
-    
-    
-    
-    
-    <div class="slds-align_absolute-center" >
-        <div class="Main">
-            <!-- <aura:if isTrue="{!v.showProgressBar}">
-            <lightning:progressIndicator currentStep="{!v.current}" type="path" >
-                <lightning:progressStep label="Service Type" value="s1" onclick="{!c.Step1}"  />
-                <lightning:progressStep label="Json Importing" value="s2" onclick="{!c.Step2}" />
-                <lightning:progressStep label="Mapping With Fields" value="s3" onclick="{!c.Step3}" />
-                <lightning:progressStep label="Preview JSON" value="s4" onclick="{!c.Step4}" />       
-            </lightning:progressIndicator>
-            </aura:if> -->
-            
-            <aura:if isTrue="{!v.InsertJosnData}">
-                
-                <aura:if isTrue="{!v.showmyspinner}">
-                    <div class="outerBox spinner">
-                        <lightning:spinner aura:id="mySpinner" variant="brand" size="medium" class='slds=hide'/>
-                    </div>
-                </aura:if>
-                
-                <div class="yo">
-                    <div class="slds-align_absolute-center" >   
-                        <lightning:card  > 
-                            <div class="slds-p-top_low slds-p-bottom_low">	
-                                <div class="slds-align_absolute-center" >
-                                    <div class="abc">
-                                        <h6><b><u>IMPORTING INPUT JSON DATA</u></b></h6>
-                                    </div>
-                                </div>
-                                <div class="slds-modal__content slds-p-around_medium">
-                                    <div class="slds-grid slds-gutters slds-p-right_xx-small slds-p-horizontal_x-large "  >
-                                        <div class="slds-col">
-                                            <lightning:input aura:id="Country" name="select" label="Country Code :" value="{!v.counrty}" required="true" style="width: 250px;"  disabled="true" ></lightning:input>
-                                        </div>
-                                        <div class="slds-col">
-                                            <lightning:input aura:id="Service" name="select" label="Service Type :" value="{!v.servType}" required="true"  style="width: 250px;" disabled="true"></lightning:input>
-                                        </div>
-                                        
-                                    </div>
-                                </div>
-                                <div class="box" >
-                                    <div class="box2">
-                                        <div class="slds-m-horizontal_medium"> 
-                                            <div class="area"> 
-                                                <h5> <b><u>INSERT JSON DATA</u></b></h5>
-                                                <lightning:textarea  type="String" aura:id="Data"  value="{!v.record}" onchange ="{!c.activeButton}" required="true"  />
-                                            </div>
-                                        </div> 
-                                        <div class="buttonsprev">
-                                            <lightning:button label="Close" onclick="{!c.navigateToParentComponent}" variant="Destructive"></lightning:button> 
-                                            <lightning:button label="Next" onclick="{!c.myControllerMethod}" disabled="{!v.disabled}"  variant="Destructive"></lightning:button>
-                                        </div>
-                                    </div>     
-                                </div>
-                            </div>
-                        </lightning:card>
-                    </div>     
-                </div>   
-            </aura:if>
-            
-            <aura:if isTrue="{!v.mapPage}">
-                
-                <aura:if isTrue="{!v.showmyspinner}">
+  
+ <aura:if isTrue="{!v.EditPage}">
+                 <aura:if isTrue="{!v.showmyspinner}">
                     <div class="outerBox spinner">
                         <lightning:spinner aura:id="mySpinner" variant="brand" size="medium" class='slds=hide'/>
                     </div>
@@ -145,14 +32,14 @@
                 <div >
                     <div class="yo2">
                         <lightning:card>
-                                <div class="slds-align_absolute-center" >
+                            <div class="slds-align_absolute-center" >
                                 <div class="abc">
                                     <h6><b><u>MAPPING JSON FIELDS WITH OBJECT FIELDS</u></b></h6>
                                 </div>
                             </div>
                             <div class="box3" >
                                 <div class="box8">
-                                    <div class="slds-m-horizontal_medium">     
+                                    <div class="slds-m-horizontal_low">     
                                         <div class="slds-grid slds-p-top_low">
                                             <div class="slds-size_2-of-8     slds-p-right_xx-small slds-p-horizontal_x-large "   >
                                                 <h5><b><u>Json Fields</u></b></h5>
@@ -175,9 +62,9 @@
                                             <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
                                                 <h5><b><u>Select Fields</u></b></h5>
                                             </div>
-                                           <div class="slds-size_1-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                                             <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
                                                 <h5><b><u>Mandatory Fields</u></b></h5>
-                                           </div>
+                                            </div>
                                             <!-- <div class="slds-size_1-of-6 slds-p-right_xx-small slds-p-horizontal_x-large "  >
                                         <h5><b><u>Date Formation</u></b></h5>
                                     </div> -->
@@ -192,14 +79,163 @@
                                                 </div>
                                                 <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
                                                     
-                                                    <lightning:select name="objects" aura:id="objectId" value="{!item.ObjectNames1__c}" onchange="{!c.handleChange}" disabled= "true">
+                                             
+                                                     <lightning:select name="objects" aura:id="objectId" value="{!item.ObjectNames1__c}" onchange="{!c.handleChange}" disabled= "true" >
+                                                        <option value="">choose one...</option>
                                                         <aura:iteration items="{!v.allObject}" var="object">
                                                             <option text="{!object.key}" value="{!object.key}" selected="{!object.selected}"/>
                                                         </aura:iteration>
                                                     </lightning:select>
                                                 </div>
                                                 <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
-                                                    <lightning:select name="objects" aura:id="childObjectId" value="{!item.ChildObjectName1__c}" >
+                                                    <lightning:select name="objects" aura:id="childObjectId" value="{!item.ChildObjectName1__c}" disabled= "true" >
+                                                        <option value="">choose one...</option>
+                                                        <option value="{!item.ObjectNames1__c}">Parent Fields</option>
+                                                        <aura:iteration items="{!v.allChildObj}" var="childObject">
+                                                            <aura:if isTrue="{!item.ObjectNames1__c == childObject.key }">
+                                                                <aura:iteration items="{!childObject.value}" var="childObject">
+                                                                    <option text="{!childObject}" value="{!childObject}" selected="{!childObject.selected}"/>
+                                                                </aura:iteration>
+                                                            </aura:if>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large " >
+                                                    <lightning:select name="allField"  aura:id="fieldId" value="{!item.SF_Object1_Field_Name__c}" disabled= "true">
+                                                        <option value="">choose one...</option>
+                                                        <aura:iteration items="{!v.allField}"  var="mapKey" indexVar="key">
+                                                            <aura:if isTrue="{!item.ChildObjectName1__c == mapKey.key }">
+                                                                <aura:iteration items="{!mapKey.value}" var="mapValue">
+                                                                    <option text="{!mapValue}" value="{!mapValue}" selected="{!mapValue.selected}"/>
+                                                                </aura:iteration>
+                                                            </aura:if>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                                
+                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
+                                                    <lightning:select name="getAllObject" aura:id="objectsId" value="{!item.ObjectNames2__c}" onchange="{!c.handleChange2}" disabled= "true">
+                                                        <option value="">choose one...</option>
+                                                        <aura:iteration items="{!v.getAllObject}" var="object2">
+                                                            <option text="{!object2.key}" value="{!object2.key}" selected="{!object2.selected}"/>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
+                                                    <lightning:select name="objects" aura:id="childObjectId" value="{!item.ChildObjectName2__c}"  onchange="{!c.handleChildObjName}" disabled= "true">
+                                                        <option value="">choose one...</option>
+                                                        <option value="{!item.ObjectNames2__c}">Parent Fields</option>
+                                                        <aura:iteration items="{!v.allChildObject}" var="childObj">
+                                                            <aura:if isTrue="{!item.ObjectNames2__c == childObj.key }">
+                                                                <aura:iteration items="{!childObj.value}" var="childObj">
+                                                                    <option text="{!childObj}" value="{!childObj}" selected="{!childObj.selected}"/>
+                                                                </aura:iteration>
+                                                            </aura:if>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large " >
+                                                    <lightning:select name="getAllField"  aura:id="fieldId" value="{!item.SF_Object2_Field_Name__c}" disabled= "true">
+                                                        <option value="">choose one...</option>
+                                                        <aura:iteration items="{!v.getAllField}"  var="mapKeys" indexVar="key">
+                                                            <aura:if isTrue="{!item.ChildObjectName2__c == mapKeys.key }">
+                                                                <aura:iteration items="{!mapKeys.value}" var="mapValue2">
+                                                                    <option text="{!mapValue2}" value="{!mapValue2}" selected="{!mapValue2.selected}"/>
+                                                                </aura:iteration>
+                                                            </aura:if>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                                
+                                                 <div class="hhh">
+                                                        <lightning:input checked="{!item.Mandatory_Field__c}" value="{!item.Mandatory_Field__c}"  type="checkbox" aura:id="boxPackFields" disabled= "true" />
+                                                    </div>
+                                            </div>
+                                             
+                                                
+                                            
+                                        </aura:iteration>
+                                        
+                                        <br></br>
+                                    </div>
+                                    <div class="buttonss">
+                                        <lightning:button label="Back" onclick="{!c.Behind}"   variant="Destructive" ></lightning:button>
+                                <lightning:button label="Edit" onclick="{!c.PreviewJSON}" iconPosition="right" variant="Destructive"></lightning:button>
+                                    </div> 
+                                </div>      
+                            </div>                             
+                        </lightning:card>             
+                    </div>
+                </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!v.UpdateRecordPage}">
+        
+        <aura:if isTrue="{!v.showmyspinner}">
+                    <div class="outerBox spinner">
+                        <lightning:spinner aura:id="mySpinner" variant="brand" size="medium" class='slds=hide'/>
+                    </div>
+                </aura:if>
+                <div >
+                    <div class="yo2">
+                        <lightning:card>
+                            <div class="slds-align_absolute-center" >
+                                <div class="abc">
+                                    <h6><b><u>MAPPING JSON FIELDS WITH OBJECT FIELDS</u></b></h6>
+                                </div>
+                            </div>
+                            <div class="box3" >
+                                <div class="box8">
+                                    <div class="slds-m-horizontal_low">     
+                                        <div class="slds-grid slds-p-top_low">
+                                            <div class="slds-size_2-of-8     slds-p-right_xx-small slds-p-horizontal_x-large "   >
+                                                <h5><b><u>Json Fields</u></b></h5>
+                                            </div>
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                                                <h5><b><u>Base Order</u></b></h5>
+                                            </div>
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                                                <h5><b><u>Base Order Detail</u></b></h5>
+                                            </div>
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                                                <h5><b><u>Select Fields</u></b></h5>
+                                            </div>
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                                                <h5><b><u>Sales Order</u></b></h5>
+                                            </div>
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                                                <h5><b><u>Sales Order Line Item</u></b></h5>
+                                            </div>
+                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                                                <h5><b><u>Select Fields</u></b></h5>
+                                            </div>
+                                             <div class="slds-size_1-of-5 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                                                <h5><b><u>Mandatory Fields</u></b></h5>
+                                            </div>
+                                            <!-- <div class="slds-size_1-of-6 slds-p-right_xx-small slds-p-horizontal_x-large "  >
+                                        <h5><b><u>Date Formation</u></b></h5>
+                                    </div> -->
+                                            
+                                        </div>
+                                        
+                                        <aura:iteration items="{!v.storejson}" var="item" indexVar="row">
+                                            
+                                            <div class="slds-grid slds-p-top_low">
+                                                <div class="slds-size_2-of-8 slds-p-left_xx-small slds-p-horizontal_x-large " >
+                                                    <lightning:input disabled= "true" value="{!item.Name}" type="text" maxsize="10" aura:id="cmpname" placeholder="Enter Json Fields" />
+                                                </div>
+                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
+                                                    
+                                             
+                                                     <lightning:select name="objects" aura:id="objectId" value="{!item.ObjectNames1__c}" onchange="{!c.handleChange}" disabled= "true" >
+                                                        <option value="">choose one...</option>
+                                                        <aura:iteration items="{!v.allObject}" var="object">
+                                                            <option text="{!object.key}" value="{!object.key}" selected="{!object.selected}"/>
+                                                        </aura:iteration>
+                                                    </lightning:select>
+                                                </div>
+                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
+                                                    <lightning:select name="objects" aura:id="childObjectId" value="{!item.ChildObjectName1__c}"  >
                                                         <option value="">choose one...</option>
                                                         <option value="{!item.ObjectNames1__c}">Parent Fields</option>
                                                         <aura:iteration items="{!v.allChildObj}" var="childObject">
@@ -226,13 +262,14 @@
                                                 
                                                 <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
                                                     <lightning:select name="getAllObject" aura:id="objectsId" value="{!item.ObjectNames2__c}" onchange="{!c.handleChange2}" disabled= "true">
+                                                        <option value="">choose one...</option>
                                                         <aura:iteration items="{!v.getAllObject}" var="object2">
                                                             <option text="{!object2.key}" value="{!object2.key}" selected="{!object2.selected}"/>
                                                         </aura:iteration>
                                                     </lightning:select>
                                                 </div>
                                                 <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
-                                                    <lightning:select name="objects" aura:id="childObjectId" value="{!item.ChildObjectName2__c}"  onchange="{!c.handleChildObjName}">
+                                                    <lightning:select name="objects" aura:id="childObjectId" value="{!item.ChildObjectName2__c}"  onchange="{!c.handleChildObjName}" >
                                                         <option value="">choose one...</option>
                                                         <option value="{!item.ObjectNames2__c}">Parent Fields</option>
                                                         <aura:iteration items="{!v.allChildObject}" var="childObj">
@@ -245,7 +282,7 @@
                                                     </lightning:select>
                                                 </div>
                                                 <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large " >
-                                                    <lightning:select name="getAllField"  aura:id="fieldId" value="{!item.SF_Object2_Field_Name__c}">
+                                                    <lightning:select name="getAllField"  aura:id="fieldId" value="{!item.SF_Object2_Field_Name__c}" >
                                                         <option value="">choose one...</option>
                                                         <aura:iteration items="{!v.getAllField}"  var="mapKeys" indexVar="key">
                                                             <aura:if isTrue="{!item.ChildObjectName2__c == mapKeys.key }">
@@ -256,173 +293,29 @@
                                                         </aura:iteration>
                                                     </lightning:select>
                                                 </div>
-                                                <div class="hhh">
+                                                                                 <div class="hhh">
                                                         <lightning:input checked="{!item.Mandatory_Field__c}" value="{!item.Mandatory_Field__c}"  type="checkbox" aura:id="boxPackFields"/>
                                                     </div>
-                                                
                                             </div>
+             
+                                                
+                                            
                                         </aura:iteration>
                                         
                                         <br></br>
                                     </div>
                                     <div class="buttonss">
-                                        <!-- <lightning:button label="Previous" onclick="{!c.Behind}"   variant="Destructive" ></lightning:button>  -->
-                                        <lightning:button label="Preview" onclick="{!c.PreviewJSON}" variant="Destructive"></lightning:button>                                                 
-                                        
+                                        <lightning:button label="Save" onclick="{!c.SaveHandler}" iconPosition="right" variant="Destructive"></lightning:button>
                                     </div> 
                                 </div>      
                             </div>                             
                         </lightning:card>
                     </div>
                 </div>
-            </aura:if>
-            <aura:if isTrue="{!v.mapPageForPreview}">
                 
-                <aura:if isTrue="{!v.showmyspinner}">
-                    <div class="outerBox spinner">
-                        <lightning:spinner aura:id="mySpinner" variant="brand" size="medium" class='slds=hide'/>
-                    </div>
-                </aura:if>
-                
-                <div >
-                    <div class="yo2">
-                        <lightning:card>
-                            <div class="slds-align_absolute-center" >
-                                <div class="abc">
-                                    <h6><b><u>MAPPING JSON FIELDS WITH OBJECT FIELDS</u></b></h6>
-                                </div>
-                            </div>
-                            <div class="box3" >
-                                <div class="box8">
-                                    <div class="slds-m-horizontal_medium">     
-                                        <div class="slds-grid slds-p-top_low">
-                                            <div class="slds-size_2-of-8     slds-p-right_xx-small slds-p-horizontal_x-large "   >
-                                                <h5><b><u>Json Fields</u></b></h5>
-                                            </div>
-                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
-                                                <h5><b><u>Select Object</u></b></h5>
-                                            </div>
-                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
-                                                <h5><b><u>Select Child Object</u></b></h5>
-                                            </div>
-                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
-                                                <h5><b><u>Select Fields</u></b></h5>
-                                            </div>
-                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
-                                                <h5><b><u>Select Object</u></b></h5>
-                                            </div>
-                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
-                                                <h5><b><u>Select Child Object</u></b></h5>
-                                            </div>
-                                            <div class="slds-size_2-of-8 slds-p-right_xx-small slds-p-horizontal_x-large "  >
-                                                <h5><b><u>Select Fields</u></b></h5>
-                                            </div>
-                                            <!-- <div class="slds-size_1-of-6 slds-p-right_xx-small slds-p-horizontal_x-large "  >
-                                        <h5><b><u>Date Formation</u></b></h5>
-                                    </div> -->
-                                            
-                                        </div>
-                                        
-                                        <aura:iteration items="{!v.storejson}" var="item" indexVar="row">
-                                            
-                                            <div class="slds-grid slds-p-top_low">
-                                                <div class="slds-size_2-of-8 slds-p-left_xx-small slds-p-horizontal_x-large " >
-                                                    <lightning:input disabled= "true" value="{!item.Name}" type="text" maxsize="10" aura:id="cmpname" placeholder="Enter Json Fields" />
-                                                </div>
-                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
-                                                    <lightning:select disabled="true" name="objects" aura:id="objectId" value="{!item.ObjectNames1__c}" onchange="{!c.handleChange}">
-                                                        <option value="">choose one...</option>
-                                                        <aura:iteration items="{!v.allObject}" var="object">
-                                                            <option text="{!object.key}" value="{!object.key}" selected="{!object.selected}"/>
-                                                        </aura:iteration>
-                                                    </lightning:select>
-                                                </div>
-                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
-                                                    <lightning:select disabled="true" name="objects" aura:id="childObjectId" value="{!item.ChildObjectName1__c}" >
-                                                        <option value="">choose one...</option>
-                                                        <option value="{!item.ObjectNames1__c}">Parent Fields</option>
-                                                        <aura:iteration items="{!v.allChildObj}" var="childObject">
-                                                            <aura:if isTrue="{!item.ObjectNames1__c == childObject.key }">
-                                                                <aura:iteration items="{!childObject.value}" var="childObject">
-                                                                    <option text="{!childObject}" value="{!childObject}" selected="{!childObject.selected}"/>
-                                                                </aura:iteration>
-                                                            </aura:if>
-                                                        </aura:iteration>
-                                                    </lightning:select>
-                                                </div>
-                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large " >
-                                                    <lightning:select disabled="true" name="allField"  aura:id="fieldId" value="{!item.SF_Object1_Field_Name__c}">
-                                                        <option value="">choose one...</option>
-                                                        <aura:iteration items="{!v.allField}"  var="mapKey" indexVar="key">
-                                                            <aura:if isTrue="{!item.ChildObjectName1__c == mapKey.key }">
-                                                                <aura:iteration items="{!mapKey.value}" var="mapValue">
-                                                                    <option text="{!mapValue}" value="{!mapValue}" selected="{!mapValue.selected}"/>
-                                                                </aura:iteration>
-                                                            </aura:if>
-                                                        </aura:iteration>
-                                                    </lightning:select>
-                                                </div>
-                                                
-                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
-                                                    <lightning:select disabled="true" name="getAllObject" aura:id="objectsId" value="{!item.ObjectNames2__c}" onchange="{!c.handleChange2}">
-                                                        <option value="">choose one...</option>
-                                                        <aura:iteration items="{!v.getAllObject}" var="object2">
-                                                            <option text="{!object2.key}" value="{!object2.key}" selected="{!object2.selected}"/>
-                                                        </aura:iteration>
-                                                    </lightning:select>
-                                                </div>
-                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large ">
-                                                    <lightning:select disabled="true" name="objects" aura:id="childObjectId" value="{!item.ChildObjectName2__c}"  onchange="{!c.handleChildObjName}">
-                                                        <option value="">choose one...</option>
-                                                         <option value="{!item.ObjectNames2__c}">Parent Fields</option>
-                                                        <aura:iteration items="{!v.allChildObject}" var="childObj">
-                                                            <aura:if isTrue="{!item.ObjectNames2__c == childObj.key }">
-                                                                <aura:iteration items="{!childObj.value}" var="childObj">
-                                                                    <option text="{!childObj}" value="{!childObj}" selected="{!childObj.selected}"/>
-                                                                </aura:iteration>
-                                                            </aura:if>
-                                                        </aura:iteration>
-                                                    </lightning:select>
-                                                </div>
-                                                <div id="{!item}" class="slds-size_2-of-8 slds-p-left_xx-large slds-p-horizontal_x-large " >
-                                                    <lightning:select disabled="true" name="getAllField"  aura:id="fieldId" value="{!item.SF_Object2_Field_Name__c}">
-                                                        <option value="">choose one...</option>
-                                                        <aura:iteration items="{!v.getAllField}"  var="mapKeys" indexVar="key">
-                                                            <aura:if isTrue="{!item.ChildObjectName2__c == mapKeys.key }">
-                                                                <aura:iteration items="{!mapKeys.value}" var="mapValue2">
-                                                                    <option text="{!mapValue2}" value="{!mapValue2}" selected="{!mapValue2.selected}"/>
-                                                                </aura:iteration>
-                                                            </aura:if>
-                                                        </aura:iteration>
-                                                    </lightning:select>
-                                                </div>
-                                                <div class="hhh">
-                                                        <lightning:input checked="{!item.Mandatory_Field__c}" value="{!item.Mandatory_Field__c}"  type="checkbox" aura:id="boxPackFields" disabled="true"/>
-                                                </div>
-                                                
-                                            </div>
-                                        </aura:iteration>
-                                        
-                                        <br></br>
-                                    </div>
-                                    <div class="buttonss">
-                                        <!-- <lightning:button label="Previous" onclick="{!c.Behind}"   variant="Destructive" ></lightning:button>  -->
-                                        <!--<lightning:button label="Preview" onclick="{!c.PreviewJSON}"  iconPosition="right" variant="Destructive"></lightning:button> -->                                                
-                                        
-                                        <div class="slds-align_absolute-center">
-                                            <lightning:button label="Cancel" onclick="{!c.navigateToParentComponent}"  iconPosition="left"  variant="Destructive" ></lightning:button>
-                                            <lightning:button label="Edit" onclick="{!c.previousPage}" iconName="utility:backward" iconPosition="l" variant="Destructive" ></lightning:button> 
-                                            <lightning:button label="Save" onclick="{!c.saveHandler}" iconName="utility:forward" iconPosition="right"  variant="Destructive" ></lightning:button>                                                 
-                                        </div>
-                                    </div> 
-                                </div>      
-                            </div>                             
-                        </lightning:card>
-                    </div>
-                </div>
-            </aura:if>
-            
-             <aura:if isTrue="{!v.calllwcforback}">
+    </aura:if>
+    
+    <aura:if isTrue="{!v.calllwcforback}">
         <aura:if isTrue="{!v.showmyspinner}">
                     <div class="outerBox spinner">
                         <lightning:spinner aura:id="mySpinner" variant="brand" size="medium" class='slds=hide'/>
@@ -431,39 +324,5 @@
         <c:mainettiServiceType aura:id="lWCComponent2"></c:mainettiServiceType>  
         
     </aura:if>
-            
-            
-            <aura:if isTrue="{!v.PostmanLink}">
-                
-                <aura:if isTrue="{!v.showmyspinner}">
-                    <div class="outerBox spinner">
-                        <lightning:spinner aura:id="mySpinner" variant="brand" size="medium" class='slds=hide'/>
-                    </div>
-                </aura:if>
-                
-                <div class="margin">
-                    <div class="yo">
-                        <div class="slds-align_absolute-center" >
-                            <lightning:card>
-                                <div class="box" >
-                                    <div class="box2">
-                                        <div class="slds-m-horizontal_medium"> 
-                                            <div class="area"> 
-                                                <h5> <b><u>INSERTED JSON DATA</u></b></h5>
-                                                <lightning:textarea  type="String" aura:id="Data"  value="{!v.recordName}"   />
-                                            </div>
-                                        </div> 
-                                        <div class="slds-align_absolute-center">
-                                            <lightning:button label="Previous" onclick="{!c.previousPage}" iconName="utility:backward" iconPosition="left" variant="Destructive" ></lightning:button> 
-                                                <lightning:button label="Save" onclick="{!c.saveHandler}" iconName="utility:forward" iconPosition="right"  variant="Destructive" ></lightning:button>                                                 
-                                        </div>
-                                    </div>      
-                                </div>                             
-                            </lightning:card>
-                        </div>     
-                    </div>  
-                </div>
-            </aura:if>
-        </div>
-    </div>
+	
 </aura:component>

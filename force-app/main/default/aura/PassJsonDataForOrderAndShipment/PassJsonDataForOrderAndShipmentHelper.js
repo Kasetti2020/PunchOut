@@ -1,22 +1,20 @@
-({
-    
-    
+({    
     getAllFields : function(component, event, helper){
         this.showSpinner(component, event, helper);
         var action = component.get("c.getAllfieldss");
         action.setCallback(this, function(response) {
             var state = response.getState();
             var allFields = component.get("v.allField");
+           // alert('FromFirstline'+allFields);
             if (state === "SUCCESS") {
                 this.hideSpinner(component, event, helper);
                 var result = response.getReturnValue();
-                 // console.log('apex results--> '+JSON.stringify(result));
                 var arrayMapKeys = [];
                 var objectfields=result.objectfieldmap;
                 for(var key in objectfields){
                     arrayMapKeys.push({key: key, value: objectfields[key]});
                 }
-                
+                 
                 component.set("v.allObject",arrayMapKeys);
                 component.set("v.allField", arrayMapKeys);
             }
@@ -48,15 +46,20 @@
             if (state === "SUCCESS") {
                 this.hideSpinner(component, event, helper);
                 var result = response.getReturnValue();
-                // console.log('apex results--> '+JSON.stringify(result));
+                 console.log('apex results--> '+JSON.stringify(result));
+              //    alert('apex results--> '+JSON.stringify(result));
                 var arrayMapKey = [];
                 var objectfields=result.objectfield;
+                 console.log('apex objectfields--> '+JSON.stringify(objectfields));
                 for(var key in objectfields){
                     arrayMapKey.push({key: key, value: objectfields[key]});
                 }
-                
                 component.set("v.getAllObject",arrayMapKey);
-                // component.set("v.getAllField", arrayMapKey);
+                console.log('apex component.set("v.getAllObject"--> '+JSON.stringify(component.get("v.getAllObject")));
+                  var getallField = component.get("v.getAllField");
+                getallField = getallField.concat(arrayMapKey);
+               // component.set("v.allField", arrayMapKey);
+              //  alert('fsayugcduz1324');
             }
             else if (status === "INCOMPLETE") {
                 this.hideSpinner(component, event, helper);
@@ -126,7 +129,6 @@
         if(object==[]){
             validation=true;
             this.hideSpinner(component, event, helper);
-            
             var toastEvent = $A.get("e.force:showToast");
             toastEvent.setParams({
                 title: "Error!",
@@ -170,8 +172,8 @@
                         var removzerofromarraykeys =  item.key;
                         var deleted = removzerofromarraykeys.replace(".0", ' ');
                         var updatedStr1 = deleted.replace(/\.0/g, '');
-                        var removeemptyspace =updatedStr1.replace(/\s+/g, "");
-                        pushallvalue.push({"Name":removeemptyspace,"SF_Object1_Field_Name__c":null,"ObjectNames1__c":"Base_Order__c","ChildObjectName1__c":null,"ChildObjectName2__c":null,"ObjectNames2__c":"Sales_Order__c","Mandatory_Field__c":false});  
+                        //var removeemptyspace =updatedStr1.replace(/\s+/g, "");
+                        pushallvalue.push({"Name":updatedStr1,"SF_Object1_Field_Name__c":null,"ObjectNames1__c":null,"ChildObjectName1__c":null,"Mandatory_Field__c":false});  
                     });
                     this.getAllFields(component, event, helper);
                     this.getChildObjects(component, event, helper);
@@ -266,6 +268,7 @@
     
     callsaveHandler:function(component, event, helper) {
         var getvalidprog=component.get("v.validateprogressbarforfinal");
+         //  alert('getvalidprog>>>>');
         if(getvalidprog == false){
             var next = "s1";
             component.set("v.current", next);
@@ -282,122 +285,66 @@
             this.showSpinner(component, event, helper);
             var jsonParse=component.get("v.storejson");
             console.log('jsonPrase-->'+JSON.stringify(jsonParse));
-            var service = component.get("v.servType");
-            //   alert('service>>>'+service);
-            var country = component.get("v.counrty");
-            //   alert('country>>>'+country);
-            
+            var service = component.get("v.param1");
+            console.log('serviceType>>>>'+service);
+            var country = component.get("v.param2");
+            console.log('country>>>>>'+country);
             var jsonedit=component.get("v.ServiceTypeEdit");
-            //   alert('jsonedit>>>'+jsonedit);
-            
+            console.log('jsonedit>>>'+jsonedit);
             var type=component.get("c.getServicetype");
-            //   alert('type>>>'+type);
-            
+            console.log('ServiceType>>>'+type);
             var jsonSample = component.get("v.record");
-            //   alert('jsonSample>>>'+jsonSample);
-            
+            console.log('jsonSample>>'+jsonSample);
             var serviceRecordId = component.get("v.serviceRecordId");
-            //   alert('serviceRecordId>>>'+serviceRecordId);
-            
+            console.log('serviceRecordId>>>'+serviceRecordId);
+            var endpointUrldata = component.get("v.endpointURL");
+            console.log('endpointUrldata>>>'+endpointUrldata);
+            var selectedradiovalue = component.get("v.radioButtonValue");
+            console.log('selected radio value-->'+selectedradiovalue);
             type.setParams({
                 'services' :service,
                 'jsonData':jsonParse,
                 'jsonedit':jsonedit,
                 'countryCode':country,
                 'jsonSample' :jsonSample,
-                'serviceRecordId' :serviceRecordId
+                'serviceRecordId' :serviceRecordId,
+                'endpointUrldata' :endpointUrldata,
+                'selectedradiovalue':selectedradiovalue
+                
             });
+           // alert('state>>>>');
             type.setCallback(this,function(responce){
                 var state=responce.getState(); 
+              //  alert('state>>>>'+state);
                 if(state==='SUCCESS'){
-                    var result=responce.getReturnValue();
                     if(jsonedit==false){
                         this.hideSpinner(component, event, helper);
                         var result=responce.getReturnValue();
-                       
                         var next = "s4";
-                        // component.set("v.current", next);
-                        // component.set("v.validateprogressbarpage",true);
+                        component.set("v.current", next);
+                        component.set("v.validateprogressbarpage",true);
                         component.set("v.mapPage",false);
-                        //  component.set("v.PostmanLink",true);
+                        component.set("v.PostmanLink",true);
                         var hostname = window.location.origin;
                         var arr = hostname.split(".");
                         var instance = arr[0];
                         var instances='.my.salesforce.com/services/apexrest/TestingClass/';
                         component.set("v.records",instance+instances);
                         var toastEvent = $A.get("e.force:showToast");
+                    //    alert('Beforce Toast message');
                         toastEvent.setParams({        
                             title: "Success!",      
                             message: "The record has been Inserted successfully.",
                             type:"success",
                             mode:"dismissible"      
                         });
-                       
                         toastEvent.fire();
-                        this.callnavigateToParentComponent(component, event, helper);
-                        $A.get('e.force:refreshView').fire();
-                        
-                        if(component.get("v.radioButtonValue") === 'Both'){
-                            // alert('result>>>>'+result);
-                            /*  var a = component.find("n1").get("v.value");
-                            var b = component.find("n2").get("v.value");
-                            var res = parseInt(a) + parseInt(b);
-                            res = res + '';*/
-                            var service = component.get("v.servType");
-                            var country = component.get("v.counrty");
-                            // alert('service>>'+service);
-                            // alert('country>>>'+country);
-                            component.find("navService").navigate({   
-                                "type": "standard__component",
-                                "attributes": {
-                                    "componentName": "c__PassJsonDataForBoth"    
-                                },    
-                                "state": {
-                                    "c__service":service,
-                                    "c__country":country,
-                                    "c__result":result
-                                }
-                            });
-                            /*  var appEvent = $A.get("e.c:PassJsonDataForOutPutBoth1");
-                  appEvet.setParams({"PassData":"Application Event Workking Fine"});
-                  appEvent.fire();*/
-                            /*   alert('component.get("v.radioButtonValue")>>>>'+component.get("v.radioButtonValue"));
-                 var service = component.get("v.servType");
-                 var country = component.get("v.counrty");
-                 var serviceRecordId = component.get("v.serviceRecordId");
-                  alert('serviceRecordId>>>'+serviceRecordId);
-                  alert('service>>'+service);
-                  alert('country>>>'+country);
-        var country = component.get("v.counrty");
-        var evt = $A.get("e.force:navigateToComponent");
-        console.log('Event '+evt);
-        var accountFromId = component.get("v.recordId");
-        evt.setParams({
-            componentDef  : "c:PassJsonDataForBoth" ,
-            componentAttribute : {
-                service : service,
-                country : country
+                        //call lwc component
+                        var parentComponent = component.get("v.parent");                         
+                        // parentComponent.greetingMethod();
+                         helper.callnavigateToParentComponent(component,event,helper);
+                     //   alert('aftercallout')
 
-            }
-        
-
-        });
-      
-        evt.fire();
-                  
-                  */
-                            /*   var callOutput = component.get("v.outputComp");   
-              callOutput.callOutputMethod();
-              alert('callOutputMethod');*/
-                        }else{
-                            //call lwc component
-                            var parentComponent = component.get("v.parent");                         
-                           // parentComponent.greetingMethod();
-                        }
-                        
-                        
-                        
-                        
                     }
                     else{
                         var toastEvent = $A.get("e.force:showToast");
@@ -409,6 +356,7 @@
                         });
                         toastEvent.fire();
                         $A.get('e.force:refreshView').fire();
+                       
                     }
                 }else{
                     var error = responce.getError(); 
@@ -442,10 +390,11 @@
     },
     
     callnavigateToParentComponent:function(component, event, helper) {
-         var navService = window.location.href + "https://mainetti--magnets1.sandbox.lightning.force.com/lightning/n/Mainetti_ERP"; // Replace "LwcPageName" with the actual name or URL of your LWC page        
-                  window.location.replace(navService);
-       // var parentComponent = component.get("v.parent");                         
-       // parentComponent.greetingMethod();
+       // var parentComponent = component.get("v.parent");    
+      //  var navService = window.location.href + "/n/Mainetti_ERP"; // Replace "LwcPageName" with the actual name or URL of your LWC page
+        var navService = window.location.href + "https://mainetti--magnets1.sandbox.lightning.force.com/lightning/n/Mainetti_ERP"; // Replace "LwcPageName" with the actual name or URL of your LWC page        
+        window.location.replace(navService);
+        // parentComponent.greetingMethod();
     },
     
     serviceType: function(component, event, helper) {component.set('v.columns', [
@@ -492,8 +441,8 @@
                 allField = allField.concat(childMapValues);
                 // Set the updated list back to the allField attribute
                 component.set("v.allField", allField);
-                // console.log('allField::'+JSON.stringify(component.get("v.allField")));
-                // component.set("v.allField", arrayMapKeys);
+              //  alert('allField::'+JSON.stringify(component.get("v.allField")));
+                 component.set("v.allField", arrayMapKeys);
             }else if (status === "INCOMPLETE") {
                 this.hideSpinner(component, event, helper);
                 console.log("No response from server or client is offline.");
@@ -517,9 +466,10 @@
     getRelatedChildObjects : function(component, event, helper){
         this.showSpinner(component, event, helper);
         // alert('inside getRelatedChildObjects');
+                  //   alert('returned');
+
         var childObj = component.get("c.getAllRelatedChildObjects");
         childObj.setCallback(this, function(response) {
-            // alert('returned');
             var state = response.getState();
             var childFields = component.get("v.allChildObject");
             if (state === "SUCCESS") {
@@ -527,7 +477,7 @@
                 var result = response.getReturnValue();
                 var childarrayMapKeys = [];
                 var childarrayMapValues = [];
-                console.log('result::'+JSON.stringify(result));
+                console.log('result123::'+JSON.stringify(result));
                 var relChildObjects=result.relatedObjectmap;
                 console.log('objectfields::'+JSON.stringify(relChildObjects));
                 for(var key in relChildObjects){
@@ -535,8 +485,8 @@
                     childarrayMapKeys.push({key: key, value: relChildObjects[key]});
                 }
                 component.set("v.allChildObject",childarrayMapKeys);
-                // alert(component.get("v.allChildObject"));
-                console.log('all Child Object::'+component.get("v.allChildObject"));
+               // alert('pAR>>'+JSON.stringify(component.get("v.allChildObject")));
+                console.log('all Child Object::'+JSON.stringify(component.get("v.allChildObject")));
                 var relChildObjectFields=result.relatedFieldsMap;
                 console.log('objectfields::'+JSON.stringify(relChildObjectFields));
                 console.log('Before allField::'+JSON.stringify(component.get("v.allField")));
@@ -548,6 +498,7 @@
                 getallField = getallField.concat(childarrayMapValues);
                 component.set("v.getAllField", getallField);
                 console.log('getAllField::'+JSON.stringify(component.get("v.getAllField")));
+             //  alert('getAllField::'+JSON.stringify(component.get("v.getAllField")));
             }else if (status === "INCOMPLETE") {
                 this.hideSpinner(component, event, helper);
                 console.log("No response from server or client is offline.");
