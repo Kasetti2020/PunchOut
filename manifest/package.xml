@@ -12,7 +12,7 @@
 		<name>ApexClass</name>
 	</types>
 	<types>
-		<members>ApproveCustomerRegistryPage</members>
+	
 		<members>PunchOutPage</members>
 		<name>ApexPage</name>
 	</types>

@@ -440,7 +440,7 @@
        // window.location.href = vfPageUrl;
         var urlString = window.location.href;
                         var CommunityBaseURL = urlString.substring(0, urlString.indexOf("/s/"));
-                        window.location = CommunityBaseURL+'/s/punchoutpage?myParam='+ encodeURIComponent(myParamValue);
+                        window.location.href = CommunityBaseURL+'/s/punchoutpage?myParam='+ encodeURIComponent(myParamValue);
 
             }
             else if(state === 'ERROR'){
