@@ -12,10 +12,10 @@
         //window.sessionStorage.setItem("key",sParameterName[1]);
        // var retrievedValue = window.sessionStorage.getItem("key");
         
-        component.set("v.recordId", sParameterName[1]);
+       // component.set("v.recordId", sParameterName[1]);
 
         // Store in localStorage
-        window.localStorage.setItem("recordId", sParameterName[1]);
+        window.localStorage.setItem("recordUrlId", sParameterName[1]);
        // alert(retrievedValue);
     },
     //Product seach functon

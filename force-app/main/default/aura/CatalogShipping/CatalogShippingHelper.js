@@ -421,16 +421,25 @@
     /////Added By Mahadevaprasad R
     checkingOpenVisualForcePage:function(component,event,helper,custid) 
     { 
+        var retrievedValue = window.sessionStorage.getItem("recordUrlId");
+        //alert(retrievedValue);
         
-        alert(custid);
+        var currentUrl = window.location.href;
+        var sParameterName = currentUrl.split('=');
         var AddandCloneData=component.get('c.checkLengthAddAndCloneDataToDelete');
         AddandCloneData.setParams({
-            "customerid": custid
+            "punchOutRqt":sParameterName[1]
         });
         AddandCloneData.setCallback(this, function(response) {
             var state = response.getState();
             if(state === 'SUCCESS'){
-                
+                var toastEvent = $A.get("e.force:showToast");
+    toastEvent.setParams({
+        "title": "Success!",
+        "message": "Punched Out",
+        "type": "success",
+    });
+    toastEvent.fire();
                var myParamValue = response.getReturnValue();
         console.log('checkingAddAndCloneData>>'+myParamValue);
         // Construct the URL with the parameter

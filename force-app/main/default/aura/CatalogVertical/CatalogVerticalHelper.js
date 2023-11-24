@@ -95,7 +95,7 @@
         var actionsave = component.get("c.saveSO");
       // var newVal = sParameterName[1]+'T'+component.get("v.searchedCurrency");
         //alert(newVal);
-        var storedRecordId = window.localStorage.getItem("recordId");
+        var storedRecordId = window.localStorage.getItem("recordUrlId");
 
         // Set the attribute with the stored ID
         component.set("v.recordId", storedRecordId);
@@ -109,7 +109,7 @@
             custRefModel : custRefModel,
             selectedCurrency:component.get("v.selectedCurrency"),
             searchedCurrency:component.get("v.searchedCurrency"),
-            panoutId:'a2jHz0000006jR1IAI'
+            panoutId:storedRecordId
         });
         actionsave.setCallback(this, function(response) 
                                {

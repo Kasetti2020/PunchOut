@@ -49,7 +49,7 @@ public without sharing class SOController
         //Ma List<Sales_Order_Line_Items__c> SoliList=new List<Sales_Order_Line_Items__c>();
         List<Base_Order__c> SOList=new List<Base_Order__c>();
         List<Base_Order_Detail__c> SoliList=new List<Base_Order_Detail__c>();
-         //Ma SOList =[select id, name, Retailer_Code1__c,Retailer__c,Product__r.Business_Vertical__c,Status__c,CurrencyIsoCode,Supplier_Code__c,Enquiry_Status__c,Link_To_ERP__c from Sales_Order__c where Supplier__c =:customerData AND recordtypeId =:CartRecordType ];
+        //Ma SOList =[select id, name, Retailer_Code1__c,Retailer__c,Product__r.Business_Vertical__c,Status__c,CurrencyIsoCode,Supplier_Code__c,Enquiry_Status__c,Link_To_ERP__c from Sales_Order__c where Supplier__c =:customerData AND recordtypeId =:CartRecordType ];
         SOList =[select id, name, Retailer_Code1__c,Product__r.Business_Vertical__c,CurrencyIsoCode,Supplier_Code__c from Base_Order__c where Supplier__c =:customerData AND recordtypeId =:CartRecordType ];
         
         system.debug('SOList>>'+SOList);
@@ -71,29 +71,29 @@ public without sharing class SOController
         Contact loggedInContact = FetchCustData();
         Contact con = CatalogOrderController.getcostomerinfo(retailercode);
         system.debug('prodData.CurrencyIsoCode>>>'+prodData.CurrencyIsoCode); 
-       /* if(searchedCurrency!=selectedCurrency)
-        {
-            prodData.CurrencyIsoCode=searchedCurrency.split('-')[0];
-        }else if(selectedCurrency!=null && priceByCurr==null)
-        {
-            prodData.CurrencyIsoCode=selectedCurrency.split('-')[0];
-        }
-        else{
-            prodData.CurrencyIsoCode=con.Preferred_Currency__c.split('-')[0];
-        }*/
+        /* if(searchedCurrency!=selectedCurrency)
+{
+prodData.CurrencyIsoCode=searchedCurrency.split('-')[0];
+}else if(selectedCurrency!=null && priceByCurr==null)
+{
+prodData.CurrencyIsoCode=selectedCurrency.split('-')[0];
+}
+else{
+prodData.CurrencyIsoCode=con.Preferred_Currency__c.split('-')[0];
+}*/
         system.debug('prodData.CurrencyIsoCode>>>'+prodData.CurrencyIsoCode);
         if(SOList.size()==0)                                    // if no data on the respective customer then insert the new SO and SOLI
         {
-             system.debug('insideIf');
+            system.debug('insideIf');
             Base_Order__c So=new Base_Order__c();
             So.Supplier__c = customerData;
             So.Supplier_Contact__c = loggedInContact.Id;
             So.PunchOut_Request__c=panoutId;
-           // So.RecordtypeId = CartRecordType;
+            // So.RecordtypeId = CartRecordType;
             So.Retailer_Code1__c = retailercode;
             So.PunchOut_Status__c = 'Product Added';
-          //Ma  So.OrderSource__c = 'Catalog Order';
-           So.SupplierParty_CNUF__c = 'SupplierParty';
+            //Ma  So.OrderSource__c = 'Catalog Order';
+            So.SupplierParty_CNUF__c = 'SupplierParty';
             So.CustomerParty_Name__c = 'CustomerParty';
             So.Vertical__c = prodData.Product_Unique_ID__r.Business_Vertical__c;
             So.Company__c = prodData.Order_to_Company__c;
@@ -105,7 +105,7 @@ public without sharing class SOController
             {
                 So.CurrencyIsoCode =prodData.CurrencyIsoCode;
             }
-           //Ma So.Enquiry_Status__c ='';
+            //Ma So.Enquiry_Status__c ='';
             //Ma So.Link_To_ERP__c ='';
             if(ContRetailer.size() !=0)
             {
@@ -124,9 +124,9 @@ public without sharing class SOController
                 //Ma So.Manufacturer_Code__c = ContRetailer[0].Manufacturer_Factory_Code__c;
             }
             So.OwnerId =config.SalesOrder_OwnerId__c; 
-             system.debug('Solist>>>>'+So);
+            system.debug('Solist>>>>'+So);
             insert So;                                                            
-             system.debug('So>>>>'+So);
+            system.debug('So>>>>'+So);
             Base_Order_Detail__c soli=new Base_Order_Detail__c();
             soli.Base_Order__c=So.id;
             soli.Products__c = prodData.Product_Unique_ID__c;
@@ -145,28 +145,28 @@ public without sharing class SOController
             soli.BOX_QTY__c =prodData.BOX_QTY__c;
             soli.Product_image_url__c=prodData.Product_image_url__c;
             soli.Price_Specification_Book_Product__c = prodData.Id;
-           // Ma soli.Printshop_Pick__c = prodData.Print_Shop__c;
-           // Ma soli.Family__c = prodData.Product_Family__c;
+            // Ma soli.Printshop_Pick__c = prodData.Print_Shop__c;
+            // Ma soli.Family__c = prodData.Product_Family__c;
             if(priceByCurr!=null)
             { 
                 soli.Price_Product_by_Currency__c = priceproductbycurrency.id;
-               // Ma Soli.Price_per_100_pc__c = priceproductbycurrency.Price_100_pcs__c;
+                // Ma Soli.Price_per_100_pc__c = priceproductbycurrency.Price_100_pcs__c;
                 Soli.Price_100_pcs__c =String.valueof(priceproductbycurrency.Price_100_pcs__c);
-              // Ma  Soli.Price_1000_pcs__c =String.valueof((priceproductbycurrency.Price_100_pcs__c)*10);
+                // Ma  Soli.Price_1000_pcs__c =String.valueof((priceproductbycurrency.Price_100_pcs__c)*10);
             }
             else
             {
                 Soli.Price_100_pcs__c=String.valueof(0.00);
-               // Ma Soli.Price_1000_pcs__c =String.valueof(0.00);
+                // Ma Soli.Price_1000_pcs__c =String.valueof(0.00);
             }
-           /* Soli.EUR_Rebate_pc__c = prodData.EUR_Rebate_pc__c;
-            Soli.EUR_Reuse_Rebate_pc__c = prodData.EUR_Reuse_Rebate_pc__c;
-            Soli.USD_Rebate_pc__c = prodData.USD_Rebate_pc__c;
-            Soli.USD_Reuse_Rebate_pc__c = prodData.USD_Reuse_Rebate_pc__c;
-            Soli.Status__c = 'Order Submitted';
-            Soli.Production_Status__c='';
-            Soli.Online_Detail_Status__c ='';
-            soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */        
+            /* Soli.EUR_Rebate_pc__c = prodData.EUR_Rebate_pc__c;
+Soli.EUR_Reuse_Rebate_pc__c = prodData.EUR_Reuse_Rebate_pc__c;
+Soli.USD_Rebate_pc__c = prodData.USD_Rebate_pc__c;
+Soli.USD_Reuse_Rebate_pc__c = prodData.USD_Reuse_Rebate_pc__c;
+Soli.Status__c = 'Order Submitted';
+Soli.Production_Status__c='';
+Soli.Online_Detail_Status__c ='';
+soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */        
             soli.CurrencyIsoCode = So.CurrencyIsoCode;
             insert soli;
             system.debug('soli>>>>'+soli);
@@ -176,15 +176,15 @@ public without sharing class SOController
         {
             //SoliList =[select id, name,Sales_Order__c,Products__c,Local_SKU__c,Colour__c,Quantity__c,Product_image_url__c,Full_Box_Order__c,BOX_QTY__c,Price_Product_by_Currency__c,Customer_Ref_Model__c,Ordered_Quantity__c,Supply_Quantity__c,Supply_Quantity_num__c from Sales_Order_Line_Items__c where Sales_Order__c=:SOList[0].id AND Colour__c=:prodData.Color__c AND Products__c=:prodData.Product_Unique_ID__c];
             //Mahadevaprasad  SoliList =[select id, name,Sales_Order__c,Products__c,Local_SKU__c,Colour__c,Quantity__c,Product_image_url__c,Full_Box_Order__c,BOX_QTY__c,Price_Product_by_Currency__c,Customer_Ref_Model__c,Ordered_Quantity__c,Supply_Quantity__c,Supply_Quantity_num__c,Production_Status__c,Online_Detail_Status__c from Sales_Order_Line_Items__c where Sales_Order__c=:SOList[0].id AND Colour__c=:prodData.Color__c AND Price_Specification_Book_Product__c=:prodData.Id];
-             SoliList =[select id, name,Base_Order__c,Products__c,Local_SKU__c,Colour__c,Quantity__c,Product_image_url__c,Full_Box_Order__c,BOX_QTY__c,Price_Product_by_Currency__c,Ordered_Quantity__c,Supply_Quantity__c,Supply_Quantity_num__c from Base_Order_Detail__c where Base_Order__c=:SOList[0].id AND Colour__c=:prodData.Color__c AND Price_Specification_Book_Product__c=:prodData.Id];
+            SoliList =[select id, name,Base_Order__c,Products__c,Local_SKU__c,Colour__c,Quantity__c,Product_image_url__c,Full_Box_Order__c,BOX_QTY__c,Price_Product_by_Currency__c,Ordered_Quantity__c,Supply_Quantity__c,Supply_Quantity_num__c from Base_Order_Detail__c where Base_Order__c=:SOList[0].id AND Colour__c=:prodData.Color__c AND Price_Specification_Book_Product__c=:prodData.Id];
             
             // system.debug('SoliList>>>>'+SoliList);
             //system.debug('SoliList.size>>'+SoliList.size());
             if(SoliList.size()==0)                                  // if no data on the respective SKU and color then insert the SO and SOLI
             {
                 system.debug('SoliList in if>>'+SoliList);
-                 //Mahadevaprasad Sales_Order_Line_Items__c soli=new Sales_Order_Line_Items__c();
-                 Base_Order_Detail__c soli=new Base_Order_Detail__c();
+                //Mahadevaprasad Sales_Order_Line_Items__c soli=new Sales_Order_Line_Items__c();
+                Base_Order_Detail__c soli=new Base_Order_Detail__c();
                 soli.Base_Order__c=SOList[0].id;
                 soli.Products__c = prodData.Product_Unique_ID__c;
                 soli.Product_Description__c = prodData.Description__c;
@@ -196,8 +196,8 @@ public without sharing class SOController
                 soli.Quantity__c = quantity;                           
                 //Ma soli.Ordered_Quantity__c = Integer.valueOf(quantity);
                 soli.Supply_Quantity__c = quantity;
-               //Ma soli.Supply_Quantity_num__c = Integer.valueOf(quantity);
-               //Ma soli.Remaining_Qty__c = Integer.valueOf(quantity);
+                //Ma soli.Supply_Quantity_num__c = Integer.valueOf(quantity);
+                //Ma soli.Remaining_Qty__c = Integer.valueOf(quantity);
                 soli.Full_Box_Order__c =prodData.Retailer_Code__r.Full_Box_Order__c;
                 soli.BOX_QTY__c =prodData.BOX_QTY__c;
                 soli.Product_image_url__c=prodData.Product_image_url__c;
@@ -207,20 +207,20 @@ public without sharing class SOController
                 if(priceByCurr!=null)
                 { 
                     soli.Price_Product_by_Currency__c = priceproductbycurrency.id;
-                  //Ma  Soli.Price_per_100_pc__c = priceproductbycurrency.Price_100_pcs__c;
+                    //Ma  Soli.Price_per_100_pc__c = priceproductbycurrency.Price_100_pcs__c;
                     Soli.Price_100_pcs__c =String.valueof(priceproductbycurrency.Price_100_pcs__c);
-                  //Ma  Soli.Price_1000_pcs__c =String.valueof((priceproductbycurrency.Price_100_pcs__c)*10);
+                    //Ma  Soli.Price_1000_pcs__c =String.valueof((priceproductbycurrency.Price_100_pcs__c)*10);
                 }
                 else
                 {
                     Soli.Price_100_pcs__c=String.valueof(0.00);
-                   //Ma Soli.Price_1000_pcs__c =String.valueof(0.00);
+                    //Ma Soli.Price_1000_pcs__c =String.valueof(0.00);
                 }
                 
-                 //Ma Soli.Status__c = 'Order Submitted';
+                //Ma Soli.Status__c = 'Order Submitted';
                 //Ma Soli.Production_Status__c ='';
                 //Ma Soli.Online_Detail_Status__c ='';
-             //Ma   soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;
+                //Ma   soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;
                 soli.CurrencyIsoCode = SOList[0].CurrencyIsoCode;
                 insert soli;
                 
@@ -249,16 +249,16 @@ public without sharing class SOController
                 if(priceByCurr!=null)
                 { 
                     SoliList[0].Price_Product_by_Currency__c = priceproductbycurrency.id;
-                  //Ma  SoliList[0].Price_per_100_pc__c = priceproductbycurrency.Price_100_pcs__c;
+                    //Ma  SoliList[0].Price_per_100_pc__c = priceproductbycurrency.Price_100_pcs__c;
                     SoliList[0].Price_100_pcs__c =String.valueof(priceproductbycurrency.Price_100_pcs__c);
-                 //Ma   SoliList[0].Price_1000_pcs__c =String.valueof((priceproductbycurrency.Price_100_pcs__c)*10);
+                    //Ma   SoliList[0].Price_1000_pcs__c =String.valueof((priceproductbycurrency.Price_100_pcs__c)*10);
                 }
                 else
                 {
                     SoliList[0].Price_100_pcs__c=String.valueof(0.00);
-                  //Ma  SoliList[0].Price_1000_pcs__c =String.valueof(0.00);
+                    //Ma  SoliList[0].Price_1000_pcs__c =String.valueof(0.00);
                 }
-              //Ma  SoliList[0].Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;
+                //Ma  SoliList[0].Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;
                 SoliList[0].CurrencyIsoCode = SOList[0].CurrencyIsoCode;
                 system.debug('Quantity__c>>>'+SoliList[0].Quantity__c);
                 system.debug('Quantity__c>'+integer.ValueOf(quantity));
@@ -801,14 +801,14 @@ public without sharing class SOController
         system.debug('CartRecordType>>'+CartRecordType);
         
         //Mahadevaprasad SOList =[select id, name, Retailer_Code1__c,Retailer_Code1__r.name,Retailer_Code1__r.Show_Price_in_Order__c,Retailer__c,Product__r.Business_Vertical__c from Sales_Order__c where Supplier__c =: customerid AND RecordTypeId =: CartRecordType];
-         SOList =[select id, name, Retailer_Code1__c,Retailer_Code1__r.name,Retailer_Code1__r.Show_Price_in_Order__c,Product__r.Business_Vertical__c from Base_Order__c where Supplier__c =: customerid ];
+        SOList =[select id, name, Retailer_Code1__c,Retailer_Code1__r.name,Retailer_Code1__r.Show_Price_in_Order__c,Product__r.Business_Vertical__c from Base_Order__c where Supplier__c =: customerid ];
         Decimal TotalCartprice = 0.0;
         System.debug('SOList.size()>>'+SOList.size());
         
         if(SOList.size()>0)  
         {
-           //Mahadevaprasad SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Sales_Order__c,Products__c,Print__c,Products__r.Name,Sales_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Sales_Order__r.Retailer_Code1__r.name,Sales_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Sales_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Sales_Order_Line_Items__c where Sales_Order__r.RecordTypeID =: CartRecordType AND Sales_Order__c =:SOList[0].id  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
-             SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Base_Order__c,Products__c,Print__c,Products__r.Name,Base_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Base_Order__r.Retailer_Code1__r.name,Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Base_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Base_Order_Detail__c where Base_Order__c =:SOList[0].id  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
+            //Mahadevaprasad SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Sales_Order__c,Products__c,Print__c,Products__r.Name,Sales_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Sales_Order__r.Retailer_Code1__r.name,Sales_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Sales_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Sales_Order_Line_Items__c where Sales_Order__r.RecordTypeID =: CartRecordType AND Sales_Order__c =:SOList[0].id  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
+            SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Base_Order__c,Products__c,Print__c,Products__r.Name,Base_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Base_Order__r.Retailer_Code1__r.name,Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Base_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Base_Order_Detail__c where Base_Order__c =:SOList[0].id  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
             system.debug(' SOliList>>'+ SOliList);
             for(Base_Order_Detail__c SOLI:SOliList)
             {
@@ -900,13 +900,13 @@ public without sharing class SOController
         
         if(remainingrec.size()==0)
         {
-           //Ma Sales_Order__c SOToDelete = new Sales_Order__c();
+            //Ma Sales_Order__c SOToDelete = new Sales_Order__c();
             Base_Order__c SOToDelete = new Base_Order__c();
             SOToDelete.id= soId;
             delete SOToDelete;
         }
         //Ma for(Sales_Order_Line_Items__c SOLI:remainingrec)
-         for(Base_Order_Detail__c SOLI:remainingrec)
+        for(Base_Order_Detail__c SOLI:remainingrec)
         {
             if(SOLI.Added_As_a_Label__c==false)
             {
@@ -958,32 +958,34 @@ public without sharing class SOController
         
     }
     //Added by seema 
-  /*Ma @AuraEnabled
-    public static Base_Order__c checkLengthAddAndCloneDataToDelete(string customerid)    
-    {
-        
-        Base_Order__c soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where  Supplier__c=:customerid];
-       //Ma List<Sales_Order_Line_Items__c> soli=[select id,Added_As_a_Label__c,Sales_Order__r.Supplier__c from Sales_Order_Line_Items__c where Added_As_a_Label__c=true And Sales_Order__r.Supplier__c=:customerid];
-        system.debug('soli>>>>.'+soli);
-        punchoutcxmlgenerate.cxmlOutPutCreate(soli.Id);
-        soli.PunchOut_Status__c='Punched Out';
-        Update soli;
-         
-        
-        return soli;
-    }  */ 
+    /*Ma @AuraEnabled
+public static Base_Order__c checkLengthAddAndCloneDataToDelete(string customerid)    
+{
 
+Base_Order__c soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where  Supplier__c=:customerid];
+//Ma List<Sales_Order_Line_Items__c> soli=[select id,Added_As_a_Label__c,Sales_Order__r.Supplier__c from Sales_Order_Line_Items__c where Added_As_a_Label__c=true And Sales_Order__r.Supplier__c=:customerid];
+system.debug('soli>>>>.'+soli);
+punchoutcxmlgenerate.cxmlOutPutCreate(soli.Id);
+soli.PunchOut_Status__c='Punched Out';
+Update soli;
+
+
+return soli;
+}  */ 
+    //Added by seema  Mahadevaprasad R
     @AuraEnabled
-    public static string checkLengthAddAndCloneDataToDelete(string customerid)    
-    {
+    public static string checkLengthAddAndCloneDataToDelete(string punchOutRqt)    {
         
-        Base_Order__c soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where  Supplier__c=:customerid];
-       //Ma List<Sales_Order_Line_Items__c> soli=[select id,Added_As_a_Label__c,Sales_Order__r.Supplier__c from Sales_Order_Line_Items__c where Added_As_a_Label__c=true And Sales_Order__r.Supplier__c=:customerid];
+        //PunchOut_Request__c punch=[select Id,payloadID__c,TimeStamp__c From PunchOut_Request__c where Id=: punchOutRqt ];
+        list<Base_Order__c> soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where PunchOut_Request__c=:punchOutRqt];
+        string cxmlValue= punchoutcxmlgenerate.generateCXML(punchOutRqt);
         system.debug('soli>>>>.'+soli);
-       string cxmlValue= punchoutcxmlgenerate.cxmlOutPutCreate(soli.Id);
-        soli.PunchOut_Status__c='Punched Out';
+        for(Base_Order__c b:soli){
+            b.PunchOut_Status__c='Punched Out';
+            
+        }
         Update soli;
-         
+        
         
         return cxmlValue;
     }
@@ -1390,22 +1392,22 @@ else*/ if(priceBookCurrencyMap.containskey(Soli.Price_Specification_Book_Product
                         Soli.Print__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Sizer_Print__c;
                         Soli.Family__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Product_Family__c;
                         Integer tempQty = Integer.ValueOf(Soli.Supply_Quantity__c);
-                          system.debug('tempQty >>>>>>>'+tempQty);
+                        system.debug('tempQty >>>>>>>'+tempQty);
                         if(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c == null)
                             tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c = 0;
                         Integer tempBoxQty ;
-                          tempBoxQty  = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c);
+                        tempBoxQty  = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c);
                         system.debug('tempBoxQty >>>>>>>'+tempBoxQty);
-                         if(tempBoxQty == null){
+                        if(tempBoxQty == null){
                             tempBoxQty = 0;
                         }
-                          Integer tempMOQQty;
-                              tempMOQQty = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).MOQ__c);
+                        Integer tempMOQQty;
+                        tempMOQQty = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).MOQ__c);
                         system.debug('tempMOQQty >>>>>>>'+tempMOQQty);
                         if(tempMOQQty == null){
                             tempMOQQty = 0;
                         }
-
+                        
                         
                         //added on 17 Mar 2020 to populate values even if correction in qty is not required
                         Soli.Full_Box_Order__c = retailer[0].Full_Box_Order__c;
@@ -1417,41 +1419,41 @@ else*/ if(priceBookCurrencyMap.containskey(Soli.Price_Specification_Book_Product
                             returnVal = 'Couldn\'t find box quantity in the Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c+ ' with color '+Soli.Colour__c;
                             return returnVal;
                         }
-                       /* if(!onlyvalidate){
-                            if( retailer[0].Full_Box_Order__c == true && tempBoxQty != null && (math.mod(tempQty, tempBoxQty)) != 0 )
-                            {
-                                
-                                //system.debug('Soli.Remaining_Qty__c: '+Soli.Remaining_Qty__c);
-                                //system.debug('boxQty: '+tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c);
-                                system.debug('poli name: '+SOWrapData.PoliPOIdMap.get((Id)Soli.POLI_Text_Ids__c));
-                                Double vboxQty = (Math.ceil(Soli.Remaining_Qty__c/tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c))*tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c;
-                                Soli.Quantity__c = String.ValueOf(Integer.ValueOf(vboxQty));    //text
-                                Soli.Ordered_Quantity__c = Integer.ValueOf(vboxQty);    //number
-                                Soli.Supply_Quantity_num__c = Integer.ValueOf(vboxQty); //number
-                                Soli.Remaining_Qty__c = Integer.ValueOf(vboxQty);   //number
-                                Soli.Supply_Quantity__c = String.ValueOf(Integer.ValueOf(vboxQty)); //text
-                                if(boxQtyChangeAlert == null)
-                                    boxQtyChangeAlert = 'Order quantity of '+Soli.Customer_Ref_Model__c+' in '+SOWrapData.PoliPOIdMap.get((Id)Soli.POLI_Text_Ids__c).Name+' is changed to '+String.ValueOf(Integer.ValueOf(vboxQty));
-                                else
-                                    boxQtyChangeAlert = ' And Order quantity of '+Soli.Customer_Ref_Model__c+' in '+SOWrapData.PoliPOIdMap.get((Id)Soli.POLI_Text_Ids__c).Name+' is changed to '+String.ValueOf(Integer.ValueOf(vboxQty));
-                                
-                            }
-                        }
-                                              if(tempMOQQty > tempQty ){
-                            system.debug('Inside Minimum order Quantity');
-                            if(!onlyvalidate){
-                                Soli.Quantity__c = String.valueof(tempMOQQty);    //text
-                                Soli.Ordered_Quantity__c = tempMOQQty;    //number
-                                Soli.Supply_Quantity_num__c = tempMOQQty; //number
-                                Soli.Remaining_Qty__c = tempMOQQty;   //number
-                                Soli.Supply_Quantity__c = String.valueof(tempMOQQty); //text
-                            }else{
-                                
-                                isMOQMissing = true;
-                                returnVal += 'The Order quantity of '+Soli.Customer_Ref_Model__c +' is less than Minimum Order Quantity '+tempMOQQty+'\n';
-                                // return   returnVal;    
-                            }
-                        }*/
+                        /* if(!onlyvalidate){
+if( retailer[0].Full_Box_Order__c == true && tempBoxQty != null && (math.mod(tempQty, tempBoxQty)) != 0 )
+{
+
+//system.debug('Soli.Remaining_Qty__c: '+Soli.Remaining_Qty__c);
+//system.debug('boxQty: '+tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c);
+system.debug('poli name: '+SOWrapData.PoliPOIdMap.get((Id)Soli.POLI_Text_Ids__c));
+Double vboxQty = (Math.ceil(Soli.Remaining_Qty__c/tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c))*tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c;
+Soli.Quantity__c = String.ValueOf(Integer.ValueOf(vboxQty));    //text
+Soli.Ordered_Quantity__c = Integer.ValueOf(vboxQty);    //number
+Soli.Supply_Quantity_num__c = Integer.ValueOf(vboxQty); //number
+Soli.Remaining_Qty__c = Integer.ValueOf(vboxQty);   //number
+Soli.Supply_Quantity__c = String.ValueOf(Integer.ValueOf(vboxQty)); //text
+if(boxQtyChangeAlert == null)
+boxQtyChangeAlert = 'Order quantity of '+Soli.Customer_Ref_Model__c+' in '+SOWrapData.PoliPOIdMap.get((Id)Soli.POLI_Text_Ids__c).Name+' is changed to '+String.ValueOf(Integer.ValueOf(vboxQty));
+else
+boxQtyChangeAlert = ' And Order quantity of '+Soli.Customer_Ref_Model__c+' in '+SOWrapData.PoliPOIdMap.get((Id)Soli.POLI_Text_Ids__c).Name+' is changed to '+String.ValueOf(Integer.ValueOf(vboxQty));
+
+}
+}
+if(tempMOQQty > tempQty ){
+system.debug('Inside Minimum order Quantity');
+if(!onlyvalidate){
+Soli.Quantity__c = String.valueof(tempMOQQty);    //text
+Soli.Ordered_Quantity__c = tempMOQQty;    //number
+Soli.Supply_Quantity_num__c = tempMOQQty; //number
+Soli.Remaining_Qty__c = tempMOQQty;   //number
+Soli.Supply_Quantity__c = String.valueof(tempMOQQty); //text
+}else{
+
+isMOQMissing = true;
+returnVal += 'The Order quantity of '+Soli.Customer_Ref_Model__c +' is less than Minimum Order Quantity '+tempMOQQty+'\n';
+// return   returnVal;    
+}
+}*/
                         
                         
                         //if(tempQty < tempMOQQty)
@@ -1508,10 +1510,10 @@ else*/ if(priceBookCurrencyMap.containskey(Soli.Price_Specification_Book_Product
                                         system.debug('MoqNFullBoxqty >>>>>>'+MoqNFullBoxqty);
                                         if(onlyvalidate && tempQty != tempBoxQty){
                                             if(!(tempQty > tempBoxQty)){
-                                            isMOQMissing = true;
-                                            returnVal += 'The Order quantity of '+ Soli.Customer_Ref_Model__c+'  should match the Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
+                                                isMOQMissing = true;
+                                                returnVal += 'The Order quantity of '+ Soli.Customer_Ref_Model__c+'  should match the Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
                                             }
-                                            }
+                                        }
                                     }
                                     else{//When tempMOQQty is not evenly divisible by tempBoxQty
                                         for(integer i =1 ; i<=500 ;i++){
@@ -1524,16 +1526,16 @@ else*/ if(priceBookCurrencyMap.containskey(Soli.Price_Specification_Book_Product
                                                 MoqNFullBoxqty = tempVal;
                                                 system.debug('MoqNFullBoxqty inside Input Qty is Less than MOQ >>>>>>'+MoqNFullBoxqty);
                                                 if(onlyvalidate){
-                                                     if(!(tempQty > tempBoxQty)){
-                                                    isMOQMissing = true;
-                                                    returnVal += 'The Order quantity of '+Soli.Customer_Ref_Model__c+'  is less than Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
-                                                     }
-                                                    else{
-                                                         isMOQMissing = true;
-                                                    returnVal += 'The Order quantity of '+Soli.Customer_Ref_Model__c+' should match the Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
-                                                   
+                                                    if(!(tempQty > tempBoxQty)){
+                                                        isMOQMissing = true;
+                                                        returnVal += 'The Order quantity of '+Soli.Customer_Ref_Model__c+'  is less than Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
                                                     }
-                                                     }
+                                                    else{
+                                                        isMOQMissing = true;
+                                                        returnVal += 'The Order quantity of '+Soli.Customer_Ref_Model__c+' should match the Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
+                                                        
+                                                    }
+                                                }
                                                 break;
                                             }
                                         }
@@ -2038,36 +2040,36 @@ else*/ if(SO.CurrencyIsoCode.contains(procurr.CurrencyIsoCode) && procurr.MagNET
                 system.debug('pricebook for matched product: '+proColourPriceBookMap.get(Soli.Customer_Ref_Model__c));
                 Map<String,Price_Specification_Book_Product__c> tempcolorPbMap = proColourPriceBookMap.get(Soli.Customer_Ref_Model__c);
                 //If condition is added on 13-04-22 to Handle the null exception if Soli.Colour__c value is null
-              if(Soli.Colour__c != null){
-                if( tempcolorPbMap.containskey(Soli.Colour__c.toLowerCase()) )
-                {
-                    Soli.Price_Specification_Book_Product__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Id;
-                    
-                    //SO getting saved if SOLI BOX_quantity is missing.04/06/2021
-                    if(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c == null)
-                        tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c = 0;
-                    Integer tempBoxQty = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c);
-                    if( retailerVal[0].Full_Box_Order__c == true && tempBoxQty == 0 )
+                if(Soli.Colour__c != null){
+                    if( tempcolorPbMap.containskey(Soli.Colour__c.toLowerCase()) )
                     {
-                        returnVal = 'Couldn\'t find box quantity in the Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c+ ' with color '+Soli.Colour__c;
+                        Soli.Price_Specification_Book_Product__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Id;
+                        
+                        //SO getting saved if SOLI BOX_quantity is missing.04/06/2021
+                        if(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c == null)
+                            tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c = 0;
+                        Integer tempBoxQty = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c);
+                        if( retailerVal[0].Full_Box_Order__c == true && tempBoxQty == 0 )
+                        {
+                            returnVal = 'Couldn\'t find box quantity in the Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c+ ' with color '+Soli.Colour__c;
+                            return returnVal;
+                        }
+                    }
+                    else
+                    {
+                        returnVal = 'Cannot find Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c+ ' with color '+Soli.Colour__c;
+                        return returnVal;
+                    }
+                    if(Soli.Customer_Ref_Model__c == tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Customer_Ref_Model__c)
+                    {
+                        
+                    }
+                    else
+                    {
+                        returnVal = 'Cannot find Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c;
                         return returnVal;
                     }
                 }
-                else
-                {
-                    returnVal = 'Cannot find Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c+ ' with color '+Soli.Colour__c;
-                    return returnVal;
-                }
-                if(Soli.Customer_Ref_Model__c == tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Customer_Ref_Model__c)
-                {
-                    
-                }
-                else
-                {
-                    returnVal = 'Cannot find Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c;
-                    return returnVal;
-                }
-            }
                 //To handle the Exception if Soli.Color__c value is null
                 else{
                     returnVal = 'Cannot find Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c+ ' WITHOUT Color ';
@@ -2137,87 +2139,87 @@ else*/ if(priceBookCurrencyMap.containskey(Soli.Price_Specification_Book_Product
             {
                 Map<String,Price_Specification_Book_Product__c> tempcolorPbMap = proColourPriceBookMap.get(Soli.Customer_Ref_Model__c);
                 //If condition is added on 13-04-22 to Handle the null exception if Soli.Colour__c value is null
-				if(Soli.Colour__c != null){
-                if(tempcolorPbMap.containskey(Soli.Colour__c.toLowerCase()) )
-                {
-                    Soli.Price_Specification_Book_Product__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Id;
-                    Soli.Product_Description__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Description__c;
-                    Soli.Products__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Product_Unique_ID__c;
-                    Soli.Printshop_Pick__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Print_Shop__c;
-                    Soli.Local_SKU__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Local_SKU__c;
-                    Soli.USD_Rebate_pc__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).USD_Rebate_pc__c;
-                    Soli.EUR_Rebate_pc__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).EUR_Rebate_pc__c;
-                    Soli.USD_Reuse_Rebate_pc__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).USD_Reuse_Rebate_pc__c;
-                    Soli.EUR_Reuse_Rebate_pc__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).EUR_Reuse_Rebate_pc__c;
-                    Soli.Product_image_url__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Product_image_url__c;
-                    Soli.Print__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Sizer_Print__c;
-                    Soli.Family__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Product_Family__c;  
-                    Integer tempQty = Integer.ValueOf(Soli.Supply_Quantity__c);
-                    
-                    if(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c == null)
-                        tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c = 0;
-                    Integer tempBoxQty ;
-                          tempBoxQty  = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c);
+                if(Soli.Colour__c != null){
+                    if(tempcolorPbMap.containskey(Soli.Colour__c.toLowerCase()) )
+                    {
+                        Soli.Price_Specification_Book_Product__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Id;
+                        Soli.Product_Description__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Description__c;
+                        Soli.Products__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Product_Unique_ID__c;
+                        Soli.Printshop_Pick__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Print_Shop__c;
+                        Soli.Local_SKU__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Local_SKU__c;
+                        Soli.USD_Rebate_pc__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).USD_Rebate_pc__c;
+                        Soli.EUR_Rebate_pc__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).EUR_Rebate_pc__c;
+                        Soli.USD_Reuse_Rebate_pc__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).USD_Reuse_Rebate_pc__c;
+                        Soli.EUR_Reuse_Rebate_pc__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).EUR_Reuse_Rebate_pc__c;
+                        Soli.Product_image_url__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Product_image_url__c;
+                        Soli.Print__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Sizer_Print__c;
+                        Soli.Family__c = tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).Product_Family__c;  
+                        Integer tempQty = Integer.ValueOf(Soli.Supply_Quantity__c);
+                        
+                        if(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c == null)
+                            tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c = 0;
+                        Integer tempBoxQty ;
+                        tempBoxQty  = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c);
                         system.debug('tempBoxQty >>>>>>>'+tempBoxQty);
-                         if(tempBoxQty == null){
+                        if(tempBoxQty == null){
                             tempBoxQty = 0;
                         }
-                          Integer tempMOQQty;
-                              tempMOQQty = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).MOQ__c);
+                        Integer tempMOQQty;
+                        tempMOQQty = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).MOQ__c);
                         system.debug('tempMOQQty >>>>>>>'+tempMOQQty);
                         if(tempMOQQty == null){
                             tempMOQQty = 0;
                         }
-                    
-                    //added on 17 Mar 2020 to populate values even if correction in qty is not required
-                    Soli.Full_Box_Order__c = retailer[0].Full_Box_Order__c;
-                    if(Soli.Full_Box_Order__c)
-                        Soli.BOX_QTY__c = tempBoxQty;
-                    
-                    if( retailer[0].Full_Box_Order__c == true && tempBoxQty == 0 )
-                    {
-                        returnVal = 'Couldn\'t find box quantity in the Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c+ ' with color '+Soli.Colour__c;
-                        return returnVal;
-                    }
-                  /*  if(!onlyvalidate){
-                        if( retailer[0].Full_Box_Order__c == true && tempBoxQty != null && (math.mod(tempQty, tempBoxQty)) != 0 )
-                        {
-                            
-                            //system.debug('Soli.Remaining_Qty__c: '+Soli.Remaining_Qty__c);
-                            //system.debug('boxQty: '+tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c);
-                            //system.debug('poli name: '+SOWrapData.PoliPOIdMap.get(Soli.Purchase_Order_LineItem__c));
-                            Double vboxQty = (Math.ceil(Soli.Remaining_Qty__c/tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c))*tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c;
-                            Soli.Quantity__c = String.ValueOf(Integer.ValueOf(vboxQty));    //text
-                            Soli.Ordered_Quantity__c = Integer.ValueOf(vboxQty);    //number
-                            Soli.Supply_Quantity_num__c = Integer.ValueOf(vboxQty); //number
-                            Soli.Remaining_Qty__c = Integer.ValueOf(vboxQty);   //number
-                            Soli.Supply_Quantity__c = String.ValueOf(Integer.ValueOf(vboxQty)); //text
-                            if(boxQtyChangeAlert == null)
-                                boxQtyChangeAlert = 'Order quantity of '+Soli.Customer_Ref_Model__c+' in '+Soli.POLI_Text_Name__c+' is changed to '+String.ValueOf(Integer.ValueOf(vboxQty));
-                            else
-                                boxQtyChangeAlert = ' And Order quantity of '+Soli.Customer_Ref_Model__c+' in '+Soli.POLI_Text_Name__c+' is changed to '+String.ValueOf(Integer.ValueOf(vboxQty));
-                            
-                        }
-                    }
-                    Integer tempMOQQty = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).MOQ__c);
-                    system.debug('tempMOQQty >>>>>>>'+tempMOQQty);
-                    
-                    if(tempMOQQty > tempQty ){
-                        system.debug('Inside Minimum order Quantity');
                         
-                        if(!onlyvalidate){
-                            Soli.Quantity__c = String.valueof(tempMOQQty);    //text
-                            Soli.Ordered_Quantity__c = tempMOQQty;    //number
-                            Soli.Supply_Quantity_num__c = tempMOQQty; //number
-                            Soli.Remaining_Qty__c = tempMOQQty;   //number
-                            Soli.Supply_Quantity__c = String.valueof(tempMOQQty); //text
-                        }else{
-                            isMOQMissing = true;
-                            returnVal+= 'The Order quantity of '+Soli.Customer_Ref_Model__c +' is less than Minimum Order Quantity '+tempMOQQty+'\n';
-                            //return  returnVal;      
+                        //added on 17 Mar 2020 to populate values even if correction in qty is not required
+                        Soli.Full_Box_Order__c = retailer[0].Full_Box_Order__c;
+                        if(Soli.Full_Box_Order__c)
+                            Soli.BOX_QTY__c = tempBoxQty;
+                        
+                        if( retailer[0].Full_Box_Order__c == true && tempBoxQty == 0 )
+                        {
+                            returnVal = 'Couldn\'t find box quantity in the Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c+ ' with color '+Soli.Colour__c;
+                            return returnVal;
                         }
-                    }*/
-                       integer MoqNFullBoxqty;
+                        /*  if(!onlyvalidate){
+if( retailer[0].Full_Box_Order__c == true && tempBoxQty != null && (math.mod(tempQty, tempBoxQty)) != 0 )
+{
+
+//system.debug('Soli.Remaining_Qty__c: '+Soli.Remaining_Qty__c);
+//system.debug('boxQty: '+tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c);
+//system.debug('poli name: '+SOWrapData.PoliPOIdMap.get(Soli.Purchase_Order_LineItem__c));
+Double vboxQty = (Math.ceil(Soli.Remaining_Qty__c/tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c))*tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).BOX_QTY__c;
+Soli.Quantity__c = String.ValueOf(Integer.ValueOf(vboxQty));    //text
+Soli.Ordered_Quantity__c = Integer.ValueOf(vboxQty);    //number
+Soli.Supply_Quantity_num__c = Integer.ValueOf(vboxQty); //number
+Soli.Remaining_Qty__c = Integer.ValueOf(vboxQty);   //number
+Soli.Supply_Quantity__c = String.ValueOf(Integer.ValueOf(vboxQty)); //text
+if(boxQtyChangeAlert == null)
+boxQtyChangeAlert = 'Order quantity of '+Soli.Customer_Ref_Model__c+' in '+Soli.POLI_Text_Name__c+' is changed to '+String.ValueOf(Integer.ValueOf(vboxQty));
+else
+boxQtyChangeAlert = ' And Order quantity of '+Soli.Customer_Ref_Model__c+' in '+Soli.POLI_Text_Name__c+' is changed to '+String.ValueOf(Integer.ValueOf(vboxQty));
+
+}
+}
+Integer tempMOQQty = Integer.ValueOf(tempcolorPbMap.get(Soli.Colour__c.toLowerCase()).MOQ__c);
+system.debug('tempMOQQty >>>>>>>'+tempMOQQty);
+
+if(tempMOQQty > tempQty ){
+system.debug('Inside Minimum order Quantity');
+
+if(!onlyvalidate){
+Soli.Quantity__c = String.valueof(tempMOQQty);    //text
+Soli.Ordered_Quantity__c = tempMOQQty;    //number
+Soli.Supply_Quantity_num__c = tempMOQQty; //number
+Soli.Remaining_Qty__c = tempMOQQty;   //number
+Soli.Supply_Quantity__c = String.valueof(tempMOQQty); //text
+}else{
+isMOQMissing = true;
+returnVal+= 'The Order quantity of '+Soli.Customer_Ref_Model__c +' is less than Minimum Order Quantity '+tempMOQQty+'\n';
+//return  returnVal;      
+}
+}*/
+                        integer MoqNFullBoxqty;
                         if(retailer[0].Full_Box_Order__c == true){
                             if(!(tempQty >= tempMOQQty)){
                                 if(tempBoxQty > 0){
@@ -2268,11 +2270,11 @@ else*/ if(priceBookCurrencyMap.containskey(Soli.Price_Specification_Book_Product
                                         MoqNFullBoxqty = ((integer)math.ceil(tempQty/ tempBoxQty))*tempBoxQty;
                                         system.debug('MoqNFullBoxqty >>>>>>'+MoqNFullBoxqty);
                                         if(onlyvalidate && tempQty != tempBoxQty){
-                                             if(!(tempQty > tempBoxQty)){
-                                            isMOQMissing = true;
-                                            returnVal += 'The Order quantity of '+ Soli.Customer_Ref_Model__c+' should match the Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
-                                             }
-                                             }
+                                            if(!(tempQty > tempBoxQty)){
+                                                isMOQMissing = true;
+                                                returnVal += 'The Order quantity of '+ Soli.Customer_Ref_Model__c+' should match the Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
+                                            }
+                                        }
                                     }
                                     else{//When tempMOQQty is not evenly divisible by tempBoxQty
                                         for(integer i =1 ; i<=500 ;i++){
@@ -2286,13 +2288,13 @@ else*/ if(priceBookCurrencyMap.containskey(Soli.Price_Specification_Book_Product
                                                 system.debug('MoqNFullBoxqty inside Input Qty is Less than MOQ >>>>>>'+MoqNFullBoxqty);
                                                 if(onlyvalidate){
                                                     if(!(tempQty > tempBoxQty)){
-                                                    isMOQMissing = true;
-                                                    returnVal += 'The Order quantity of '+Soli.Customer_Ref_Model__c+'  is less than Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
-                                                     }
+                                                        isMOQMissing = true;
+                                                        returnVal += 'The Order quantity of '+Soli.Customer_Ref_Model__c+'  is less than Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
+                                                    }
                                                     else{
-                                                         isMOQMissing = true;
-                                                    returnVal += 'The Order quantity of '+Soli.Customer_Ref_Model__c+' should match the Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
-                                                   
+                                                        isMOQMissing = true;
+                                                        returnVal += 'The Order quantity of '+Soli.Customer_Ref_Model__c+' should match the Full Box Quantity.The nearest multiples of box quantity is '+MoqNFullBoxqty+'\n';
+                                                        
                                                     } }
                                                 break;
                                             }
@@ -2329,18 +2331,18 @@ else*/ if(priceBookCurrencyMap.containskey(Soli.Price_Specification_Book_Product
                         }
                         system.debug('MoqNFullBoxqty>>>>>>'+MoqNFullBoxqty);
                         if(!onlyvalidate){
-                             Soli.Quantity__c = String.valueof(MoqNFullBoxqty);    //text
-                                Soli.Ordered_Quantity__c = MoqNFullBoxqty;    //number
-                                Soli.Supply_Quantity_num__c = MoqNFullBoxqty; //number
-                                Soli.Remaining_Qty__c = MoqNFullBoxqty;   //number
-                                Soli.Supply_Quantity__c = String.valueof(MoqNFullBoxqty); //text
+                            Soli.Quantity__c = String.valueof(MoqNFullBoxqty);    //text
+                            Soli.Ordered_Quantity__c = MoqNFullBoxqty;    //number
+                            Soli.Supply_Quantity_num__c = MoqNFullBoxqty; //number
+                            Soli.Remaining_Qty__c = MoqNFullBoxqty;   //number
+                            Soli.Supply_Quantity__c = String.valueof(MoqNFullBoxqty); //text
+                        }
                     }
-                }
-                else
-                {
-                    returnVal = 'Couldn\'t find Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c+ ' with color '+Soli.Colour__c;
-                    return returnVal;
-                }
+                    else
+                    {
+                        returnVal = 'Couldn\'t find Price specification book for Customer Ref Model '+Soli.Customer_Ref_Model__c+ ' with color '+Soli.Colour__c;
+                        return returnVal;
+                    }
                 }
                 //To handle the Exception if Soli.Color__c value is null
                 else{
@@ -5647,7 +5649,7 @@ system.debug('Regwrap>>'+Regwrap);
     
     
     //Added by Mahadevaprasad  on 07/11/2023 Starts
-     @AuraEnabled
+    @AuraEnabled
     public static String punchOutMethod(string recordId) {
         PunchOut_Request__c punch=[select id,Operation__c,payloadID__c from PunchOut_Request__c where Id=:recordId];
         System.debug('Operation><>>>>>'+punch.Operation__c);

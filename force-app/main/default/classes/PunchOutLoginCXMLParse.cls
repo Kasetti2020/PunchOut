@@ -157,7 +157,8 @@ public class PunchOutLoginCXMLParse {
                 
             }
             else if(requestNode.getChildElement('OrderRequest', null)!=null){
-                PunchOutOrderCXMLParse.parseCXML(cxmlData);
+               string returnValue= PunchOutOrderCXMLParse.parseCXML(cxmlData);
+                return returnValue;
             }
             
         }
@@ -295,9 +296,7 @@ public class PunchOutLoginCXMLParse {
         
         list<Base_Order__c> base=[select Id,PunchOut_Request__c from Base_Order__c where PunchOut_Request__c=:punchOutId And PunchOut_Status__c='Product Added'];
         
-        //delete base;
-
-		//delete  punch;      
+            
         System.debug(cxml);
         String returnSetupResp;
         /////From Wrapper class 
@@ -307,22 +306,25 @@ public class PunchOutLoginCXMLParse {
         string payloadID=cxml.payloadID;
         string clientSecret=cxml.header.sender.credential.sharedSecret;
         string clientId=cxml.header.sender.credential.identity;
-        
+        System.debug('clientId><><'+clientId);
         map<string,string> punchMap=new map<string,string>();
-        //string accessToken;
+        string accessToken;
         
         /////from custom metadata getting all recordS
         list<PunchOut_User_Credential__mdt> mcs = PunchOut_User_Credential__mdt.getAll().values();
         for(PunchOut_User_Credential__mdt panch:mcs){
-            punchMap.put(panch.Client_Id__c,panch.UserName__c+'#'+panch.password__c);
+            punchMap.put(panch.Client_Id__c,panch.UserName__c+'#'+panch.EndPointUrl__c);
         }
         
         
-      /*  try{
+        try{
             
             if(punchMap.containsKey(clientId)){
                 string UserNameAndPassWord=punchMap.get(clientId);
                 accessToken=PunchOutLoginCXMLParse.getAccessToken(clientId,clientSecret,UserNameAndPassWord);
+               delete base;
+
+				delete  punch;  
             }
         }
         catch(PunchOutLoginException ex){
@@ -331,28 +333,28 @@ public class PunchOutLoginCXMLParse {
             returnSetupResp= PunchOutCXMLgenerate.xmlError('Sender identity or shared secret is invalid',payloadID,timeStamp,'401','Unauthorized');
             return returnSetupResp;
         }
-        */
+        
         //string accessToken=PunchOutLoginCXMLParse.getAccessToken(clientId,clientSecret);
         list<PunchOut_Request__c> punchOut=[select Id,payloadID__c,Operation__c From PunchOut_Request__c Where payloadID__c=:payloadID];
         String redirectURL;
         ////when punchOut size is Equal to zero
         PunchOut_Request__c rqt=new PunchOut_Request__c();
-        String accesstoken = getAccessToken1('','','');
+        
         if(punchOut.size()==0){
             
             rqt.BuyerCookie__c=buyerCookie;
             rqt.TimeStamp__c=DateTime.Valueof(timeStamp.replace('T', ' '));
             rqt.payloadID__c=payloadID;
             rqt.Operation__c=operation;
-            //insert rqt;
+            insert rqt;
             
-            redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accesstoken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
-            //redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQM3A74pUkLyNhe43SIbo3Pl4fNatTNCd8Ikt_G6n.5G__eh13d6pv3i.7VC26iEzaDlQ9w.atDECBvDZNYnIkT._VKVl&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
+            redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
+           
         }else if(punchOut.size()>0){
             punchOut[0].Operation__c=operation;
-            //update punchOut;
-            redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accesstoken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
-            //redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid=00D9D0000000QEP!AQEAQM3A74pUkLyNhe43SIbo3Pl4fNatTNCd8Ikt_G6n.5G__eh13d6pv3i.7VC26iEzaDlQ9w.atDECBvDZNYnIkT._VKVl&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
+            update punchOut;
+            redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
+           
         }
         
         
@@ -362,19 +364,21 @@ public class PunchOutLoginCXMLParse {
     }
     
     
-    public static string getAccessToken1(String clientId, String clientSecret,string UserNameAndPassWord) {
-        
+    public static string getAccessToken(String clientId, String clientSecret,string UserNameAndPassWord) {
+        List<String> names  = UserNameAndPassWord.split('#');
+        string userName=names[0];
+        string endPointUrl=names[1];
         Auth.JWT jwt = new Auth.JWT();
-        jwt.setSub('magnetv20@mainetti.com');
+        jwt.setSub(userName);
         jwt.setAud('https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory'); 
-        jwt.setIss('3MVG9N6eDmZRVJOkogIaHQibQG3Kxu.3E32SkEsZqJKUIjsuxUe.yrCNjHPXBeHR91gWPfhtVcx3rkxYOpSMm');
+        jwt.setIss(clientId);
         
         //Create the object that signs the JWT bearer token
         Auth.JWS jws = new Auth.JWS(jwt,'salesforcemainetti');
         String token = jws.getCompactSerialization();
-        String tokenEndpoint ='https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/services/oauth2/token';
+        //String tokenEndpoint ='https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/services/oauth2/token';
         
-        Auth.JWTBearerTokenExchange bearer = new Auth.JWTBearerTokenExchange(tokenEndpoint, jws);
+        Auth.JWTBearerTokenExchange bearer = new Auth.JWTBearerTokenExchange(endPointUrl, jws);
         
         //Get the access token
         String accessToken = bearer.getAccessToken();
@@ -382,98 +386,7 @@ public class PunchOutLoginCXMLParse {
         return accessToken;
         
         
-        /*String ClientId1 = '3MVG9N6eDmZRVJOkogIaHQibQG8ckzH2p_YFtzzezrkLFIiIUhbmltIEaIC10eLeL6SdP7Co8ZxGOgqa.3C_T';
-        String ClientSecret2 = 'BD9E2C6243CB53A94A7B2E0849B79B5F24933517D1C48BBF819CFF251DDCBC21';
-        
-        String endpoint  = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory?response_type=code&client_id='+
-                           ClientId1 + '&redirect_uri=https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/oauth2/callback';                         
-        
-        HttpRequest request = new HttpRequest();
-        request.setEndpoint(endpoint);
-        request.setMethod('GET');
-        //request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-              
-        Http http = new Http();
-        HttpResponse response = http.send(request);
-        System.debug( 'Status<><>>>'+response.getStatusCode());
-        System.debug( 'Body><>>'+response.getBody());
-        
-        return 'Success';*/
-        
-        
-        
-        /*HttpRequest request = new HttpRequest();
-        request.setEndpoint('https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/services/oauth2/token');
-        request.setMethod('POST');
-        request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-        request.setBody('grant_type=client_credentials' +
-                        '&client_id=' +ClientId1 +
-                        '&client_secret=' + ClientSecret2);
-        
-        Http http = new Http();
-        HttpResponse response = http.send(request);
-        System.debug( 'Status<><>>>'+response.getStatusCode());
-        System.debug( 'Body><>>'+response.getBody());
-        //String accessValue =UserInfo.getOrganizationId().substring(0, 15) +' '+ UserInfo.getSessionId().substring(15);
-        //System.debug('accessValue><><'+accessValue);
-        String accesstoken;
-        if (response.getStatusCode() == 200) {
-            Map<String, Object> jsonResponse = (Map<String, Object>)JSON.deserializeUntyped(response.getBody());
-            System.debug('jsonResponse::'+jsonResponse);
-            accessToken = String.valueOf(jsonResponse.get('access_token'));
-            System.debug('accessToken::'+accessToken);
-            //url = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order';
-            //System.debug('url::'+url);
-        } else {
-            System.debug('Error getting access token: ' + response.getBody());
-            //return null;
-        }
-        
-        return accesstoken;*/
-        /*System.debug('clientId><><'+clientId);
-        System.debug('clientSecret><><'+clientSecret);
-        List<String> names  = UserNameAndPassWord.split('#');
-        string userName=names[0];
-        string passWord=names[1];
-        HttpRequest request = new HttpRequest();
-        request.setEndpoint('https://test.salesforce.com/services/oauth2/token');
-        request.setMethod('POST');
-        request.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-        request.setBody('grant_type=password' +
-                        '&client_id=' + EncodingUtil.urlEncode(clientId, 'UTF-8') +
-                        '&client_secret=' + EncodingUtil.urlEncode(clientSecret, 'UTF-8') +
-                        '&username=' + EncodingUtil.urlEncode(userName, 'UTF-8') +
-                        '&password=' + EncodingUtil.urlEncode(passWord, 'UTF-8'));
-        
-        Http http = new Http();
-        HttpResponse response = http.send(request);
-        System.debug( 'Status<><>>>'+response.getStatusCode());
-        System.debug( 'Body><>>'+response.getBody());
-        String accessValue =UserInfo.getOrganizationId().substring(0, 15) +' '+ UserInfo.getSessionId().substring(15);
-        System.debug('accessValue><><'+accessValue);
-        string paramvalue = UserInfo.getOrganizationId()+''+UserInfo.getSessionId().substring(15);
-        System.debug('paramvalue><><'+paramvalue);
-        // System.debug(UserInfo.getOrganizationId().substring(0, 15) + ' ' +  UserInfo.getSessionId().substring(15));
-        if (response.getStatusCode() == 200) {
-            // Map<String, Object> authResult = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
-            // String accessToken = (String) authResult.get('access_token');
-            String access =UserInfo.getOrganizationId().substring(0, 15) +' '+ UserInfo.getSessionId().substring(15);
-            System.debug('access><><'+access);
-            System.debug(UserInfo.getOrganizationId().substring(0, 15) +''+ UserInfo.getSessionId().substring(15));
-            List<String> res = access.split(' ');
-            System.debug(res[0]);
-            System.debug(res[1]);
-            string accessToken=res[0]+res[1];
-            System.debug('accessToken><><'+accessToken);
-            string redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?';
-            System.debug(redirectURL);
-            //accessToken='00D9D0000000QEP!AQEAQGEs9UsKhD23li0dZUPAtZSQy9q0XS1BDWfyOeVZ_R0QP2YUgp1_95cEHMwheuw5I83xOCNUjlMUtlltizOMFDLmDIJ_';
-            return accessToken;
-        } else {
-            // Handle authentication error
-            System.debug('Authentication error: ' + response.getBody());
-            return null;
-        }*/
+
         
     }
     

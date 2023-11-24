@@ -155,7 +155,7 @@ public class PunchOutOrderCXMLParse {
     
     
     
-    public static CXML parseCXML(String cxmlData) {
+    public static string parseCXML(String cxmlData) {
         Dom.Document doc = new Dom.Document();
         doc.load(cxmlData);
         
@@ -187,8 +187,9 @@ public class PunchOutOrderCXMLParse {
         cxml.request = new Request();
         cxml.request.orderRequest = parseOrderRequest(requestNode.getChildElement('OrderRequest', null));
         system.debug('PunchOutOrderCXMLParse<><><'+cxml);
-        PunchOutOrderCXMLParse.baseOrderCreation(cxml);
-        return cxml;
+       string cxmlreturn= PunchOutOrderCXMLParse.BaseOrderCreation(cxml);
+         
+        return cxmlreturn;
     }
     
     
@@ -401,7 +402,7 @@ public class PunchOutOrderCXMLParse {
         return charge;
     }
     
-      public static void BaseOrderCreation(CXML cxml) {
+      public static string BaseOrderCreation(CXML cxml) {
       /* Base_Order__c base=new Base_Order__c();
           base.Start_Process__c=false;
          
@@ -432,16 +433,25 @@ public class PunchOutOrderCXMLParse {
           baseupdate.PunchOut_Status__c='Order Confirmed';
           baseupdate.Retailer_code__c='Saver';
           update baseupdate;
-*/
-       Base_Order__c baseupdate=[select id,Start_Process__c,Processing_Status__c,Retailer_code__c,PunchOut_Request__r.payloadID__c from Base_Order__c where PunchOut_Request__r.payloadID__c =:cxml.payloadID ];
+*/system.debug('cxml.payloadID><>'+cxml.payloadID);
+          //list<PunchOut_Request__c> punch = [select Id,payloadID__c,Operation__c,Createddate,timestamp__c From PunchOut_Request__c where payloadID__c =:cxml.payloadID ];
+          
+        
+          Base_Order__c baseupdate=[select id,Start_Process__c,Processing_Status__c,Retailer_code__c,PunchOut_Request__r.payloadID__c from Base_Order__c where PunchOut_Request__r.payloadID__c =:cxml.payloadID ];
+         System.debug('baseupdate><>'+baseupdate);
+          string returnValue=PunchOutCXMLgenerate.xmlError('DataUploaded Successfully',cxml.payloadID,cxml.timestamp,'200','Ok') ;
+       system.debug('returnValue><>'+returnValue);
           baseupdate.Start_Process__c=true;
            baseupdate.Processing_Status__c='Draft';
           baseupdate.PunchOut_Status__c='Order Confirmed';
           baseupdate.Retailer_code__c='Saver';
-          Update baseupdate;
+         Update baseupdate;
           
           
-    }
+        
+
+          return returnValue;
+      }
     
     
 }

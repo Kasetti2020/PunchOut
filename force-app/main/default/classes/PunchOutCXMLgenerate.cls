@@ -239,9 +239,14 @@ public class PunchOutCXMLgenerate {
     }
     
  //////////////generating cxml Value   
-     public static void generateCXML(String recordId){
+     public static String generateCXML(String recordId){
           PunchOut_Request__c punch=[select Id,payloadID__c,TimeStamp__c From PunchOut_Request__c where Id=: recordId ];
          
+         list<Base_Order__c> baseList=[select Id,PunchOut_Request__c,OrderSource__c,Company__c From Base_Order__c Where PunchOut_Request__c=:recordId ] ;
+         set<id> baseListId=new set<id>();
+         for(Base_Order__c b:baseList ){
+             baseListId.add(b.Id);
+         }
     List<JF_SF_Field_Mapping__c> mappingRecords = [SELECT Name,SF_Object1_Field_Name__c, ObjectNames1__c,Service_Type__c
             FROM JF_SF_Field_Mapping__c where Service_Type__r.Name ='Sales Order Request'];
         Map<String,String> perentMap = new Map<String,String>();  
@@ -313,7 +318,7 @@ public class PunchOutCXMLgenerate {
             
             parentKeyVal=parentKeyVal.replace('__c', '__r.Id');
            // Stringvarible = parentvalue+'('+childval+' FROM '+childObj+') FROM '+parentKeyVal+' where id =:recordId';
-             Stringvarible = +childval+' FROM '+childObj+' where '+parentKeyVal+' =:recordId';
+             Stringvarible = +childval+' FROM '+childObj+' where '+parentKeyVal+' =:baseListId';
             System.debug('Stringvarible>>'+Stringvarible);
             
         }else{
@@ -380,8 +385,8 @@ public class PunchOutCXMLgenerate {
         for (SObject record : sList) {
            Dom.XmlNode itemIn = punchOutOrderMessage.addChildElement('ItemIn', null, null);
             Dom.XmlNode itemId = itemIn.addChildElement('ItemID', null, null);
-                     itemId.addChildElement('SupplierPartID', null, null).addTextNode('SupplierPartID');
-            itemId.addChildElement('SupplierPartAuxiliaryID', null, null).addTextNode('SupplierPartAuxiliaryID');
+                     itemId.addChildElement('SupplierPartID', null, null).addTextNode(baseList[0].OrderSource__c);
+            itemId.addChildElement('SupplierPartAuxiliaryID', null, null).addTextNode(baseList[0].Company__c);
              Dom.XmlNode itemDetail = itemIn.addChildElement('ItemDetail', null, null);
             Dom.XmlNode unitPrice = itemDetail.addChildElement('UnitPrice', null, null);
             Dom.XmlNode unitPriceMoney = unitPrice.addChildElement('Money', null, null);
@@ -413,7 +418,7 @@ public class PunchOutCXMLgenerate {
             else if(fieldName=='Description'){
                         itemDetail.addChildElement('Description', null, null).addTextNode(String.valueOf(fieldValue));
                     }else if(fieldName=='UnitOfMeasure'){
-                        itemDetail.addChildElement('UnitOfMeasure', null, null).addTextNode(String.valueOf(fieldValue));
+                        //itemDetail.addChildElement('UnitOfMeasure', null, null).addTextNode(String.valueOf(fieldValue));
                     } else if(fieldName=='currency'){
                         unitPriceMoney.addTextNode(String.valueOf(fieldValue));
                     }
@@ -424,5 +429,6 @@ public class PunchOutCXMLgenerate {
             }
              String xmlString = doc.toXmlString();
          System.debug('xmlString><>>>>>>'+xmlString);
+         return xmlString;
         }
 }
