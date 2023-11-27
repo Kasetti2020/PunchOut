@@ -789,7 +789,7 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
     
     //fetch all the cart details         TotalPriceByCurrencyInCart
     @AuraEnabled
-    public static List<SOLIWrapper>  getAllCartDetails(id customerid)
+    public static List<SOLIWrapper>  getAllCartDetails(id punchoutID)
     {
         //Mahadevaprasad List<Sales_Order__c> SOList=new List<Sales_Order__c>();
         //Mahadevaprasad List<Sales_Order_Line_Items__c> SOliList=new List<Sales_Order_Line_Items__c>();
@@ -797,18 +797,22 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
         List<Base_Order_Detail__c> SOliList=new List<Base_Order_Detail__c>();
         List<SOLIWrapper> prodwrapList = new List<SOLIWrapper>();
         
-        system.debug('customerid>>'+customerid);
+        system.debug('customerid>>'+punchoutID);
         system.debug('CartRecordType>>'+CartRecordType);
         
         //Mahadevaprasad SOList =[select id, name, Retailer_Code1__c,Retailer_Code1__r.name,Retailer_Code1__r.Show_Price_in_Order__c,Retailer__c,Product__r.Business_Vertical__c from Sales_Order__c where Supplier__c =: customerid AND RecordTypeId =: CartRecordType];
-        SOList =[select id, name, Retailer_Code1__c,Retailer_Code1__r.name,Retailer_Code1__r.Show_Price_in_Order__c,Product__r.Business_Vertical__c from Base_Order__c where Supplier__c =: customerid ];
+        SOList =[select id, name, Retailer_Code1__c,Retailer_Code1__r.name,Retailer_Code1__r.Show_Price_in_Order__c,Product__r.Business_Vertical__c from Base_Order__c where PunchOut_Request__r.Id=:punchoutID ];
         Decimal TotalCartprice = 0.0;
         System.debug('SOList.size()>>'+SOList.size());
         
+        set<id> baseIds=new set<id>();
+        for(Base_Order__c b:SOList){
+            baseIds.add(b.Id);
+        }
         if(SOList.size()>0)  
         {
             //Mahadevaprasad SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Sales_Order__c,Products__c,Print__c,Products__r.Name,Sales_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Sales_Order__r.Retailer_Code1__r.name,Sales_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Sales_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Sales_Order_Line_Items__c where Sales_Order__r.RecordTypeID =: CartRecordType AND Sales_Order__c =:SOList[0].id  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
-            SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Base_Order__c,Products__c,Print__c,Products__r.Name,Base_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Base_Order__r.Retailer_Code1__r.name,Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Base_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Base_Order_Detail__c where Base_Order__c =:SOList[0].id  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
+            SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Base_Order__c,Products__c,Print__c,Products__r.Name,Base_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Base_Order__r.Retailer_Code1__r.name,Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Base_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Base_Order_Detail__c where Base_Order__c IN:baseIds  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
             system.debug(' SOliList>>'+ SOliList);
             for(Base_Order_Detail__c SOLI:SOliList)
             {
@@ -943,36 +947,63 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
         return prodwrapList;
     }
     
-    // Delete all the products from Cart 
+   /*Ma // Delete all the products from Cart 
     @AuraEnabled
     public static void ClearCartDetails()//parameter => string customerId removed by Vidit
     {
-        List<Sales_Order__c> SOobject=new List<Sales_Order__c>();
+       List<Sales_Order__c> SOobject=new List<Sales_Order__c>();
         Contact CustomerContact = UtilityClass.getCurrentUserContact();	
         Id conId = CustomerContact.Id;
         
         SOobject =[select id, name, Retailer_Code1__c,Retailer__c,Product__r.Business_Vertical__c from Sales_Order__c where Supplier_Contact__c =: conId AND RecordtypeId =: CartRecordType limit 1];
         
+        List<Base_Order__c> SOobject=new List<Base_Order__c>();
+        Contact CustomerContact = UtilityClass.getCurrentUserContact();	
+        Id conId = CustomerContact.Id;
+        
+        SOobject =[select id, name, Retailer_Code1__c,Product__r.Business_Vertical__c from Base_Order__c where Supplier_Contact__c =: conId  limit 1];
+        
+        if(SOobject != null)
+            delete SOobject;
+        
+    }
+MA*/
+    
+    
+     // Delete all the products from Cart 
+    @AuraEnabled
+    public static void ClearCartDetails(string punchoutID)//parameter => string customerId removed by Vidit
+    {
+      
+       
+       System.debug('punchoutID><>>'+punchoutID);
+        List<Base_Order__c> SOobject=new List<Base_Order__c>();
+        Contact CustomerContact = UtilityClass.getCurrentUserContact();	
+        
+        Id conId = CustomerContact.Id;
+        
+        SOobject =[select id, name, Retailer_Code1__c,Product__r.Business_Vertical__c,PunchOut_Request__r.Id from Base_Order__c where  PunchOut_Request__r.Id=:punchoutID];
+        System.debug('SOobject><>>'+SOobject);
         if(SOobject != null)
             delete SOobject;
         
     }
     //Added by seema 
-    /*Ma @AuraEnabled
-public static Base_Order__c checkLengthAddAndCloneDataToDelete(string customerid)    
+     @AuraEnabled
+public static List<Base_Order_Detail__c> checkLengthAddAndCloneDataToDelete(string customerid)    
 {
 
-Base_Order__c soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where  Supplier__c=:customerid];
+//Base_Order__c soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where  Supplier__c=:customerid];
+    List<Base_Order_Detail__c> soli=[select id,Added_As_a_Label__c,Base_Order__r.Supplier__c from Base_Order_Detail__c where Added_As_a_Label__c=true And Base_Order__r.Supplier__c=:customerid];
 //Ma List<Sales_Order_Line_Items__c> soli=[select id,Added_As_a_Label__c,Sales_Order__r.Supplier__c from Sales_Order_Line_Items__c where Added_As_a_Label__c=true And Sales_Order__r.Supplier__c=:customerid];
 system.debug('soli>>>>.'+soli);
-punchoutcxmlgenerate.cxmlOutPutCreate(soli.Id);
-soli.PunchOut_Status__c='Punched Out';
-Update soli;
+
 
 
 return soli;
-}  */ 
-    //Added by seema  Mahadevaprasad R
+}  
+    /*Ma
+    //Added by   Mahadevaprasad R
     @AuraEnabled
     public static string checkLengthAddAndCloneDataToDelete(string punchOutRqt)    {
         
@@ -989,6 +1020,7 @@ return soli;
         
         return cxmlValue;
     }
+*/ 
     @AuraEnabled
     public static void checkAddAndCloneDataToDelete(string customerid)    
     {
@@ -1000,7 +1032,8 @@ return soli;
     @AuraEnabled 
     public static string updateCartValue(String solilistjson)
     {
-        try{
+         try{
+             /*ma
             list<SOLIWrapper> prodwrapList = new list<SOLIWrapper>();
             list<Sales_Order_Line_Items__c> Solilist = new list<Sales_Order_Line_Items__c>();
             list<SOLIWrapper> solideserlist = (list<SOLIWrapper>)JSON.deserialize(solilistjson , list<SOLIWrapper>.class);
@@ -1008,6 +1041,29 @@ return soli;
             for(SOLIWrapper SOLIwrap:solideserlist)
             {
                 Sales_Order_Line_Items__c Soliobj = new Sales_Order_Line_Items__c();
+                Soliobj.id = SOLIwrap.id;
+                Soliobj.Ordered_Quantity__c=Integer.valueOf(SOLIwrap.Quantity);
+                Soliobj.Supply_Quantity__c=SOLIwrap.Quantity;
+                Soliobj.Remaining_Qty__c=Integer.valueOf(SOLIwrap.Quantity);
+                Soliobj.Quantity__c=SOLIwrap.Quantity;
+                Soliobj.Colour__c=SOLIwrap.Color;
+                Soliobj.Local_SKU__c=SOLIwrap.LocalSKU;
+                Soliobj.Size__c=SOLIwrap.Size;
+                Soliobj.Remarks__c=SOLIwrap.Remarks;
+                Solilist.add(Soliobj);
+            }
+            upsert Solilist;
+            return 'SUCCESS';
+Ma*/
+             
+             
+             list<SOLIWrapper> prodwrapList = new list<SOLIWrapper>();
+            list<Base_Order_Detail__c> Solilist = new list<Base_Order_Detail__c>();
+            list<SOLIWrapper> solideserlist = (list<SOLIWrapper>)JSON.deserialize(solilistjson , list<SOLIWrapper>.class);
+            
+            for(SOLIWrapper SOLIwrap:solideserlist)
+            {
+                Base_Order_Detail__c Soliobj = new Base_Order_Detail__c();
                 Soliobj.id = SOLIwrap.id;
                 Soliobj.Ordered_Quantity__c=Integer.valueOf(SOLIwrap.Quantity);
                 Soliobj.Supply_Quantity__c=SOLIwrap.Quantity;

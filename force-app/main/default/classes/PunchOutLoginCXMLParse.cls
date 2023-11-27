@@ -283,19 +283,7 @@ public class PunchOutLoginCXMLParse {
     public static string xmlLoginMethod(CXML cxml){
         
         
-        
-        DateTime currentDate = DateTime.now();
-        currentDate=currentDate-1;
-        system.debug('currentDate::'+currentDate);
-        list<PunchOut_Request__c> punch=[select Id,payloadID__c,Operation__c,Createddate From PunchOut_Request__c where Createddate<:currentDate ];
-        system.debug('punch::'+punch.size());
-        set<id> punchOutId=new set<id>();
-        for(PunchOut_Request__c p:punch){
-            punchOutId.add(p.Id);
-        }
-        
-        list<Base_Order__c> base=[select Id,PunchOut_Request__c from Base_Order__c where PunchOut_Request__c=:punchOutId And PunchOut_Status__c='Product Added'];
-        
+       
             
         System.debug(cxml);
         String returnSetupResp;
@@ -322,9 +310,7 @@ public class PunchOutLoginCXMLParse {
             if(punchMap.containsKey(clientId)){
                 string UserNameAndPassWord=punchMap.get(clientId);
                 accessToken=PunchOutLoginCXMLParse.getAccessToken(clientId,clientSecret,UserNameAndPassWord);
-               delete base;
-
-				delete  punch;  
+               
             }
         }
         catch(PunchOutLoginException ex){
@@ -333,6 +319,23 @@ public class PunchOutLoginCXMLParse {
             returnSetupResp= PunchOutCXMLgenerate.xmlError('Sender identity or shared secret is invalid',payloadID,timeStamp,'401','Unauthorized');
             return returnSetupResp;
         }
+        /// if it more than one day punchout not did value are deleting
+         
+        DateTime currentDate = DateTime.now();
+        currentDate=currentDate-1;
+        system.debug('currentDate::'+currentDate);
+        list<PunchOut_Request__c> punch=[select Id,payloadID__c,Operation__c,Createddate From PunchOut_Request__c where Createddate<:currentDate ];
+        system.debug('punch::'+punch.size());
+        set<id> punchOutId=new set<id>();
+        for(PunchOut_Request__c p:punch){
+            punchOutId.add(p.Id);
+        }
+        
+        list<Base_Order__c> base=[select Id,PunchOut_Request__c from Base_Order__c where PunchOut_Request__c=:punchOutId And PunchOut_Status__c='Product Added'];
+         delete base;
+
+				delete  punch; 
+        
         
         //string accessToken=PunchOutLoginCXMLParse.getAccessToken(clientId,clientSecret);
         list<PunchOut_Request__c> punchOut=[select Id,payloadID__c,Operation__c From PunchOut_Request__c Where payloadID__c=:payloadID];
@@ -340,7 +343,7 @@ public class PunchOutLoginCXMLParse {
         ////when punchOut size is Equal to zero
         PunchOut_Request__c rqt=new PunchOut_Request__c();
         
-        if(punchOut.size()==0){
+        if(punchOut.size()==0 && operation=='Create' ){
             
             rqt.BuyerCookie__c=buyerCookie;
             rqt.TimeStamp__c=DateTime.Valueof(timeStamp.replace('T', ' '));
@@ -350,11 +353,14 @@ public class PunchOutLoginCXMLParse {
             
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
            
-        }else if(punchOut.size()>0){
+        }else if(punchOut.size()>0 &&(operation=='Edit' || operation=='Inspect')){
             punchOut[0].Operation__c=operation;
             update punchOut;
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
            
+        } else {
+             returnSetupResp= PunchOutCXMLgenerate.xmlError('POST XML is not valid:',payloadID,timeStamp,'400','Bad Request');
+            return returnSetupResp;
         }
         
         

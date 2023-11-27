@@ -16,7 +16,7 @@
 
         // Store in localStorage
         window.localStorage.setItem("recordUrlId", sParameterName[1]);
-       // alert(retrievedValue);
+       // alert(sParameterName[1]);
     },
     //Product seach functon
     Search: function(component, event, helper) 

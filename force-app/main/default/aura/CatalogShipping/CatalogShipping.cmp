@@ -21,7 +21,7 @@
     <aura:attribute name="showremarks" type="boolean" default="false"/>
     
     <aura:attribute name="isOperation" type="boolean" default="false"/>
-    
+    <aura:attribute name="isQuantity" type="boolean" default="true"/>
     <ui:inputText aura:id="articleURL"/>
     
     <!--VisulaForcePage-->
@@ -182,7 +182,7 @@
                                 </td>
                                 <td data-label="Close Date" >
                                     <aura:if isTrue="{!cartDetail.fullboxQty}">
-                                        <lightning:input type="number" name="{!ind}" value="{!cartDetail.Quantity}" onchange="{!c.CalculateBoxQty}" disabled="{!c.isOperation}"	/>
+                                        <lightning:input type="number" name="{!ind}" value="{!cartDetail.Quantity}" onchange="{!c.CalculateBoxQty}"  disabled="{isQuantity}"	/>
                                         <aura:set attribute="else">
                                             <lightning:input type="number" aura:id="myInput" name="{!ind}" value="{!cartDetail.Quantity}"  onchange="{!c.CalculateBoxQty}"/>
                                         </aura:set>

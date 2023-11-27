@@ -1,6 +1,7 @@
 ({
     toGetcustomerData:function(component, event,helper){
-        //alert('hii');
+         var currentUrl = window.location.href;
+        var sParameterName = currentUrl.split('=');
         var action1 = component.get("c.FetchCustData");
         action1.setCallback(this, function(response){
             var state = response.getState();
@@ -11,13 +12,14 @@
                 var actiongetcart = component.get("c.getAllCartDetails");
                 var custid =component.get("v.DisplayCustDetail");
                 actiongetcart.setParams({ 
-                    "customerid": custid
+                    "punchoutID": sParameterName[1]
                 });
                 actiongetcart.setCallback(this, function(response){
                     var state = response.getState();
                     if (state === "SUCCESS") { 
                         if(response.getReturnValue()!= null)
                         {
+                            alert(response.getReturnValue().length);
                             component.set('v.CartValue',response.getReturnValue().length);
                             component.set('v.DisplayCartDetail',response.getReturnValue());
                             //alert( component.get('v.DisplayCartDetail').Id);
@@ -91,13 +93,16 @@
                 //component.set('v.isOperation',true)
                 if(resultvalue=='create'){
                     component.set('v.isOperation',true);
+                    component.set('v.isQuantity',false);
                    
                 } else  if(resultvalue=='edit'){
                     component.set('v.isOperation',true);
+                     component.set('v.isQuantity',false);
                      
                 }
                 else  if(resultvalue=='inspect'){
                     component.set('v.isOperation',false);
+                    component.set('v.isQuantity',true);
                    
                     
                 }
@@ -519,10 +524,12 @@
     ClearCart:function(component, event,helper) 
     {
         //var CustomerID=component.get('v.DisplayCustDetail');
+         var currentUrl = window.location.href;
+        var sParameterName = currentUrl.split('=');
         var action1 = component.get("c.ClearCartDetails");
-        /*action1.setParams({ 
-            "customerid":CustomerID
-        });*/
+        action1.setParams({ 
+            "punchoutID":sParameterName[1]
+        });
         action1.setCallback(this, function(response){
             var state = response.getState();
             

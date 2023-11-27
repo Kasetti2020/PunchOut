@@ -352,11 +352,11 @@
         $A.enqueueAction(action);
     },
     getCartCount: function(component, event,helper) 
-    {
-        //alert('Inside Count'); 
+    { var currentUrl = window.location.href;
+        var sParameterName = currentUrl.split('=');
         var action = component.get('c.getCartDataCount');
         action.setParams({ 
-            "customerid": component.get('v.onselectcustomeid')
+            "customerid": sParameterName[1]
         });
         action.setCallback(this, function(actionResult) {
             var status=actionResult.getState();

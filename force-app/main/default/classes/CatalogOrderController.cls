@@ -846,9 +846,17 @@ CurrCode = ResCurr[0];
      @AuraEnabled
     //Commented By Bharath Reddy On 26/11/2021 ,Because string type Parameter is not fectching the customerid value
    // public static Integer getCartDataCount(String customerid)
-        public static Integer getCartDataCount(Id customerid)
+     /*Ma   public static Integer getCartDataCount(Id customerid)
     {
         Integer count= SOController.getAllCartDetails(customerid).size();
+        system.debug('count>>>'+count);
+        return count;
+    }Ma*/
+     public static Integer getCartDataCount(Id customerid)
+    {
+        
+        list<Base_Order__c> SOList =[select id,PunchOut_Request__r.Id from Base_Order__c where PunchOut_Request__r.Id=:customerid ];
+        Integer count= SOList.size();
         system.debug('count>>>'+count);
         return count;
     }
