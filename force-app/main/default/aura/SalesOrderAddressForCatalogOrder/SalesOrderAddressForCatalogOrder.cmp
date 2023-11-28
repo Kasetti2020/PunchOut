@@ -44,9 +44,26 @@
     <aura:attribute name="SeasonYearCheck" type="Boolean" default="false"/>
     <aura:attribute name="RetailerCheck" type="Boolean" default="false"/>
     
+    <!--Added By Mahadevaprasad on 28/11/2023 starts -->
+    <aura:attribute name="DisplayCartDetail" type="list"/>
+    <aura:attribute name="CartValue" type="Integer" default="0"/>
+    <aura:attribute name="InactiveStatus" type="Boolean" default="false"/>
+    <aura:attribute name="renderTotalAmmount" type="Boolean" default="true"/>
+    <aura:attribute name="TotalOrderAmmount" type="Decimal"/>
+    <aura:attribute name="CurrencyIso" type="String" />
+    <aura:attribute name="loaded" type="Boolean" default="true"/>
+    <aura:attribute name="ShowPriceInOrder" type="Boolean"/>
+    <aura:attribute name="showremarks" type="boolean" default="false"/>
+    <aura:attribute name="HideButtons" type="Boolean" default="true"/>
+    <!--Added By Mahadevaprasad on 28/11/2023 Ends -->
     <div class="slds-hide" aura:id="spinner">
         <lightning:spinner style="position: fixed" alternativeText="Loading" size="large" />
     </div>
+    
+      
+    
+    
+    
     <aura:if isTrue="{!v.OrderDetailFlag}">
         <div role="dialog" tabindex="-1" aria-labelledby="header43" class="slds-modal slds-fade-in-open" style="Max-width">
             <div class="slds-modal__container" style="max-width: 100%;width: 96%;font-size:11px;">
@@ -68,6 +85,101 @@
                 
                 <!-- Bill to and ship adress starts-->
                 <div class="slds-modal__content slds-p-around--x-small"> 
+                    
+                    <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_col-bordered1 slds-table_resizable-cols " style="font-size:11px;">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th class="" scope="col" style="width:15%;">
+                                <div class="slds-truncate" title="Product">{!$Label.c.Product}</div>
+                            </th>
+                            <!--<th class="" scope="col">
+                                <div class="slds-truncate" title="Product">Price Specification Book Product Name</div>
+                            </th>-->
+                            <th class="" scope="col" style="width:5%;"></th>
+
+                            <th class="" scope="col" style="width:38%;">
+                                <div class="slds-truncate" title="Description">{!$Label.c.Description}</div>
+                            </th>
+                            <th class="" scope="col" style="width:12%;">
+                                <div class="slds-truncate" title="Quantity">{!$Label.c.Quantity}</div>
+                            </th>
+                            <!--Added By Bharath on 08/11/2021 starts -->
+                            <aura:if isTrue="{!v.ShowPriceInOrder}">
+                                <th class="" scope="col" style="width:12%;">
+                                    <div class="slds-truncate" title="OrderAmmount">{!$Label.c.Order_Amount}</div>
+                                </th>
+                            </aura:if>
+                             <!--Added By Bharath on 08/11/2021 Ends -->
+                            <aura:if isTrue="{!v.showremarks}">
+                                <th class="" scope="col">
+                                    
+                                    <div class="slds-truncate" title="Quantity">{!$Label.c.remarks}</div>
+                                    
+                                </th> </aura:if>
+                            <th class="slds-text-align_center" scope="col" style="width:5%;">
+                                
+                                <div class="slds-truncate" title="Action">{!$Label.c.Action}</div>
+                                    
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.DisplayCartDetail}" var="cartDetail" indexVar="ind">
+                            <tr class="slds-hint-parent">
+                                <td data-label="Opportunity Name" scope="row">
+                                    <img src="{!cartDetail.Productimage}" alt="Product" width="110"/>
+                                </td>
+                                <td data-label="QuickView">
+                                    <aura:if isTrue="{!v.selectedTab=='Labels &amp; Tickets'}">
+                                        <aura:if isTrue="{!cartDetail.variableDataProduct == 'Yes'}">
+                                            <lightning:buttonIcon iconName="utility:preview" size="large" onclick="{!c.viewCareLabel}" value="{!cartDetail.Id}" name="{!ind}" variant="bare" alternativeText="{!$Label.c.View}" title="{!$Label.c.View}" iconClass="dark"/>
+                                        </aura:if>
+                                    </aura:if>
+                                </td>
+                                <td data-label="Account Name">
+                                    <p><b style="width:140px;display:inline-block;">{!$Label.c.Mainetti_Model_Code} </b><span style="color:#a41f34;">: {!cartDetail.PSBP}</span></p>
+                                    <p class="slds-truncate"><b style="width:140px;display:inline-block;">{!$Label.c.Description} </b>: {!cartDetail.Description} from {!cartDetail.retailerName}</p>
+                                    <!--<aura:if isTrue="{!cartDetail.fullboxQty}">-->
+                                    <p><b style="width:140px;display:inline-block;">{!$Label.c.Color} </b>: {!cartDetail.Color}</p>
+                                    <p><b style="width:140px;display:inline-block;">{!$Label.c.Size} </b>: {!cartDetail.Size}</p>
+                                    <aura:if isTrue="{!cartDetail.fullboxQty}">
+                                        <p><b style="width:140px;display:inline-block;">{!$Label.c.Box_Quantity} </b>: {!cartDetail.boxquantity}</p>
+                                    </aura:if>
+                                    <aura:if isTrue="{!cartDetail.Status=='Active'}">
+                                    <p><b style="width:140px;display:inline-block;">{!$Label.c.STATUS} </b>: {!cartDetail.Status}</p>
+                                     </aura:if>
+                                     <aura:if isTrue="{!cartDetail.Status=='Inactive'}">
+                                    <p><b style="width:140px;display:inline-block;">{!$Label.c.STATUS} </b><span style="color:#a41f34;">: {!cartDetail.Status}</span></p>
+                                     </aura:if>
+                                        <!--</aura:if>-->
+                                </td>
+                                <td data-label="Close Date" >
+                                    <aura:if isTrue="{!cartDetail.fullboxQty}">
+                                        <lightning:input type="number" name="{!ind}" value="{!cartDetail.Quantity}" onchange="{!c.CalculateBoxQty}"  disabled="{isQuantity}"	/>
+                                        <aura:set attribute="else">
+                                            <lightning:input type="number" aura:id="myInput" name="{!ind}" value="{!cartDetail.Quantity}"  onchange="{!c.CalculateBoxQty}"/>
+                                        </aura:set>
+                                    </aura:if>
+                                </td>
+                                <aura:if isTrue="{!v.ShowPriceInOrder}">
+                                    <td>
+                                        <lightning:input type="text" name="{!ind}" value="{!cartDetail.CurrencyIsoCode + cartDetail.BlankString +   cartDetail.TotalPriceByCurrency}"  disabled="true"	/>
+                                    </td>
+                                </aura:if>
+                                
+                                
+                            </tr>
+                        </aura:iteration>
+                        
+                    </tbody>
+                </table>
+                    
+                    
+                    
+                    
+                    
+                    
+                    
                     <div class="slds-box slds-m-around--small1">
                         <h2 class="box-title" style="width:62px">{!$Label.c.Details}</h2>
                         <div class="slds-grid slds-wrap slds-gutters" style="margin-top:-20px;">

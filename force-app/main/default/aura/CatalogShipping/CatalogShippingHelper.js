@@ -19,15 +19,19 @@
                     if (state === "SUCCESS") { 
                         if(response.getReturnValue()!= null)
                         {
-                            alert(response.getReturnValue().length);
+                           // alert(response.getReturnValue().length);
                             component.set('v.CartValue',response.getReturnValue().length);
                             component.set('v.DisplayCartDetail',response.getReturnValue());
+                           // console.log('DisplayCartDetail<>>>'+JSON.stringify(DisplayCartDetail));
                             //alert( component.get('v.DisplayCartDetail').Id);
                             //Added By Raghu On 12/11/2021 starts
                             //To get the Total Order Amount
                             var totalAmmount =0;
                                 for(let i=0;i<response.getReturnValue().length;i++){
                                     totalAmmount += component.get("v.DisplayCartDetail")[i].TotalPriceByCurrency;
+                                    if(component.get("v.DisplayCartDetail")[i].Status=='Inactive'){
+                                       component.set('v.InactiveStatus',true);
+                                    }
                                 }
                                 totalAmmount = totalAmmount.toFixed(2);
                                 totalAmmount = Number(totalAmmount).toLocaleString(undefined, {minimumFractionDigits: 2});
@@ -39,10 +43,13 @@
                            //Added By Raghu On 12/11/2021 ends
                                 //alert(component.get("v.DisplayCartDetail")[0].orderUom);
                             //ENC 2.1 ## Added to show remarks based on retailer code remarks 
+                            //alert(component.get('v.CartValue'));
                             if(component.get('v.CartValue') !=0)
                             {
+                                //alert('123');
                                 component.set('v.showremarks',component.get("v.DisplayCartDetail")[0].showremarks);
                                 component.set("v.ShowPriceInOrder",component.get("v.DisplayCartDetail")[0].ShowPriceInOrder);
+                                component.get('v.ShowPriceInOrder');
                             }
                         }
                         else

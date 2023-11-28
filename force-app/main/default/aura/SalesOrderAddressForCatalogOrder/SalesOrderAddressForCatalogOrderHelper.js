@@ -1,6 +1,9 @@
 ({
     toGetCustomerAddess : function(component, event,helper) 
     {
+        
+         var currentUrl = window.location.href;
+        var sParameterName = currentUrl.split('=');
         var custInfoid =component.get("v.CustomerInfoID");
         var retailerName =component.get("v.retailerName");
         console.log("retailer name>>>>"+retailerName);
@@ -10,17 +13,19 @@
             "custInfoid": custInfoid,
             "retailer": retailerName,
             "retailercodeId":component.get("v.retailerCodeId"),
-            "orderSource": component.get("v.OrderSource")
+            "orderSource": component.get("v.OrderSource"),
+            "punchRqtId":sParameterName[1]
         });
         action.setCallback(this, function(response){
             var state = response.getState();
             var res = response.getReturnValue();
-            
+           // alert(JSON.stringify(res.billAddListRqt));
+            console.log('Bill TO<><>>'+JSON.stringify(res.billAddListRqt));
             if (state === "SUCCESS") 
             {
                
-                component.set("v.BillAddressList", res.billAddList);
-                component.set("v.ShipAddressList", res.shipAddList);
+                component.set("v.BillAddressList", res.shipAddListRqt);
+                component.set("v.ShipAddressList", res.billAddListRqt);
                 component.set("v.BuyerAddressList", res.buyerAddList);
                 component.set("v.InvoiceAddressList", res.invoiceAddList);
                 component.set("v.shipTermList", res.shipTermList);
@@ -141,6 +146,77 @@
             }
         });
         $A.enqueueAction(action);
+    },
+    
+    
+    toGetcustomerData:function(component, event,helper){
+         var currentUrl = window.location.href;
+        var sParameterName = currentUrl.split('=');
+       
+               var action = component.get("c.getAllActiveCartDetails");
+        
+        action.setParams({ 
+           
+            "punchoutID":sParameterName[1]
+        });
+        action.setCallback(this, function(response){
+                    alert('state');
+                    var state = response.getState();
+                    //alert(state);
+                    if (state === "SUCCESS") { 
+                       // alert('state');
+                        if(response.getReturnValue()!= null)
+                        {
+                             console.log('DisplayCartDetail><>>'+JSON.stringify(response.getReturnValue()));
+                            component.set('v.CartValue',response.getReturnValue().length);
+                            component.set('v.DisplayCartDetail',response.getReturnValue());
+                          
+                            var totalAmmount =0;
+                                for(let i=0;i<response.getReturnValue().length;i++){
+                                    totalAmmount += component.get("v.DisplayCartDetail")[i].TotalPriceByCurrency;
+                                   
+                                }
+                                totalAmmount = totalAmmount.toFixed(2);
+                                totalAmmount = Number(totalAmmount).toLocaleString(undefined, {minimumFractionDigits: 2});
+                            component.set('v.renderTotalAmmount',false);
+                            component.set('v.renderTotalAmmount',true);
+                            component.set('v.TotalOrderAmmount',totalAmmount);
+                            component.set('v.CurrencyIso',component.get("v.DisplayCartDetail")[0].CurrencyIsoCode);
+                            component.set('v.loaded',false);
+                          
+                            if(component.get('v.CartValue') !=0)
+                            {
+                               
+                                component.set('v.showremarks',component.get("v.DisplayCartDetail")[0].showremarks);
+                                component.set("v.ShowPriceInOrder",component.get("v.DisplayCartDetail")[0].ShowPriceInOrder);
+                               
+                            }
+                        }
+                        else
+                        {
+                            if(component.get('v.CartValue') == 0)
+                            {
+                                component.set("v.HideButtons",false);
+                            } 
+                            var toastEvent = $A.get("e.force:showToast");
+                            toastEvent.setParams({
+                                title: $A.get("$Label.c.Warning"),
+                                message: $A.get("$Label.c.No_Product_in_Cart"),
+                                type: "warning"
+                            });
+                            toastEvent.fire();
+                            component.set('v.loaded',false);
+                        }
+                        
+                    }
+                   // var spinner = component.find('spinner');
+                   // $A.util.toggleClass(spinner, "slds-hide");
+                });
+                $A.enqueueAction(action); 
+          
+        
+      
+        
     },
     getDefaultAddress : function(component, event, helper)
     {

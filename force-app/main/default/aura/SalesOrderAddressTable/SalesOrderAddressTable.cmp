@@ -19,7 +19,7 @@
                             <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Factory_Name}</dt>
                             <dd class="slds-item_detail slds-truncate" title=""><ui:outputText value="{!Add.Factory_Name__c}"/></dd>
                             <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Street} </dt>
-                            <dd class="slds-item_detail slds-truncate" title=""><ui:outputText value="{!Add.Address_1__c}"/></dd>
+                            <dd class="slds-item_detail slds-truncate" title=""><ui:outputText value="{!Add.Street__c}"/></dd>
                             <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.City} </dt>
                             <dd class="slds-item_detail slds-truncate" title=""><ui:outputText value="{!Add.City__c}"/></dd>
                             <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.State} </dt>
@@ -27,7 +27,7 @@
                             <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Country} </dt>
                             <dd class="slds-item_detail slds-truncate" title=""><ui:outputText value="{!Add.Country__c}"/></dd>
                             <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Postal_Code}</dt>
-                            <dd class="slds-item_detail slds-truncate" title=""><ui:outputText value="{!Add.Postcode__c}"/></dd>
+                            <dd class="slds-item_detail slds-truncate" title=""><ui:outputText value="{!Add.PostalCode__c}"/></dd>
                             <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Contact_Name} </dt>
                             <dd class="slds-item_detail slds-truncate" title=""><ui:outputText value="{!Add.Contact__c}"/></dd>
                             <dt class="slds-item_label slds-text-color_weak slds-truncate" title="">{!$Label.c.Contact_Number}</dt>

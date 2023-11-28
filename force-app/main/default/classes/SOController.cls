@@ -787,20 +787,22 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
         return 'success';
     }
     
-    //fetch all the cart details         TotalPriceByCurrencyInCart
-    @AuraEnabled
-    public static List<SOLIWrapper>  getAllCartDetails(id punchoutID)
+    
+    
+    //<!--Added By Mahadevaprasad on 28/11/2023 starts -->
+  ////getting all active model 
+  @AuraEnabled
+       public static List<SOLIWrapper>  getAllActiveCartDetails(Id punchoutID)
     {
-        //Mahadevaprasad List<Sales_Order__c> SOList=new List<Sales_Order__c>();
-        //Mahadevaprasad List<Sales_Order_Line_Items__c> SOliList=new List<Sales_Order_Line_Items__c>();
+        system.debug('customerid123>>'+punchoutID);
         List<Base_Order__c> SOList=new List<Base_Order__c>();
         List<Base_Order_Detail__c> SOliList=new List<Base_Order_Detail__c>();
         List<SOLIWrapper> prodwrapList = new List<SOLIWrapper>();
         
-        system.debug('customerid>>'+punchoutID);
+        //system.debug('customerid123>>'+punchoutID);
         system.debug('CartRecordType>>'+CartRecordType);
         
-        //Mahadevaprasad SOList =[select id, name, Retailer_Code1__c,Retailer_Code1__r.name,Retailer_Code1__r.Show_Price_in_Order__c,Retailer__c,Product__r.Business_Vertical__c from Sales_Order__c where Supplier__c =: customerid AND RecordTypeId =: CartRecordType];
+       
         SOList =[select id, name, Retailer_Code1__c,Retailer_Code1__r.name,Retailer_Code1__r.Show_Price_in_Order__c,Product__r.Business_Vertical__c from Base_Order__c where PunchOut_Request__r.Id=:punchoutID ];
         Decimal TotalCartprice = 0.0;
         System.debug('SOList.size()>>'+SOList.size());
@@ -812,7 +814,7 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
         if(SOList.size()>0)  
         {
             //Mahadevaprasad SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Sales_Order__c,Products__c,Print__c,Products__r.Name,Sales_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Sales_Order__r.Retailer_Code1__r.name,Sales_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Sales_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Sales_Order_Line_Items__c where Sales_Order__r.RecordTypeID =: CartRecordType AND Sales_Order__c =:SOList[0].id  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
-            SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Base_Order__c,Products__c,Print__c,Products__r.Name,Base_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Base_Order__r.Retailer_Code1__r.name,Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Base_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Base_Order_Detail__c where Base_Order__c IN:baseIds  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
+            SOliList =[select id,Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c,Supply_Quantity__c,Price_100_pcs__c,name,Base_Order__c,Products__c,Print__c,Products__r.Name,Base_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Base_Order__r.Retailer_Code1__r.name,Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Base_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Base_Order_Detail__c where Base_Order__c IN:baseIds  AND Added_As_a_Label__c=false AND Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c='Active'];//  AND Added_As_a_Label__c=false Added by seema .
             system.debug(' SOliList>>'+ SOliList);
             for(Base_Order_Detail__c SOLI:SOliList)
             {
@@ -836,6 +838,8 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
                 productobj.orderUom = SOLI.Order_UOM__c;
                 productobj.ShowPriceInOrder = SOLI.Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c;
                 productobj.variableDataProduct = SOLI.variable_data_product__c;
+                productobj.Status =  SOLI.Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c;
+                //Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c
                 // Decimal.ValueOf(str)
                 //  system.debug(' SOLI.Price_Specification_Book_Product__r.UOM_Price__c :::'+ SOLI.Price_Specification_Book_Product__r.UOM_Price__c);
                 // system.debug(' SOLI.Quantity__c :::'+ SOLI.Quantity__c);
@@ -878,7 +882,116 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
                 system.debug(' productobj :::'+ productobj);
                 prodwrapList.add(productobj);
             }
+            system.debug(' prodwrapList4567 :::'+ prodwrapList);
             return prodwrapList;
+            
+        }
+        else 
+        {
+            return null;
+        }
+    }
+ ///<!--Added By Mahadevaprasad on 28/11/2023 Ends -->
+    
+    
+    
+    
+    //fetch all the cart details         TotalPriceByCurrencyInCart
+    @AuraEnabled
+    public static List<SOLIWrapper>  getAllCartDetails(id punchoutID)
+    {
+        //Mahadevaprasad List<Sales_Order__c> SOList=new List<Sales_Order__c>();
+        //Mahadevaprasad List<Sales_Order_Line_Items__c> SOliList=new List<Sales_Order_Line_Items__c>();
+        List<Base_Order__c> SOList=new List<Base_Order__c>();
+        List<Base_Order_Detail__c> SOliList=new List<Base_Order_Detail__c>();
+        List<SOLIWrapper> prodwrapList = new List<SOLIWrapper>();
+        
+        system.debug('customerid>>'+punchoutID);
+        system.debug('CartRecordType>>'+CartRecordType);
+        
+        //Mahadevaprasad SOList =[select id, name, Retailer_Code1__c,Retailer_Code1__r.name,Retailer_Code1__r.Show_Price_in_Order__c,Retailer__c,Product__r.Business_Vertical__c from Sales_Order__c where Supplier__c =: customerid AND RecordTypeId =: CartRecordType];
+        SOList =[select id, name, Retailer_Code1__c,Retailer_Code1__r.name,Retailer_Code1__r.Show_Price_in_Order__c,Product__r.Business_Vertical__c from Base_Order__c where PunchOut_Request__r.Id=:punchoutID ];
+        Decimal TotalCartprice = 0.0;
+        System.debug('SOList.size()>>'+SOList.size());
+        
+        set<id> baseIds=new set<id>();
+        for(Base_Order__c b:SOList){
+            baseIds.add(b.Id);
+        }
+        if(SOList.size()>0)  
+        {
+            //Mahadevaprasad SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Sales_Order__c,Products__c,Print__c,Products__r.Name,Sales_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Sales_Order__r.Retailer_Code1__r.name,Sales_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Sales_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Sales_Order_Line_Items__c where Sales_Order__r.RecordTypeID =: CartRecordType AND Sales_Order__c =:SOList[0].id  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
+            SOliList =[select id,Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c,Supply_Quantity__c,Price_100_pcs__c,name,Base_Order__c,Products__c,Print__c,Products__r.Name,Base_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Base_Order__r.Retailer_Code1__r.name,Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Base_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Base_Order_Detail__c where Base_Order__c IN:baseIds  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
+            system.debug(' SOliList>>'+ SOliList);
+            for(Base_Order_Detail__c SOLI:SOliList)
+            {
+                SOLIWrapper productobj = new SOLIWrapper();
+                productobj.id = SOLI.id;
+                productobj.SOid = SOLI.Base_Order__c;
+                productobj.Name=SOLI.Products__r.Name;
+                productobj.Quantity=SOLI.Quantity__c;
+                productobj.Color=SOLI.Colour__c;
+                productobj.LocalSKU=SOLI.Local_SKU__c;
+                productobj.fullboxQty=SOLI.Full_Box_Order__c;
+                productobj.boxquantity=SOLI.BOX_QTY__c;
+                productobj.Description=SOLI.Product_Description__c;
+                productobj.Productimage=SOLI.Product_image_url__c;
+                productobj.Remarks=SOLI.Remarks__c;
+                productobj.retailerName = SOLI.Base_Order__r.Retailer_Code1__r.name;
+                productobj.showremarks = SOLI.Base_Order__r.Retailer_Code1__r.Remarks__c;
+                productobj.PSBP = SOLI.Price_Specification_Book_Product__r.Name;
+                productobj.ProductId = SOLI.Products__r.Id;
+                productobj.MOQ = SOLI.Price_Specification_Book_Product__r.MOQ__c; 
+                productobj.orderUom = SOLI.Order_UOM__c;
+                productobj.ShowPriceInOrder = SOLI.Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c;
+                productobj.variableDataProduct = SOLI.variable_data_product__c;
+                productobj.Status =  SOLI.Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c;
+                //Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c
+                // Decimal.ValueOf(str)
+                //  system.debug(' SOLI.Price_Specification_Book_Product__r.UOM_Price__c :::'+ SOLI.Price_Specification_Book_Product__r.UOM_Price__c);
+                // system.debug(' SOLI.Quantity__c :::'+ SOLI.Quantity__c);
+                //system.debug(' SOLI.Id :::'+ SOLI.Id);
+                //system.debug(' SOLI.Id :::'+ SOLI.Products__r.Name);
+                
+                //If the user is perticular user then perticular price is set added By raghu starts
+                system.debug(' SOLI.Price_Product_by_Currency__r.MagNET_Price_Code__c :::'+ SOLI.Price_Product_by_Currency__r.MagNET_Price_Code__c);
+                if(SOLI.Price_Product_by_Currency__r.MagNET_Price_Code__c != null){
+                    // system.debug(' SOLI.Supply_Quantity__c>>'+ SOLI.Supply_Quantity__c);
+                    //system.debug(' SOLI.Price_100_pcs__c>>'+ SOLI.Price_100_pcs__c);
+                    //system.debug('SOLI.COLOUR>>'+SOLI.Colour__c);
+                    productobj.TotalPriceByCurrency = ((Decimal.ValueOf(SOLI.Supply_Quantity__c))/100) * Decimal.ValueOf(SOLI.Price_100_pcs__c);
+                    // productobj.TotalPriceByCurrency = (SOLI.Price_Product_by_Currency__r.UOM_Price__c) *  (Decimal.ValueOf(SOLI.Quantity__c) );
+                    system.debug(' productobj.TotalPriceByCurrency>>'+ productobj.TotalPriceByCurrency);
+                }
+                else {
+                    if(SOLI.Supply_Quantity__c != Null){ 
+                        //system.debug(' SOLI.Supply_Quantity__c>>'+ SOLI.Supply_Quantity__c);
+                        system.debug(' SOLI.Price_100_pcs__c>>'+ SOLI.Price_100_pcs__c);
+                        system.debug('SOLI.COLOUR>>'+SOLI.Colour__c);
+                        productobj.TotalPriceByCurrency = ((Decimal.ValueOf(SOLI.Supply_Quantity__c))/100) * Decimal.ValueOf(SOLI.Price_100_pcs__c);
+                        system.debug('productobj.TotalPriceByCurrency:::'+productobj.TotalPriceByCurrency);
+                        // productobj.TotalPriceByCurrency = (SOLI.Price_Specification_Book_Product__r.UOM_Price__c) *  (Decimal.ValueOf(SOLI.Quantity__c) ); 
+                        system.debug(' (if) productobj.TotalPriceByCurrency>>'+ productobj.TotalPriceByCurrency);
+                    }
+                }
+                // added By raghu ends
+                system.debug(' productobj.TotalPriceByCurrency :::'+ productobj.TotalPriceByCurrency);
+                productobj.CurrencyIsoCode = SOLI.CurrencyIsoCode;
+                productobj.BlankString = '  ';
+                //if(SOLI.Products__r.Sub_category__c == 'STICKER' || SOLI.Products__r.Sub_category__c == 'SIZER')			// added by chandana on 03/26/2020
+                if(SOLI.variable_data_product__c == 'YES')
+                {
+                    productobj.Size=SOLI.print__c;
+                }
+                else{
+                    productobj.Size=SOLI.Size__c;
+                }
+                system.debug(' productobj :::'+ productobj);
+                prodwrapList.add(productobj);
+            }
+            system.debug(' prodwrapList123 :::'+ prodwrapList);
+            return prodwrapList;
+            
         }
         else 
         {
@@ -947,36 +1060,36 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
         return prodwrapList;
     }
     
-   /*Ma // Delete all the products from Cart 
-    @AuraEnabled
-    public static void ClearCartDetails()//parameter => string customerId removed by Vidit
-    {
-       List<Sales_Order__c> SOobject=new List<Sales_Order__c>();
-        Contact CustomerContact = UtilityClass.getCurrentUserContact();	
-        Id conId = CustomerContact.Id;
-        
-        SOobject =[select id, name, Retailer_Code1__c,Retailer__c,Product__r.Business_Vertical__c from Sales_Order__c where Supplier_Contact__c =: conId AND RecordtypeId =: CartRecordType limit 1];
-        
-        List<Base_Order__c> SOobject=new List<Base_Order__c>();
-        Contact CustomerContact = UtilityClass.getCurrentUserContact();	
-        Id conId = CustomerContact.Id;
-        
-        SOobject =[select id, name, Retailer_Code1__c,Product__r.Business_Vertical__c from Base_Order__c where Supplier_Contact__c =: conId  limit 1];
-        
-        if(SOobject != null)
-            delete SOobject;
-        
-    }
+    /*Ma // Delete all the products from Cart 
+@AuraEnabled
+public static void ClearCartDetails()//parameter => string customerId removed by Vidit
+{
+List<Sales_Order__c> SOobject=new List<Sales_Order__c>();
+Contact CustomerContact = UtilityClass.getCurrentUserContact();	
+Id conId = CustomerContact.Id;
+
+SOobject =[select id, name, Retailer_Code1__c,Retailer__c,Product__r.Business_Vertical__c from Sales_Order__c where Supplier_Contact__c =: conId AND RecordtypeId =: CartRecordType limit 1];
+
+List<Base_Order__c> SOobject=new List<Base_Order__c>();
+Contact CustomerContact = UtilityClass.getCurrentUserContact();	
+Id conId = CustomerContact.Id;
+
+SOobject =[select id, name, Retailer_Code1__c,Product__r.Business_Vertical__c from Base_Order__c where Supplier_Contact__c =: conId  limit 1];
+
+if(SOobject != null)
+delete SOobject;
+
+}
 MA*/
     
     
-     // Delete all the products from Cart 
+    // Delete all the products from Cart 
     @AuraEnabled
     public static void ClearCartDetails(string punchoutID)//parameter => string customerId removed by Vidit
     {
-      
-       
-       System.debug('punchoutID><>>'+punchoutID);
+        
+        
+        System.debug('punchoutID><>>'+punchoutID);
         List<Base_Order__c> SOobject=new List<Base_Order__c>();
         Contact CustomerContact = UtilityClass.getCurrentUserContact();	
         
@@ -989,37 +1102,37 @@ MA*/
         
     }
     //Added by seema 
-     @AuraEnabled
-public static List<Base_Order_Detail__c> checkLengthAddAndCloneDataToDelete(string customerid)    
-{
-
-//Base_Order__c soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where  Supplier__c=:customerid];
-    List<Base_Order_Detail__c> soli=[select id,Added_As_a_Label__c,Base_Order__r.Supplier__c from Base_Order_Detail__c where Added_As_a_Label__c=true And Base_Order__r.Supplier__c=:customerid];
-//Ma List<Sales_Order_Line_Items__c> soli=[select id,Added_As_a_Label__c,Sales_Order__r.Supplier__c from Sales_Order_Line_Items__c where Added_As_a_Label__c=true And Sales_Order__r.Supplier__c=:customerid];
-system.debug('soli>>>>.'+soli);
-
-
-
-return soli;
-}  
-    /*Ma
-    //Added by   Mahadevaprasad R
     @AuraEnabled
-    public static string checkLengthAddAndCloneDataToDelete(string punchOutRqt)    {
+    public static List<Base_Order_Detail__c> checkLengthAddAndCloneDataToDelete(string customerid)    
+    {
         
-        //PunchOut_Request__c punch=[select Id,payloadID__c,TimeStamp__c From PunchOut_Request__c where Id=: punchOutRqt ];
-        list<Base_Order__c> soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where PunchOut_Request__c=:punchOutRqt];
-        string cxmlValue= punchoutcxmlgenerate.generateCXML(punchOutRqt);
+        //Base_Order__c soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where  Supplier__c=:customerid];
+        List<Base_Order_Detail__c> soli=[select id,Added_As_a_Label__c,Base_Order__r.Supplier__c from Base_Order_Detail__c where Added_As_a_Label__c=true And Base_Order__r.Supplier__c=:customerid];
+        //Ma List<Sales_Order_Line_Items__c> soli=[select id,Added_As_a_Label__c,Sales_Order__r.Supplier__c from Sales_Order_Line_Items__c where Added_As_a_Label__c=true And Sales_Order__r.Supplier__c=:customerid];
         system.debug('soli>>>>.'+soli);
-        for(Base_Order__c b:soli){
-            b.PunchOut_Status__c='Punched Out';
-            
-        }
-        Update soli;
         
         
-        return cxmlValue;
-    }
+        
+        return soli;
+    }  
+    /*Ma
+//Added by   Mahadevaprasad R
+@AuraEnabled
+public static string checkLengthAddAndCloneDataToDelete(string punchOutRqt)    {
+
+//PunchOut_Request__c punch=[select Id,payloadID__c,TimeStamp__c From PunchOut_Request__c where Id=: punchOutRqt ];
+list<Base_Order__c> soli=[select id,Supplier__c,PunchOut_Status__c from Base_Order__c where PunchOut_Request__c=:punchOutRqt];
+string cxmlValue= punchoutcxmlgenerate.generateCXML(punchOutRqt);
+system.debug('soli>>>>.'+soli);
+for(Base_Order__c b:soli){
+b.PunchOut_Status__c='Punched Out';
+
+}
+Update soli;
+
+
+return cxmlValue;
+}
 */ 
     @AuraEnabled
     public static void checkAddAndCloneDataToDelete(string customerid)    
@@ -1032,32 +1145,32 @@ return soli;
     @AuraEnabled 
     public static string updateCartValue(String solilistjson)
     {
-         try{
-             /*ma
-            list<SOLIWrapper> prodwrapList = new list<SOLIWrapper>();
-            list<Sales_Order_Line_Items__c> Solilist = new list<Sales_Order_Line_Items__c>();
-            list<SOLIWrapper> solideserlist = (list<SOLIWrapper>)JSON.deserialize(solilistjson , list<SOLIWrapper>.class);
-            
-            for(SOLIWrapper SOLIwrap:solideserlist)
-            {
-                Sales_Order_Line_Items__c Soliobj = new Sales_Order_Line_Items__c();
-                Soliobj.id = SOLIwrap.id;
-                Soliobj.Ordered_Quantity__c=Integer.valueOf(SOLIwrap.Quantity);
-                Soliobj.Supply_Quantity__c=SOLIwrap.Quantity;
-                Soliobj.Remaining_Qty__c=Integer.valueOf(SOLIwrap.Quantity);
-                Soliobj.Quantity__c=SOLIwrap.Quantity;
-                Soliobj.Colour__c=SOLIwrap.Color;
-                Soliobj.Local_SKU__c=SOLIwrap.LocalSKU;
-                Soliobj.Size__c=SOLIwrap.Size;
-                Soliobj.Remarks__c=SOLIwrap.Remarks;
-                Solilist.add(Soliobj);
-            }
-            upsert Solilist;
-            return 'SUCCESS';
+        try{
+            /*ma
+list<SOLIWrapper> prodwrapList = new list<SOLIWrapper>();
+list<Sales_Order_Line_Items__c> Solilist = new list<Sales_Order_Line_Items__c>();
+list<SOLIWrapper> solideserlist = (list<SOLIWrapper>)JSON.deserialize(solilistjson , list<SOLIWrapper>.class);
+
+for(SOLIWrapper SOLIwrap:solideserlist)
+{
+Sales_Order_Line_Items__c Soliobj = new Sales_Order_Line_Items__c();
+Soliobj.id = SOLIwrap.id;
+Soliobj.Ordered_Quantity__c=Integer.valueOf(SOLIwrap.Quantity);
+Soliobj.Supply_Quantity__c=SOLIwrap.Quantity;
+Soliobj.Remaining_Qty__c=Integer.valueOf(SOLIwrap.Quantity);
+Soliobj.Quantity__c=SOLIwrap.Quantity;
+Soliobj.Colour__c=SOLIwrap.Color;
+Soliobj.Local_SKU__c=SOLIwrap.LocalSKU;
+Soliobj.Size__c=SOLIwrap.Size;
+Soliobj.Remarks__c=SOLIwrap.Remarks;
+Solilist.add(Soliobj);
+}
+upsert Solilist;
+return 'SUCCESS';
 Ma*/
-             
-             
-             list<SOLIWrapper> prodwrapList = new list<SOLIWrapper>();
+            
+            
+            list<SOLIWrapper> prodwrapList = new list<SOLIWrapper>();
             list<Base_Order_Detail__c> Solilist = new list<Base_Order_Detail__c>();
             list<SOLIWrapper> solideserlist = (list<SOLIWrapper>)JSON.deserialize(solilistjson , list<SOLIWrapper>.class);
             
@@ -3300,7 +3413,7 @@ system.debug('Regwrap>>'+Regwrap);
     } 
     // Added by Vidit fetch Shipping and Billing address
     @AuraEnabled
-    public static addressWrapper FetchCustAdd(String custInfoid,String retailer, String retailercodeId, String orderSource, String supplierCode)
+    public static addressWrapper FetchCustAdd(String custInfoid,String retailer, String retailercodeId, String orderSource, String supplierCode,String punchRqtId)
     {
         system.debug('orderSource>>>>'+orderSource);
         Map<String, List<String>> CompanyAndItsShippingTerms = new Map<String, List<String>>();
@@ -3310,8 +3423,8 @@ system.debug('Regwrap>>'+Regwrap);
         String CompName;
         String currencyName;
         boolean iscloned = false;
-        Sales_Order__c cartSO = new Sales_Order__c();
-        
+        //ma Sales_Order__c cartSO = new Sales_Order__c();
+        Base_order__c cartSO = new Base_order__c();
         for(Retailer_Related_Data__c rrd:[Select Id,Order_to_Company__c,Preferred_Currency__c from Retailer_Related_Data__c where ContactID__c =:con.Id AND Status__c = 'Active' AND Retailer_Code__c =:retailercodeId ])
         {
             system.debug('rrd getcostomerinfo'+rrd);
@@ -3360,7 +3473,8 @@ system.debug('Regwrap>>'+Regwrap);
         }
         else
         {
-            cartSO = UtilityClass.getSORecordAsCart(custInfoid);
+            // cartSO = UtilityClass.getSORecordAsCart(custInfoid);
+            cartSO = UtilityClass.getSORecordAsBaseCart(custInfoid);
             system.debug('cartSO>>>>'+cartSO);
             
             Schema.DescribeFieldResult companyResult = Online_Enquiry__c.Order_Country__c.getDescribe();
@@ -3407,9 +3521,14 @@ system.debug('Regwrap>>'+Regwrap);
         List<Ship_Bill_Address__c> shipAddress = new List<Ship_Bill_Address__c>();
         List<Ship_Bill_Address__c> buyerAddress = new List<Ship_Bill_Address__c>();
         List<Ship_Bill_Address__c> invoiceAddress = new List<Ship_Bill_Address__c>();
+        List<PunchOut_Request__c> shipAddressRqt = new List<PunchOut_Request__c>();
         
         //fetching address realted to customer and grouping them by their record types
         List<Ship_Bill_Address__c> custAddress= [select id,name,recordtype.name,Is_Default__c,Company_Name__c,Address_1__c,City__c,State__c,Country__c,Postcode__c,Factory_Name__c,Contact__c,Tel_No__c,Email_Address__c, Fax_No__c from Ship_Bill_Address__c where Customer_Information__c =: custInfoid AND Bill_Ship_Status__c=:'Active'];
+        shipAddressRqt=[select Id,payloadID__c,Operation__c,Street__c,City__c,State__c,PostalCode__c,Country__c,CXML_data__c From PunchOut_Request__c Where Id=:punchRqtId];
+        
+        
+        
         for(Ship_Bill_Address__c addss:custAddress)
         {
             if(addss.recordtype.name == 'Bill To' || addss.recordtype.name == 'Bill To Locked')
@@ -4957,6 +5076,8 @@ system.debug('Regwrap>>'+Regwrap);
         @AuraEnabled
         public String Name {get;set;}
         @AuraEnabled
+        public String Status {get;set;}
+        @AuraEnabled
         public String producttype {get;set;}
         @AuraEnabled
         public String Productimage {get;set;}
@@ -5005,6 +5126,8 @@ system.debug('Regwrap>>'+Regwrap);
     //wrapper for address
     public class addressWrapper
     { 
+        @AuraEnabled
+        public List<PunchOut_Request__c> billAddListRqt;
         @AuraEnabled
         public List<Ship_Bill_Address__c> billAddList;
         @AuraEnabled
@@ -5153,9 +5276,9 @@ system.debug('Regwrap>>'+Regwrap);
         }
     }
     @AuraEnabled
-    public static addressWrapper FetchCustAddForCatalogOrder(String custInfoid,String retailer, String retailercodeId, String orderSource)
+    public static addressWrapper FetchCustAddForCatalogOrder(String custInfoid,String retailer, String retailercodeId, String orderSource,String punchRqtId)
     {
-        system.debug('orderSource>>>>'+orderSource);
+        system.debug('punchRqtId>>>>'+punchRqtId);
         Map<String, List<String>> CompanyAndItsShippingTerms = new Map<String, List<String>>();
         Online_Enquiry__c oe = new Online_Enquiry__c();
         CompanyAndItsShippingTerms = RegistrationService.getDependentMap(oe,'Order_Country__c','Delivery_Instruction__c');
@@ -5163,8 +5286,8 @@ system.debug('Regwrap>>'+Regwrap);
         String CompName;
         String currencyName;
         boolean iscloned = false;
-        Sales_Order__c cartSO = new Sales_Order__c();
-        
+       //Ma Sales_Order__c cartSO = new Sales_Order__c();
+        Base_order__c cartSO = new Base_order__c();
         for(Retailer_Related_Data__c rrd:[Select Id,Order_to_Company__c,Preferred_Currency__c from Retailer_Related_Data__c where ContactID__c =:con.Id AND Status__c = 'Active' AND Retailer_Code__c =:retailercodeId ])
         {
             system.debug('rrd getcostomerinfo'+rrd);
@@ -5213,7 +5336,8 @@ system.debug('Regwrap>>'+Regwrap);
         }
         else
         {
-            cartSO = UtilityClass.getSORecordAsCart(custInfoid);
+             cartSO = UtilityClass.getSORecordAsBaseCart(custInfoid);
+            //cartSO = UtilityClass.getSORecordAsCart(custInfoid);
             system.debug('cartSO>>>>'+cartSO);
             
             Schema.DescribeFieldResult companyResult = Online_Enquiry__c.Order_Country__c.getDescribe();
@@ -5260,9 +5384,11 @@ system.debug('Regwrap>>'+Regwrap);
         List<Ship_Bill_Address__c> shipAddress = new List<Ship_Bill_Address__c>();
         List<Ship_Bill_Address__c> buyerAddress = new List<Ship_Bill_Address__c>();
         List<Ship_Bill_Address__c> invoiceAddress = new List<Ship_Bill_Address__c>();
-        
+        List<PunchOut_Request__c> billRqt = new List<PunchOut_Request__c>();
         //fetching address realted to customer and grouping them by their record types
         List<Ship_Bill_Address__c> custAddress= [select id,name,recordtype.name,Is_Default__c,Company_Name__c,Address_1__c,City__c,State__c,Country__c,Postcode__c,Factory_Name__c,Contact__c,Tel_No__c,Email_Address__c, Fax_No__c from Ship_Bill_Address__c where Customer_Information__c =: custInfoid AND Bill_Ship_Status__c=:'Active'];
+         billRqt=[select Id,payloadID__c,Operation__c,Street__c,City__c,State__c,PostalCode__c,Country__c From PunchOut_Request__c Where Id=:punchRqtId];
+        system.debug('billRqt>>>>'+billRqt);
         for(Ship_Bill_Address__c addss:custAddress)
         {
             if(addss.recordtype.name == 'Bill To' || addss.recordtype.name == 'Bill To Locked')
@@ -5288,7 +5414,7 @@ system.debug('Regwrap>>'+Regwrap);
         addWrap.invoiceAddList = invoiceAddress;
         addWrap.defaultCompany = CompName;
         addWrap.defaultCurrency = currencyName;
-        
+        addwrap.billAddListRqt=billRqt;
         
         
         if(CompanyAndItsShippingTerms.containskey(CompName))
@@ -5327,7 +5453,7 @@ system.debug('Regwrap>>'+Regwrap);
         addWrap.divisionList = listValuesOfDivision;
         
         //to get suppiel code and manufacturing code
-        List<Retailer_Related_Data__c> ContRetailer = new List<Retailer_Related_Data__c>();
+       /*ma List<Retailer_Related_Data__c> ContRetailer = new List<Retailer_Related_Data__c>();
         ContRetailer = [select id,Name,Supplier_Code__c,Retailer_Code__r.Supplier_Code_UnMask__c,Retailer_Code__r.Manufacturer_Code_UnMask__c,Customer_Information__c,Retailer_Code__c,Manufacturer_Factory_Code__c from Retailer_Related_Data__c where Customer_Information__c =: custInfoid AND Retailer_Code__c =: retailercodeId];
         System.debug('ContRetailer>>>>>>'+ContRetailer);
         if(ContRetailer[0].Retailer_Code__c != null){
@@ -5337,7 +5463,7 @@ system.debug('Regwrap>>'+Regwrap);
         else{
             addWrap.SOUnMask = false;
             addWrap.MOUnMask = false;
-        }
+        }*/
         //Fetching Checkbox values for mandatory feilds according to retailer code
         List<Retailer_Code__c> MandatoryCheck = new List<Retailer_Code__c>();
         MandatoryCheck = [Select Season_Mandatory__c , Season_Year_Mandatory__c ,Retailer_PO_Mandatory__c,Division_Mandatory__c from Retailer_Code__c where Id =: retailercodeId ];
@@ -5353,12 +5479,12 @@ system.debug('Regwrap>>'+Regwrap);
             system.debug(' date todate ::'+Date.today());
         }
         system.debug('prototypeSO::'+prototypeSO);
-        prototypeSO.Supplier_Code__c=ContRetailer[0].Supplier_Code__c;
-        prototypeSO.Manufacturer_Code__c=ContRetailer[0].Manufacturer_Factory_Code__c;
-        prototypeSO.Id = cartSO.Id;
-        addWrap.protoSO = prototypeSO;
+        //Ma prototypeSO.Supplier_Code__c=ContRetailer[0].Supplier_Code__c;
+       //Ma prototypeSO.Manufacturer_Code__c=ContRetailer[0].Manufacturer_Factory_Code__c;
+       // prototypeSO.Id = cartSO.Id;
+        //addWrap.protoSO = prototypeSO;
         
-        
+        system.debug('addWrap>>>>'+addWrap);
         
         return addWrap;
     }

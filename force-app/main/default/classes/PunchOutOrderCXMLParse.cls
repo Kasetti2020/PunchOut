@@ -39,7 +39,7 @@ public class PunchOutOrderCXMLParse {
         public String state { get; set; }
         public String postalCode { get; set; }
         public String country { get; set; }
-         public String name { get; set; }
+        public String name { get; set; }
         public String deliverTo { get; set; }
         
     }
@@ -49,7 +49,7 @@ public class PunchOutOrderCXMLParse {
         public string numberValue{ get; set; }
         public string isoCountryCode{ get; set; }
     }
-     public class Phone {
+    public class Phone {
         public string name { get; set; }
         public TelephoneNumber telephoneNumber{ get; set; }
     }
@@ -68,7 +68,7 @@ public class PunchOutOrderCXMLParse {
         public Fax fax { get; set; }
     }
     
-     
+    
     public class ShipTo {
         public Address address { get; set; }
         
@@ -181,14 +181,17 @@ public class PunchOutOrderCXMLParse {
         cxml.header.sender = parseSender(sender.getChildElement('Credential', null));
         cxml.header.sender.userAgent = sender.getChildElement('UserAgent', null).getText();
         
-        
+         string cxmlreturn;
         // Parse Request Node
         Dom.XmlNode requestNode = cxmlNode.getChildElement('Request', null);
         cxml.request = new Request();
         cxml.request.orderRequest = parseOrderRequest(requestNode.getChildElement('OrderRequest', null));
         system.debug('PunchOutOrderCXMLParse<><><'+cxml);
-       string cxmlreturn= PunchOutOrderCXMLParse.BaseOrderCreation(cxml);
-         
+        if(String.isBlank(cxml.payloadID)||String.isBlank(cxml.payloadID)){
+             cxmlreturn= PunchOutCXMLgenerate.xmlError('POST XML payloadID is not valid:',cxml.payloadID,cxml.timeStamp,'400','Bad Request');
+        } else {
+      cxmlreturn = PunchOutOrderCXMLParse.BaseOrderCreation(cxml);
+        }
         return cxmlreturn;
     }
     
@@ -292,25 +295,25 @@ public class PunchOutOrderCXMLParse {
         return address;
     }
     
-     public static Phone parsePhone(Dom.XmlNode postalPhone) {
+    public static Phone parsePhone(Dom.XmlNode postalPhone) {
         Phone phone = new Phone();
-         phone.TelephoneNumber = parseTelephoneNumber(postalPhone.getChildElement('TelephoneNumber', null));
-       
+        phone.TelephoneNumber = parseTelephoneNumber(postalPhone.getChildElement('TelephoneNumber', null));
+        
         return phone;
     }
     public static Fax parseFax(Dom.XmlNode postalFax) {
         Fax fax = new Fax();
-         fax.TelephoneNumber = parseTelephoneNumber(postalFax.getChildElement('TelephoneNumber', null));
-       
+        fax.TelephoneNumber = parseTelephoneNumber(postalFax.getChildElement('TelephoneNumber', null));
+        
         return fax;
     }
-     public static TelephoneNumber parseTelephoneNumber(Dom.XmlNode postalTelephoneNumber) {
+    public static TelephoneNumber parseTelephoneNumber(Dom.XmlNode postalTelephoneNumber) {
         TelephoneNumber telephoneNumber = new TelephoneNumber();
-         telephoneNumber.countryCode = postalTelephoneNumber.getChildElement('CountryCode', null).getText();
-          telephoneNumber.areaOrCityCode = postalTelephoneNumber.getChildElement('AreaOrCityCode', null).getText();
-       telephoneNumber.numberValue = postalTelephoneNumber.getChildElement('Number', null).getText();
-       Dom.XmlNode countryCodeNode = postalTelephoneNumber.getChildElement('CountryCode', null);
-         telephoneNumber.isoCountryCode = countryCodeNode.getAttribute('isoCountryCode', null);
+        telephoneNumber.countryCode = postalTelephoneNumber.getChildElement('CountryCode', null).getText();
+        telephoneNumber.areaOrCityCode = postalTelephoneNumber.getChildElement('AreaOrCityCode', null).getText();
+        telephoneNumber.numberValue = postalTelephoneNumber.getChildElement('Number', null).getText();
+        Dom.XmlNode countryCodeNode = postalTelephoneNumber.getChildElement('CountryCode', null);
+        telephoneNumber.isoCountryCode = countryCodeNode.getAttribute('isoCountryCode', null);
         return telephoneNumber;
     }
     
@@ -328,7 +331,7 @@ public class PunchOutOrderCXMLParse {
         return postalAddress;
     }
     
-   
+    
     
     
     
@@ -346,20 +349,20 @@ public class PunchOutOrderCXMLParse {
         for (Dom.XmlNode extrinsicNode : itemDetailNode.getChildElements()) {
             Extrinsic extrinsic = new Extrinsic();
             if(extrinsicNode.getAttribute('name', null)!=null){
-            extrinsic.name = extrinsicNode.getAttribute('name', null);
-            extrinsic.value = extrinsicNode.getText();
-            itemDetail.extrinsics.add(extrinsic);
+                extrinsic.name = extrinsicNode.getAttribute('name', null);
+                extrinsic.value = extrinsicNode.getText();
+                itemDetail.extrinsics.add(extrinsic);
             }
         }
         
         return itemDetail;
     }
-     public static UnitPrice parseunitPrice(Dom.XmlNode unitPriceNode) {
+    public static UnitPrice parseunitPrice(Dom.XmlNode unitPriceNode) {
         UnitPrice fr=new UnitPrice();
         
-       Dom.XmlNode moneynode=unitPriceNode.getChildElement('Money', null);
+        Dom.XmlNode moneynode=unitPriceNode.getChildElement('Money', null);
         fr.money = unitPriceNode.getChildElement('Money', null).getText();
-          fr.currencyValue = moneynode.getAttribute('currency', null);
+        fr.currencyValue = moneynode.getAttribute('currency', null);
         
         return fr;
     }
@@ -367,7 +370,7 @@ public class PunchOutOrderCXMLParse {
     
     
     
-     public static ItemID parseItemID(Dom.XmlNode itemIDNode) {
+    public static ItemID parseItemID(Dom.XmlNode itemIDNode) {
         ItemID item = new ItemID();
         item.supplierPartAuxiliaryID = itemIDNode.getChildElement('SupplierPartAuxiliaryID', null).getText();
         item.supplierPartID = itemIDNode.getChildElement('SupplierPartID', null).getText();
@@ -402,56 +405,64 @@ public class PunchOutOrderCXMLParse {
         return charge;
     }
     
-      public static string BaseOrderCreation(CXML cxml) {
-      /* Base_Order__c base=new Base_Order__c();
-          base.Start_Process__c=false;
-         
-          base.CustomerParty_Name__c=cxml.request.OrderRequest.itemOutList[0].ItemID.supplierPartID;
-          base.SupplierParty_CNUF__c=cxml.request.OrderRequest.itemOutList[0].ItemID.supplierPartAuxiliaryID;
-          insert base;
-          list<Base_Order_Detail__c> baseLineList=new list<Base_Order_Detail__c>();
-          for(ItemOut item: cxml.request.OrderRequest.itemOutList){
-              
-              Base_Order_Detail__c  baseLine=new Base_Order_Detail__c();
-              baseLine.Base_Order__c=base.Id;
-              baseLine.Quantity__c=item.quantity;
-              baseLine.Ordered_Quantity__c = Integer.valueOf(item.quantity);
-              baseLine.Supply_Quantity__c =item.quantity;
-              baseLine.Supply_Quantity_num__c = Integer.valueOf(item.quantity);
-              baseLine.Remaining_Qty__c = Integer.valueOf(item.quantity);
-              baseLine.Size__c=item.ItemDetail.classification;
-               baseLine.Colour__c=item.ItemDetail.unitOfMeasure;
-               baseLine.print__c=item.ItemDetail.manufacturerName;
-              baseLineList.add(baseLine);
-          }
-          insert baseLineList;
-          System.debug('base><><>'+base.Id);
-          Base_Order__c baseupdate=new Base_Order__c();
-          baseupdate.Id=base.Id;
-          baseupdate.Start_Process__c=true;
-           baseupdate.Processing_Status__c='Draft';
-          baseupdate.PunchOut_Status__c='Order Confirmed';
-          baseupdate.Retailer_code__c='Saver';
-          update baseupdate;
-*/system.debug('cxml.payloadID><>'+cxml.payloadID);
-          //list<PunchOut_Request__c> punch = [select Id,payloadID__c,Operation__c,Createddate,timestamp__c From PunchOut_Request__c where payloadID__c =:cxml.payloadID ];
-          
-        
-          Base_Order__c baseupdate=[select id,Start_Process__c,Processing_Status__c,Retailer_code__c,PunchOut_Request__r.payloadID__c from Base_Order__c where PunchOut_Request__r.payloadID__c =:cxml.payloadID ];
-         System.debug('baseupdate><>'+baseupdate);
-          string returnValue=PunchOutCXMLgenerate.xmlError('DataUploaded Successfully',cxml.payloadID,cxml.timestamp,'200','Ok') ;
-       system.debug('returnValue><>'+returnValue);
-          baseupdate.Start_Process__c=true;
-           baseupdate.Processing_Status__c='Draft';
-          baseupdate.PunchOut_Status__c='Order Confirmed';
-          baseupdate.Retailer_code__c='Saver';
-         Update baseupdate;
-          
-          
-        
+    public static string BaseOrderCreation(CXML cxml) {
+        /* Base_Order__c base=new Base_Order__c();
+base.Start_Process__c=false;
 
-          return returnValue;
-      }
+base.CustomerParty_Name__c=cxml.request.OrderRequest.itemOutList[0].ItemID.supplierPartID;
+base.SupplierParty_CNUF__c=cxml.request.OrderRequest.itemOutList[0].ItemID.supplierPartAuxiliaryID;
+insert base;
+list<Base_Order_Detail__c> baseLineList=new list<Base_Order_Detail__c>();
+for(ItemOut item: cxml.request.OrderRequest.itemOutList){
+
+Base_Order_Detail__c  baseLine=new Base_Order_Detail__c();
+baseLine.Base_Order__c=base.Id;
+baseLine.Quantity__c=item.quantity;
+baseLine.Ordered_Quantity__c = Integer.valueOf(item.quantity);
+baseLine.Supply_Quantity__c =item.quantity;
+baseLine.Supply_Quantity_num__c = Integer.valueOf(item.quantity);
+baseLine.Remaining_Qty__c = Integer.valueOf(item.quantity);
+baseLine.Size__c=item.ItemDetail.classification;
+baseLine.Colour__c=item.ItemDetail.unitOfMeasure;
+baseLine.print__c=item.ItemDetail.manufacturerName;
+baseLineList.add(baseLine);
+}
+insert baseLineList;
+System.debug('base><><>'+base.Id);
+Base_Order__c baseupdate=new Base_Order__c();
+baseupdate.Id=base.Id;
+baseupdate.Start_Process__c=true;
+baseupdate.Processing_Status__c='Draft';
+baseupdate.PunchOut_Status__c='Order Confirmed';
+baseupdate.Retailer_code__c='Saver';
+update baseupdate;
+*/system.debug('cxml.payloadID><>'+cxml.payloadID);
+        //list<PunchOut_Request__c> punch = [select Id,payloadID__c,Operation__c,Createddate,timestamp__c From PunchOut_Request__c where payloadID__c =:cxml.payloadID ];
+        
+        string returnValue;
+        list<Base_Order__c> baseupdate=[select id,Start_Process__c,Processing_Status__c,Retailer_code__c,PunchOut_Request__r.payloadID__c from Base_Order__c where PunchOut_Request__r.payloadID__c =:cxml.payloadID ];
+        System.debug('baseupdate><>'+baseupdate);
+        if(baseupdate.size()>0){
+        returnValue=PunchOutCXMLgenerate.xmlError('DataUploaded Successfully',cxml.payloadID,cxml.timestamp,'200','Ok') ;
+        system.debug('returnValue><>'+returnValue);
+        for(Base_Order__c b:baseupdate){
+            b.Start_Process__c=true;
+            b.Processing_Status__c='Draft';
+            b.PunchOut_Status__c='Order Confirmed';
+            b.Retailer_code__c='Saver';
+            
+        }
+        Update baseupdate;
+        }
+        ////if payloadID is Is not valid error message will generate 
+        else if(baseupdate.size()==0){
+             returnValue= PunchOutCXMLgenerate.xmlError('POST XML payloadID Is not valid',cxml.payloadID,cxml.timestamp,'400','Bad Request');
+        }
+        
+        
+        
+        return returnValue;
+    }
     
     
 }

@@ -2,7 +2,20 @@
     doInit : function(component, event,helper) 
     {
         
+        var currentUrl = window.location.href;
+        var sParameterName = currentUrl.split('=');
+          var action = component.get("c.getAllActiveCartDetails");
+        action.setParams({ "punchoutID" : sParameterName[1] });
+        action.setCallback(this, function(response) {
+            alert('123');
+            console.log(response.getReturnValue());
+            console.log('DisplayCartDetail><>>'+JSON.stringify(response.getReturnValue()));
+        });
+        $A.enqueueAction(action);
+          
+        
         helper.toGetCustomerAddess(component, event,helper);
+        // helper.toGetcustomerData(component, event,helper);
         //alert('order Source '+component.get("v.OrderSource"));
         if(component.get("v.OrderSource")=="PO")
         {

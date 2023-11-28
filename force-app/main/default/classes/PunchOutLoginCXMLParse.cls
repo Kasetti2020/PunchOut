@@ -147,15 +147,20 @@ public class PunchOutLoginCXMLParse {
             // Parse Request Node
             Dom.XmlNode requestNode = cxmlNode.getChildElement('Request', null);
             cxml.request = new Request();
+            /////if node is PunchOutSetupRequest then it is logIn cxml
             if(requestNode.getChildElement('PunchOutSetupRequest', null)!=null){
                 cxml.request.punchOutSetupRequest = parsePunchOutSetupRequest(requestNode.getChildElement('PunchOutSetupRequest', null));
-                
-                
+                //////payloadID is Empty error cxml will generate
+                if(String.isBlank(cxml.payloadID)||String.isBlank(cxml.payloadID)){
+                    returnXml= PunchOutCXMLgenerate.xmlError('POST XML payloadID is not valid:',cxml.payloadID,cxml.timeStamp,'400','Bad Request');
+                }
+                else{
                 System.debug('PunchOutLoginCXMLParse><>>>'+cxml);
-                returnXml= PunchOutLoginCXMLParse.xmlLoginMethod(cxml);
-                
+                returnXml= PunchOutLoginCXMLParse.xmlLoginMethod(cxml,cxmlData);
+                }
                 
             }
+            /////if node is OrderRequest then it is Order Request cxml
             else if(requestNode.getChildElement('OrderRequest', null)!=null){
                string returnValue= PunchOutOrderCXMLParse.parseCXML(cxmlData);
                 return returnValue;
@@ -280,7 +285,7 @@ public class PunchOutLoginCXMLParse {
     }
     
     /////creating PunchOut_Request__c Record 
-    public static string xmlLoginMethod(CXML cxml){
+    public static string xmlLoginMethod(CXML cxml,string cxmlData){
         
         
        
@@ -338,27 +343,47 @@ public class PunchOutLoginCXMLParse {
         
         
         //string accessToken=PunchOutLoginCXMLParse.getAccessToken(clientId,clientSecret);
-        list<PunchOut_Request__c> punchOut=[select Id,payloadID__c,Operation__c From PunchOut_Request__c Where payloadID__c=:payloadID];
+        list<PunchOut_Request__c> punchOut=[select Id,payloadID__c,Operation__c,Street__c,City__c,State__c,PostalCode__c,Country__c,CXML_data__c From PunchOut_Request__c Where payloadID__c=:payloadID];
         String redirectURL;
         ////when punchOut size is Equal to zero
         PunchOut_Request__c rqt=new PunchOut_Request__c();
-        
-        if(punchOut.size()==0 && operation=='Create' ){
+        system.debug('punchOut::'+punchOut.size());
+        system.debug('operation::'+operation);
+        if(punchOut.size()==0 && operation=='create'){
             
             rqt.BuyerCookie__c=buyerCookie;
             rqt.TimeStamp__c=DateTime.Valueof(timeStamp.replace('T', ' '));
             rqt.payloadID__c=payloadID;
-            rqt.Operation__c=operation;
+            rqt.Street__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.street;
+             rqt.City__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.city;
+             rqt.State__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.state;
+             rqt.PostalCode__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.postalCode;
+             rqt.Country__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.country;
+             rqt.CXML_data__c=cxmlData;
             insert rqt;
             
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
            
-        }else if(punchOut.size()>0 &&(operation=='Edit' || operation=='Inspect')){
+        }else if(punchOut.size()>0 && operation=='edit'){
             punchOut[0].Operation__c=operation;
+            punchOut[0].Street__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.street;
+             punchOut[0].City__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.city;
+             punchOut[0].State__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.state;
+             punchOut[0].PostalCode__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.postalCode;
+             punchOut[0].Country__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.country;
+             punchOut[0].CXML_data__c=cxmlData;
             update punchOut;
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
            
-        } else {
+        }else if(punchOut.size()>0 && operation=='inspect'){
+            punchOut[0].Operation__c=operation;
+           
+            update punchOut;
+            redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
+           
+        }
+        
+        else {
              returnSetupResp= PunchOutCXMLgenerate.xmlError('POST XML is not valid:',payloadID,timeStamp,'400','Bad Request');
             return returnSetupResp;
         }

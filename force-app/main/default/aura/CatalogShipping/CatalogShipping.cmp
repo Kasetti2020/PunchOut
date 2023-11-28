@@ -9,6 +9,7 @@
     <aura:attribute name="parentcmp" type="Boolean" default="false"/>
     <aura:attribute name="GetAddress" type="Boolean" default="false"/>
     <aura:attribute name="HideButtons" type="Boolean" default="true"/>
+    <aura:attribute name="InactiveStatus" type="Boolean" default="false"/>
     <aura:attribute name="Shipcmp" type="Boolean" default="true"/>
     <aura:attribute name="DisplayCustDetail" type="String"/>
     <aura:attribute name="recordId" type="String"/>
@@ -119,6 +120,10 @@
             <div class="slds-col slds-box" style="font-size:11px;">
                 <h2 class="slds-card__header-title slds-p-vertical_small"><b>{!$Label.c.Shopping_Cart}</b></h2>
                 
+                <aura:if isTrue="{!v.InactiveStatus}">
+                   <h1 class="slds-col slds-text-align_right" style="color:#a41f34;" >Notification:&nbsp; Some ModelId Are InActive</h1>
+               
+				</aura:if>
                 <table class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_col-bordered1 slds-table_resizable-cols " style="font-size:11px;">
                     <thead>
                         <tr class="slds-line-height_reset">
@@ -178,7 +183,13 @@
                                     <aura:if isTrue="{!cartDetail.fullboxQty}">
                                         <p><b style="width:140px;display:inline-block;">{!$Label.c.Box_Quantity} </b>: {!cartDetail.boxquantity}</p>
                                     </aura:if>
-                                    <!--</aura:if>-->
+                                    <aura:if isTrue="{!cartDetail.Status=='Active'}">
+                                    <p><b style="width:140px;display:inline-block;">{!$Label.c.STATUS} </b>: {!cartDetail.Status}</p>
+                                     </aura:if>
+                                     <aura:if isTrue="{!cartDetail.Status=='Inactive'}">
+                                    <p><b style="width:140px;display:inline-block;">{!$Label.c.STATUS} </b><span style="color:#a41f34;">: {!cartDetail.Status}</span></p>
+                                     </aura:if>
+                                        <!--</aura:if>-->
                                 </td>
                                 <td data-label="Close Date" >
                                     <aura:if isTrue="{!cartDetail.fullboxQty}">
