@@ -105,7 +105,7 @@ public class PunchOutCXMLgenerate {
     }
 
     //////////// Cxml Generate 
-    public static string cxmlOutPutCreate(String whereID){
+   /* public static string cxmlOutPutCreate(String whereID){
         
         Base_Order__c punch=[select Id,PunchOut_Request__r.payloadID__c,PunchOut_Request__r.TimeStamp__c From Base_Order__c where Id=: whereID ];
         // Create a new XML document
@@ -237,10 +237,10 @@ public class PunchOutCXMLgenerate {
         
        return xmlString;
     }
-    
+    */
  //////////////generating cxml Value   
      public static String generateCXML(String recordId){
-          PunchOut_Request__c punch=[select Id,payloadID__c,TimeStamp__c From PunchOut_Request__c where Id=: recordId ];
+          PunchOut_Request__c punch=[select Id,payloadID__c,TimeStamp__c,Street__c,City__c,State__c,PostalCode__c,Country__c,Address_Name__c From PunchOut_Request__c where Id=: recordId ];
          
          list<Base_Order__c> baseList=[select Id,PunchOut_Request__c,OrderSource__c,Company__c From Base_Order__c Where PunchOut_Request__c=:recordId ] ;
          set<id> baseListId=new set<id>();

@@ -7,13 +7,31 @@
           var action = component.get("c.getAllActiveCartDetails");
         action.setParams({ "punchoutID" : sParameterName[1] });
         action.setCallback(this, function(response) {
-            alert('123');
+           // alert('123');
             console.log(response.getReturnValue());
             console.log('DisplayCartDetail><>>'+JSON.stringify(response.getReturnValue()));
+            component.set('v.DisplayCartDetail',response.getReturnValue());
         });
         $A.enqueueAction(action);
           
-        
+         var currentUrl = window.location.href;
+        var sParameterName = currentUrl.split('=');
+          var action1 = component.get("c.getAllOldShipTO");
+        action1.setParams({ "punchoutID" : sParameterName[1] });
+        action1.setCallback(this, function(response) {
+           
+            var state = response.getState();
+            alert(state);
+             if (state === "SUCCESS") 
+            {
+            var res = response.getReturnValue();
+            
+            component.set("v.ShipAddressListOld", res.billAddListRqt);
+                console.log('Bill Old TO<><>>'+JSON.stringify(res.billAddListRqt));
+            component.set("v.OldShipTo", res.billAddListRqt);
+            }
+        });
+        $A.enqueueAction(action1);
         helper.toGetCustomerAddess(component, event,helper);
         // helper.toGetcustomerData(component, event,helper);
         //alert('order Source '+component.get("v.OrderSource"));
@@ -144,9 +162,39 @@
     
     ConfirmOrder : function(component,event,helper)
     {
+        var currentUrl = window.location.href;
+        var sParameterName = currentUrl.split('=');
+                var action = component.get("c.deleteInactiveModel");
+        action.setParams({ 
+            "punchoutID": sParameterName[1]
+            
+        });
+        action.setCallback(this, function(response){
+            var state = response.getState();
+            var res = response.getReturnValue();
+           //alert('delete');
+          if(state === 'SUCCESS'){
+             
+               
+            }
+            else if(state === 'ERROR'){
+                //alert('ERROR OCCURED.'+JSON.stringify(response.getError()));
+            }
+        
+           
+        });
+        $A.enqueueAction(action);
+        
+        
+        
+        
+        helper.confirmBaseOrder(component, event,helper);
+        
+        
+        
         //--Validation for PO to SO Default Address Selection Starts here-----
         
-        var billAddressList = component.get('v.BillAddressList');
+     /*ma   var billAddressList = component.get('v.BillAddressList');
         var checkDefaultBillAddress = false;
         for(var i = 0 ; i<billAddressList.length ; i++)
         {
@@ -497,7 +545,7 @@
         }
         
         var spinner = component.find('spinner');
-        $A.util.toggleClass(spinner, "slds-hide");
+        $A.util.toggleClass(spinner, "slds-hide");ma*/
     },
     changeDate:function(component, event, helper){
         //alert('changeDate');

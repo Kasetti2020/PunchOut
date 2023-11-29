@@ -262,6 +262,7 @@ public class PunchOutLoginCXMLParse {
     ////Parse ShipTo Node
     public static ShipTo parseShipTo(Dom.XmlNode shipToNode) {
         ShipTo shipTo = new ShipTo();
+        
         shipTo.address = parseAddress(shipToNode.getChildElement('Address', null));
         return shipTo;
     }
@@ -350,10 +351,11 @@ public class PunchOutLoginCXMLParse {
         system.debug('punchOut::'+punchOut.size());
         system.debug('operation::'+operation);
         if(punchOut.size()==0 && operation=='create'){
-            
+            rqt.Operation__c=operation;
             rqt.BuyerCookie__c=buyerCookie;
             rqt.TimeStamp__c=DateTime.Valueof(timeStamp.replace('T', ' '));
             rqt.payloadID__c=payloadID;
+            rqt.Address_Name__c=cxml.request.punchOutSetupRequest.shipTo.address.name;
             rqt.Street__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.street;
              rqt.City__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.city;
              rqt.State__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.state;
@@ -366,6 +368,7 @@ public class PunchOutLoginCXMLParse {
            
         }else if(punchOut.size()>0 && operation=='edit'){
             punchOut[0].Operation__c=operation;
+            punchOut[0].Address_Name__c=cxml.request.punchOutSetupRequest.shipTo.address.name;
             punchOut[0].Street__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.street;
              punchOut[0].City__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.city;
              punchOut[0].State__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.state;

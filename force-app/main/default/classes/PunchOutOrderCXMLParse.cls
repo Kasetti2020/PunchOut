@@ -436,12 +436,22 @@ baseupdate.Processing_Status__c='Draft';
 baseupdate.PunchOut_Status__c='Order Confirmed';
 baseupdate.Retailer_code__c='Saver';
 update baseupdate;
-*/system.debug('cxml.payloadID><>'+cxml.payloadID);
+
+*/
+        
+       
+        
+        system.debug('cxml.payloadID><>'+cxml.payloadID);
         //list<PunchOut_Request__c> punch = [select Id,payloadID__c,Operation__c,Createddate,timestamp__c From PunchOut_Request__c where payloadID__c =:cxml.payloadID ];
         
         string returnValue;
-        list<Base_Order__c> baseupdate=[select id,Start_Process__c,Processing_Status__c,Retailer_code__c,PunchOut_Request__r.payloadID__c from Base_Order__c where PunchOut_Request__r.payloadID__c =:cxml.payloadID ];
+        list<Base_Order__c> baseupdate=[select id,Start_Process__c,Processing_Status__c,Retailer_code__c,PunchOut_Request__c,PunchOut_Request__r.payloadID__c from Base_Order__c where PunchOut_Request__r.payloadID__c =:cxml.payloadID ];
         System.debug('baseupdate><>'+baseupdate);
+        
+        /////// validation
+        if(baseupdate.size()>0){
+       Boolean InactiveMOdel= PunchOutValidation.InActiveModelID(baseupdate[0].PunchOut_Request__c);
+            }
         if(baseupdate.size()>0){
         returnValue=PunchOutCXMLgenerate.xmlError('DataUploaded Successfully',cxml.payloadID,cxml.timestamp,'200','Ok') ;
         system.debug('returnValue><>'+returnValue);

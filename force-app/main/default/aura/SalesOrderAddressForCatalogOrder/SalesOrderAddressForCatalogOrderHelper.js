@@ -454,6 +454,52 @@
         });
         $A.enqueueAction(action);
     },
+   // <!--Added By Mahadevaprasad on 29/11/2023 starts -->
+     confirmBaseOrder : function(component, event, helper) 
+    {
+        //alert('base order');
+        var ShipAdd = component.get("v.ShipAddressList");
+        //alert(ShipAdd);
+        console.log('ShipAdd><>>'+JSON.stringify(ShipAdd));
+        
+        var action = component.get("c.SaveBaseOrder");
+        action.setParams({ 
+            "punchoutShipTO": ShipAdd
+            
+        });
+        action.setCallback(this, function(response){
+            var state = response.getState();
+            var res = response.getReturnValue();
+           //alert(state);
+          if(state === 'SUCCESS'){
+                var toastEvent = $A.get("e.force:showToast");
+    toastEvent.setParams({
+        "title": "Success!",
+        "message": "Punched Out",
+        "type": "success",
+    });
+    toastEvent.fire();
+               var myParamValue = response.getReturnValue();
+        console.log('checkingAddAndCloneData>>'+myParamValue);
+        
+        var urlString = window.location.href;
+                        var CommunityBaseURL = urlString.substring(0, urlString.indexOf("/s/"));
+                        window.location.href = CommunityBaseURL+'/s/punchoutpage?myParam='+ encodeURIComponent(myParamValue);
+
+            }
+            else if(state === 'ERROR'){
+                alert('ERROR OCCURED.'+JSON.stringify(response.getError()));
+            }
+        
+           
+        });
+        $A.enqueueAction(action);
+           
+        
+    },
+   // <!--Added By Mahadevaprasad on 29/11/2023 Ends -->
+    
+    
     confirmSalesOrder : function(component, event, helper) 
     {
 

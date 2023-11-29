@@ -790,7 +790,23 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
     
     
     //<!--Added By Mahadevaprasad on 28/11/2023 starts -->
-  ////getting all active model 
+  ////getting all active model
+  @AuraEnabled
+       public static void  deleteInactiveModel(Id punchoutID)
+    {
+        set<id> baseLineIds=new set<id>();
+        
+         List<Base_Order_Detail__c>  BaseLine =[select id,Base_Order__r.PunchOut_Request__c,Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c from Base_Order_Detail__c where Base_Order__r.PunchOut_Request__c=:punchoutID  AND Added_As_a_Label__c=false AND Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c='Inactive'];
+        for(Base_Order_Detail__c b:BaseLine){
+            
+            baseLineIds.add(b.Base_Order__c);
+        }
+         list<Base_Order__c>   baseList =[select id from Base_Order__c Where Id In:baseLineIds];
+            delete baseList;
+        delete BaseLine;
+         
+    }
+   
   @AuraEnabled
        public static List<SOLIWrapper>  getAllActiveCartDetails(Id punchoutID)
     {
@@ -811,6 +827,12 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
         for(Base_Order__c b:SOList){
             baseIds.add(b.Id);
         }
+        
+       
+        
+        
+        
+        
         if(SOList.size()>0)  
         {
             //Mahadevaprasad SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Sales_Order__c,Products__c,Print__c,Products__r.Name,Sales_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Sales_Order__r.Retailer_Code1__r.name,Sales_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Sales_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Sales_Order_Line_Items__c where Sales_Order__r.RecordTypeID =: CartRecordType AND Sales_Order__c =:SOList[0].id  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
@@ -890,6 +912,10 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
         {
             return null;
         }
+        
+        
+        
+        
     }
  ///<!--Added By Mahadevaprasad on 28/11/2023 Ends -->
     
@@ -960,7 +986,7 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
                     //system.debug(' SOLI.Price_100_pcs__c>>'+ SOLI.Price_100_pcs__c);
                     //system.debug('SOLI.COLOUR>>'+SOLI.Colour__c);
                     productobj.TotalPriceByCurrency = ((Decimal.ValueOf(SOLI.Supply_Quantity__c))/100) * Decimal.ValueOf(SOLI.Price_100_pcs__c);
-                    // productobj.TotalPriceByCurrency = (SOLI.Price_Product_by_Currency__r.UOM_Price__c) *  (Decimal.ValueOf(SOLI.Quantity__c) );
+                     productobj.TotalPriceByCurrency = (SOLI.Price_Product_by_Currency__r.UOM_Price__c) *  (Decimal.ValueOf(SOLI.Quantity__c) );
                     system.debug(' productobj.TotalPriceByCurrency>>'+ productobj.TotalPriceByCurrency);
                 }
                 else {
@@ -3071,6 +3097,35 @@ system.debug('Regwrap>>'+Regwrap);
     {
         POViewPageHandler.revertPOChanges(POString);
     }
+
+//<!--Added By Mahadevaprasad on 29/11/2023 starts -->
+
+     @AuraEnabled
+    public static string SaveBaseOrder(list<PunchOut_Request__c> punchoutShipTO)
+    {
+        string operation=punchoutShipTO[0].Operation__c;
+        string punchOutRqt=punchoutShipTO[0].Id;
+        System.debug('punchOutRqt><>>'+punchOutRqt);
+string cxmlValue=PunchOutCXMLgenerate.generateCXML(punchOutRqt);        
+        list<Base_Order__c> basePunchOutList=[select Id,PunchOut_Request__c,CustomerParty_ShipTo_Address1__c,CustomerParty_ShipTo_CityName__c,CustomerParty_ShipTo_Postal_Code__c,CustomerParty_ShipTo_Country__c,CustomerParty_ShipTo_Address2__c,CustomerParty_ShipTo_State__c from Base_Order__c where PunchOut_Request__c=:punchOutRqt ];
+          
+            if(basePunchOutList.size()>0){
+                for(Base_Order__c b:basePunchOutList){
+                    b.CustomerParty_ShipTo_Address1__c=punchoutShipTO[0].Address_Name__c;
+                    b.CustomerParty_ShipTo_Address2__c=punchoutShipTO[0].Street__c; 
+                    b.CustomerParty_ShipTo_CityName__c=punchoutShipTO[0].City__c;
+                    b.CustomerParty_ShipTo_State__c=punchoutShipTO[0].State__c;
+                    b.CustomerParty_ShipTo_Country__c=punchoutShipTO[0].Country__c;
+                     b.CustomerParty_ShipTo_Postal_Code__c=punchoutShipTO[0].PostalCode__c;
+                }  
+                update basePunchOutList;
+            }
+        return cxmlValue;
+    }
+    
+ //   <!--Added By Mahadevaprasad on 29/11/2023 Ends -->
+
+
     
     // Added by Vidit to save Catalog Orders
     @AuraEnabled
@@ -5275,6 +5330,58 @@ system.debug('Regwrap>>'+Regwrap);
             return null;
         }
     }
+    
+     @AuraEnabled
+    public static addressWrapper  getAllOldShipTO(Id punchoutID)
+    {
+        boolean shipToChanged=false;
+        addressWrapper addWrap = new addressWrapper();
+        List<PunchOut_Request__c> billRqt = new List<PunchOut_Request__c>();
+        
+        billRqt=[select Id,payloadID__c,Operation__c,Street__c,City__c,State__c,PostalCode__c,Country__c,Address_Name__c From PunchOut_Request__c Where Id=:punchoutID];
+        list<Base_Order__c> basePunchOutList=[select Id,PunchOut_Request__c,CustomerParty_ShipTo_Address1__c,CustomerParty_ShipTo_CityName__c,CustomerParty_ShipTo_Postal_Code__c,CustomerParty_ShipTo_Country__c,CustomerParty_ShipTo_Address2__c,CustomerParty_ShipTo_State__c from Base_Order__c where PunchOut_Request__c=:punchoutID ];
+         System.debug('basePunchOutList>>>>'+basePunchOutList);
+        System.debug('billRqt>>>>'+billRqt);
+        if((basePunchOutList[0].CustomerParty_ShipTo_Address1__c)!=(billRqt[0].Address_Name__c)){
+            shipToChanged=true;
+        }else if((basePunchOutList[0].CustomerParty_ShipTo_Address2__c)!=(billRqt[0].Street__c)){
+            shipToChanged=true ; 
+            
+        }else if((basePunchOutList[0].CustomerParty_ShipTo_CityName__c)!=(billRqt[0].City__c)){
+            shipToChanged=true;  
+        }
+        else if((basePunchOutList[0].CustomerParty_ShipTo_State__c)!=(billRqt[0].State__c)){
+            shipToChanged=true ; 
+        }
+        else if((basePunchOutList[0].CustomerParty_ShipTo_Postal_Code__c)!=(billRqt[0].PostalCode__c)){
+            shipToChanged=true;  
+        }
+        else if((basePunchOutList[0].CustomerParty_ShipTo_Country__c)!=(billRqt[0].Country__c)){
+            shipToChanged=true;  
+        }
+        
+        System.debug('shipToChanged>>>>'+shipToChanged);
+        
+        if(shipToChanged){
+            
+            List<PunchOut_Request__c> billRqtOld=new   List<PunchOut_Request__c>(); 
+            PunchOut_Request__c bill=new PunchOut_Request__c();
+            
+            bill.Address_Name__c=  basePunchOutList[0].CustomerParty_ShipTo_Address1__c;
+            bill.Street__c=basePunchOutList[0].CustomerParty_ShipTo_Address2__c;
+            bill.City__c=basePunchOutList[0].CustomerParty_ShipTo_CityName__c;
+            bill.State__c=basePunchOutList[0].CustomerParty_ShipTo_State__c;
+            bill.Country__c=basePunchOutList[0].CustomerParty_ShipTo_Country__c;
+            bill.PostalCode__c=basePunchOutList[0].CustomerParty_ShipTo_Postal_Code__c;
+           billRqtOld.add(bill);
+            addwrap.billAddListRqt=billRqtOld;
+          System.debug('addwrap>>>>'+addwrap);  
+            
+        }else{
+            addWrap=new addressWrapper();
+        }
+        return addWrap;
+    }
     @AuraEnabled
     public static addressWrapper FetchCustAddForCatalogOrder(String custInfoid,String retailer, String retailercodeId, String orderSource,String punchRqtId)
     {
@@ -5387,7 +5494,7 @@ system.debug('Regwrap>>'+Regwrap);
         List<PunchOut_Request__c> billRqt = new List<PunchOut_Request__c>();
         //fetching address realted to customer and grouping them by their record types
         List<Ship_Bill_Address__c> custAddress= [select id,name,recordtype.name,Is_Default__c,Company_Name__c,Address_1__c,City__c,State__c,Country__c,Postcode__c,Factory_Name__c,Contact__c,Tel_No__c,Email_Address__c, Fax_No__c from Ship_Bill_Address__c where Customer_Information__c =: custInfoid AND Bill_Ship_Status__c=:'Active'];
-         billRqt=[select Id,payloadID__c,Operation__c,Street__c,City__c,State__c,PostalCode__c,Country__c From PunchOut_Request__c Where Id=:punchRqtId];
+         billRqt=[select Id,payloadID__c,Operation__c,Street__c,City__c,State__c,PostalCode__c,Country__c,Address_Name__c From PunchOut_Request__c Where Id=:punchRqtId];
         system.debug('billRqt>>>>'+billRqt);
         for(Ship_Bill_Address__c addss:custAddress)
         {

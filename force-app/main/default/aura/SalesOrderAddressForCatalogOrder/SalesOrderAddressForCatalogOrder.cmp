@@ -1,5 +1,5 @@
 <aura:component controller="SOController" access="global">
-    
+    <aura:attribute name="isOperation" type="Boolean" default="true" />
     <aura:attribute name="retailerName" type="String" />
     <aura:attribute name="retailerCodeId" type="String" />
     <aura:attribute name="CustomerInfoID" type="String" />
@@ -10,6 +10,7 @@
     <!-- Address -->
     <aura:attribute name="BillAddressList" type="List" />
     <aura:attribute name="ShipAddressList" type="List" />
+    <aura:attribute name="ShipAddressListOld" type="List" />
     <aura:attribute name="BuyerAddressList" type="List" />
     <aura:attribute name="InvoiceAddressList" type="List" />
     <aura:attribute name="AddressPopUpFlag" type="boolean" default="false" description="Used to close this pop up"/>
@@ -19,6 +20,7 @@
     <aura:attribute name="InvoiceAddressIndex" type="integer" default="0" />
     <aura:attribute name="OrderSource" type="String" />
     <aura:attribute name="suzhouFlag" type="Boolean" default="false"/>
+     <aura:attribute name="OldShipTo" type="Boolean" default="false"/>
     <aura:attribute name="POPDFFlag" type="Boolean" default="false"/>
     <aura:attribute name="salesOrderObj" type="Sales_Order__c" default="{ 'sobjectType': 'Sales_Order__c' }"/>
     <!-- PO to SO -->
@@ -104,11 +106,11 @@
                                 <div class="slds-truncate" title="Quantity">{!$Label.c.Quantity}</div>
                             </th>
                             <!--Added By Bharath on 08/11/2021 starts -->
-                            <aura:if isTrue="{!v.ShowPriceInOrder}">
+                            
                                 <th class="" scope="col" style="width:12%;">
                                     <div class="slds-truncate" title="OrderAmmount">{!$Label.c.Order_Amount}</div>
                                 </th>
-                            </aura:if>
+                          
                              <!--Added By Bharath on 08/11/2021 Ends -->
                             <aura:if isTrue="{!v.showremarks}">
                                 <th class="" scope="col">
@@ -116,11 +118,7 @@
                                     <div class="slds-truncate" title="Quantity">{!$Label.c.remarks}</div>
                                     
                                 </th> </aura:if>
-                            <th class="slds-text-align_center" scope="col" style="width:5%;">
-                                
-                                <div class="slds-truncate" title="Action">{!$Label.c.Action}</div>
-                                    
-                            </th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -161,11 +159,11 @@
                                         </aura:set>
                                     </aura:if>
                                 </td>
-                                <aura:if isTrue="{!v.ShowPriceInOrder}">
+                                
                                     <td>
                                         <lightning:input type="text" name="{!ind}" value="{!cartDetail.CurrencyIsoCode + cartDetail.BlankString +   cartDetail.TotalPriceByCurrency}"  disabled="true"	/>
                                     </td>
-                                </aura:if>
+                                
                                 
                                 
                             </tr>
@@ -351,12 +349,17 @@
                     </div>
                     <br/>
                     <lightning:layout >
+                         <aura:if isTrue="{!v.OldShipTo}">
                         <lightning:layoutItem class="slds-p-right_x-small" size="6">
                             <div class="slds-box slds-m-bottom_large">   
-                                <h2 class="box-title" style="width:85px">{!$Label.c.Bill_To}</h2>				
-                                <c:SalesOrderAddressTable AddressList="{!v.BillAddressList}" addressType="Bill"/>
+                                <h2 class="box-title" style="width:85px">Old Ship To</h2>				
+                                <c:SalesOrderAddressTable AddressList="{!v.ShipAddressListOld}" addressType="Bill"/>
                             </div>
                         </lightning:layoutItem>
+                       </aura:if> 
+                                            
+                        
+                        
                         <lightning:layoutItem class="slds-p-left_x-small" size="6">
                             <div class="slds-box slds-m-bottom_large">
                                 <h2 class="box-title" style="width:85px">{!$Label.c.Ship_To}</h2>
@@ -387,10 +390,16 @@
                     
                     
                 </div>
+                
                 <div class="slds-modal__footer slds-p-around--x-small">
-                    <lightning:button class="slds-button slds-button--brand" iconName="utility:file" onclick="{!c.openPDF}">{!$Label.c.PDF}</lightning:button>
+                   <aura:if isTrue="{!v.OldShipTo}">
+                   <h1 class="slds-col slds-text-align_left" style="color:#a41f34;" >Notification:&nbsp; ShipTo Address is Chnaged</h1>
+               
+				</aura:if>
+                    <aura:If isTrue="{!v.isOperation}">
                     <lightning:button class="slds-button slds-button--brand" iconName="utility:package_org" onclick="{!c.ConfirmOrder}">{!$Label.c.Confirm_Order}</lightning:button>
-                    <lightning:button class="slds-button slds-button--neutral" iconName="utility:close" onclick="{!c.closeModal}">{!$Label.c.Cancel}</lightning:button>
+                   </aura:If>
+                        <lightning:button class="slds-button slds-button--neutral" iconName="utility:close" onclick="{!c.closeModal}">{!$Label.c.Cancel}</lightning:button>
                     
                 </div>
             </div>

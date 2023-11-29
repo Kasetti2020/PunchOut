@@ -247,13 +247,17 @@
                     <div class="slds-col slds-text-align_right">
                         <aura:If isTrue="{!v.isOperation}">
                       <lightning:button class="slds-button slds-button_brand slds-m-top_medium" iconName="utility:clear" variant="base" label="{!$Label.c.CLEAR_CART}" title="{!$Label.c.CLEAR_CART}" disabled="{! !v.HideButtons}" onclick="{! c.ClearItems }"/>
-                        <aura:If isTrue="{!v.DisplayCartDetail.length>0}">
+                       </aura:If>
+                            <aura:If isTrue="{!v.DisplayCartDetail.length>0}">
                             <aura:If isTrue="{!v.HideButtons}">
+                                <aura:If isTrue="{!v.isOperation}">
                                 <lightning:button class="slds-button slds-button_brand slds-m-top_medium" iconName="utility:record_update" variant="UPDATE CART" label="{!$Label.c.UPDATE_CART}" title="{!$Label.c.UPDATE_CART}" onclick="{! c.UpdateCart}"/>
-                                <lightning:button class="{!v.PlaceorderBtn==true?'slds-button slds-button_brand slds-m-top_medium slds-button_disabled':'slds-button slds-button_brand slds-m-top_medium '}" aura:id="placeorder" disabled="{!v.PlaceorderBtn}" iconName="utility:cart" variant="PLACE ORDER" label="{!$Label.c.PLACE_ORDER}" title="{!$Label.c.PLACE_ORDER}" onclick="{! c.placeOrders }" />
+</aura:If>
+                                    <lightning:button class="{!v.PlaceorderBtn==true?'slds-button slds-button_brand slds-m-top_medium slds-button_disabled':'slds-button slds-button_brand slds-m-top_medium '}" aura:id="placeorder" disabled="{!v.PlaceorderBtn}" iconName="utility:cart" variant="PLACE ORDER" label="{!$Label.c.PLACE_ORDER}" title="{!$Label.c.PLACE_ORDER}" onclick="{! c.placeOrders }" />
                             </aura:If>   
                         </aura:If>
-                            </aura:If>
+                            
+                       
                     </div>
                     
                 </div>
@@ -271,7 +275,7 @@
         </div>
     </aura:If>
     <aura:If isTrue="{!v.GetAddress}">
-        <c:SalesOrderAddressForCatalogOrder AddressPopUpFlag="{!v.GetAddress}" CustomerInfoID="{!v.DisplayCustDetail}" OrderSource="CATALOG" retailerName="{!v.SelectedRetailerName}" retailerCodeId="{!v.SelectedRetailer}"/>
+        <c:SalesOrderAddressForCatalogOrder AddressPopUpFlag="{!v.GetAddress}" CustomerInfoID="{!v.DisplayCustDetail}" OrderSource="CATALOG" retailerName="{!v.SelectedRetailerName}" retailerCodeId="{!v.SelectedRetailer}"    isOperation="{!v.isOperation}"/>
     </aura:If>
     <aura:If isTrue="{!v.parentcmp}">
         <c:CatalogOrder parentcmp="{!v.parentcmp}" SelectedRetailercode="{!v.SelectedRetailer}" SelectedRetailer="{!v.SelectedRetailerName}"/>
