@@ -2,11 +2,16 @@
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
 	<types>
 		<members>CatalogOrderController</members>
+		<members>PunchDemoClassHandler</members>
 		<members>PunchOutCXMLgenerate</members>
+		<members>PunchOutDemoclass</members>
 		<members>PunchOutLoginCXMLParse</members>
 		<members>PunchOutOrderCXMLParse</members>
 		<members>PunchOutOrderCreation</members>
+		<members>PunchOutOrderMessageController</members>
+		<members>PunchOutValidation</members>
 		<members>PunchOutWebService</members>
+		<members>PunchoutLoginService</members>
 		<members>SOController</members>
 		<members>UtilityClass</members>
 		<members>UtilityClassTest</members>

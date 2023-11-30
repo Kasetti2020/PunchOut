@@ -1,12 +1,15 @@
 /**
 * @Author      :   Mahadevaprasad R
-* @Desc        :   This class is used for Cxml into json Conversion(loginCxml)
+* @description       :   This class is used for Cxml into json Conversion(loginCxml)
 * @TestClass   :   PunchOutLoginCXMLParseTest
 * @Date        :   29-10-2023
 **/
 
-public class PunchOutLoginCXMLParse {
-    
+public with sharing class PunchOutLoginCXMLParse {
+   /**
+     * @description Cxml Wrapper Class
+     
+     */ 
     public class CXML {
         public Header header { get; set; }
         public Request request { get; set; }
@@ -14,32 +17,52 @@ public class PunchOutLoginCXMLParse {
         public string timestamp {get;set;}
         public Response response {get;set;}
     }
+    /**
+     * @description Cxml HeaderNode Value
+     
+     */ 
     public class Header {
-        public  fromNode fromNode { get; set; }
+        public  FromNode fromNode { get; set; }
         public To to { get; set; }
         public Sender sender { get; set; }
         
+    }/**
+     * @description fromNode node Value
+     
+     */ 
+    public class FromNode {
+        public Credential credential;
     }
-    public class fromNode {
-        public Credential Credential;
-    }
+    /**
+     * @description To node Value
+     
+     */ 
     public class To {
-        public Credential Credential;
+        public Credential credential;
     }
-    
+    /**
+     * @description Credential node Value
+     
+     */
     public class Credential {
         public String domain { get; set; }
         public String identity { get; set; }
         public String sharedSecret { get; set; }
     }
     
-    
+    /**
+     * @description Sender node Value
+     
+     */
     public class Sender {
         public Credential credential { get; set; }
         public String userAgent { get; set; }
         
     }
-    
+    /**
+     * @description PostalAddress node Value
+     
+     */
     public class PostalAddress {
         public String street { get; set; }
         public String city { get; set; }
@@ -47,25 +70,41 @@ public class PunchOutLoginCXMLParse {
         public String postalCode { get; set; }
         public String country { get; set; }
     }
-    
+    /**
+     * @description Address node Value
+     
+     */
     public class Address {
         public String addressID { get; set; }
         public String name { get; set; }
         public PostalAddress postalAddress { get; set; }
     }
-    
+    /**
+     * @description ShipTo node Value
+     
+     */
     public class ShipTo {
         public Address address { get; set; }
     }
-    
+    /**
+     * @description Extrinsic node Value
+     
+     */
     public class Extrinsic {
         public String name { get; set; }
         public String value { get; set; }
     }
-    
+    /**
+     * @description Sender HeaderNode Value
+     
+     */
     public class BrowserFormPost {
-        public String URL { get; set; }
+        public String uRL { get; set; }
     }
+    /**
+     * @description PunchOutSetupRequest Node 
+     
+     */
     
     public class PunchOutSetupRequest {
         public String operation { get; set; }
@@ -74,18 +113,27 @@ public class PunchOutLoginCXMLParse {
         public BrowserFormPost browserFormPost { get; set; }
         public ShipTo shipTo { get; set; }
     }
-    
+    /**
+     * @description Request node Value
+     
+     */
     public class Request {
         public PunchOutSetupRequest punchOutSetupRequest { get; set; }
         public OrderRequest orderRequest { get; set; }
     }
     //////////OrderRequest node code getting Wrapper class
     
-    
+    /**
+     * @description OrderRequest Node Value
+     
+     */
     public class OrderRequest {
         public OrderRequestHeader orderRequestHeader { get; set; }
         
-    }
+    }/**
+     * @description OrderRequestHeader Node Value
+     
+     */
     public class OrderRequestHeader {
         
         public string orderID { get; set; }
@@ -97,17 +145,20 @@ public class PunchOutLoginCXMLParse {
     
     
     
-    //////responce status code getting Wrapper class
+   /**
+     * @description responce status code getting Wrapper class
+     
+     */
     public class Response {
-        public Status  Status  { get; set; }
+        public Status  status  { get; set; }
     }
     public class Status {
         public string code { get; set; }
         public string text { get; set; }
-        public PunchOutSetupResponse  PunchOutSetupResponse  { get; set; }
+        public PunchOutSetupResponse  punchOutSetupResponse  { get; set; }
     }
     public class PunchOutSetupResponse {
-        public StartPage  StartPage  { get; set; }
+        public StartPage  startPage  { get; set; }
     }
     public class StartPage {
         public string  url  { get; set; }
@@ -134,7 +185,7 @@ public class PunchOutLoginCXMLParse {
             cxml.header = new Header();
             /////Parse Header From Node
             Dom.XmlNode fromNode=headerNode.getChildElement('From', null);
-            cxml.header.fromNode = parseFrom(fromNode.getChildElement('Credential', null));
+            cxml.header.FromNode = parseFrom(fromNode.getChildElement('Credential', null));
             /////Parse Header To Node
             Dom.XmlNode to=headerNode.getChildElement('To', null);
             cxml.header.To = parseTo(to.getChildElement('Credential', null));
@@ -195,8 +246,8 @@ public class PunchOutLoginCXMLParse {
         // return cxml;
     }
     //////////From Node ////////
-    public static fromNode parseFrom(Dom.XmlNode credentialNode) {
-        fromNode fr=new fromNode();
+    public static FromNode parseFrom(Dom.XmlNode credentialNode) {
+        FromNode fr=new FromNode();
         Credential credential = new Credential();
         credential.domain = credentialNode.getAttribute('domain', null);
         credential.identity = credentialNode.getChildElement('Identity', null).getText();
@@ -256,7 +307,7 @@ public class PunchOutLoginCXMLParse {
     ////Parse BrowserFormPost Node
     public static BrowserFormPost parseBrowserFormPost(Dom.XmlNode formPostNode) {
         BrowserFormPost formPost = new BrowserFormPost();
-        formPost.URL = formPostNode.getChildElement('URL', null).getText();
+        formPost.uRL = formPostNode.getChildElement('URL', null).getText();
         return formPost;
     }
     ////Parse ShipTo Node
@@ -285,7 +336,12 @@ public class PunchOutLoginCXMLParse {
         return postalAddress;
     }
     
-    /////creating PunchOut_Request__c Record 
+    /** 
+ *@description this methode is used to creating PunchOut_Request__c Record 
+    * @return Order cxml sussfull or rejeted
+    * @param cxmlData 
+     * @param cxml 
+    * */  
     public static string xmlLoginMethod(CXML cxml,string cxmlData){
         
         
@@ -314,8 +370,8 @@ public class PunchOutLoginCXMLParse {
         try{
             
             if(punchMap.containsKey(clientId)){
-                string UserNameAndPassWord=punchMap.get(clientId);
-                accessToken=PunchOutLoginCXMLParse.getAccessToken(clientId,clientSecret,UserNameAndPassWord);
+                string userNameAndPassWord=punchMap.get(clientId);
+                accessToken=PunchOutLoginCXMLParse.getAccessToken(clientId,clientSecret,userNameAndPassWord);
                
             }
         }
@@ -330,27 +386,36 @@ public class PunchOutLoginCXMLParse {
         DateTime currentDate = DateTime.now();
         currentDate=currentDate-1;
         system.debug('currentDate::'+currentDate);
-        list<PunchOut_Request__c> punch=[select Id,payloadID__c,Operation__c,Createddate From PunchOut_Request__c where Createddate<:currentDate ];
+        list<PunchOut_Request__c>  punch=[select Id,payloadID__c,Operation__c,Createddate From PunchOut_Request__c where Createddate<:currentDate  WITH SECURITY_ENFORCED];
         system.debug('punch::'+punch.size());
+        
         set<id> punchOutId=new set<id>();
         for(PunchOut_Request__c p:punch){
             punchOutId.add(p.Id);
         }
         
-        list<Base_Order__c> base=[select Id,PunchOut_Request__c from Base_Order__c where PunchOut_Request__c=:punchOutId And PunchOut_Status__c='Product Added'];
-         delete base;
-
+        list<Base_Order__c> base=[select Id,PunchOut_Request__c from Base_Order__c where PunchOut_Request__c=:punchOutId And PunchOut_Status__c='Product Added' WITH SECURITY_ENFORCED];
+        if(
+            Base_Order__c.SObjectType.getDescribe().isAccessible() &&
+            Schema.sObjectType.Base_Order__c.isDeletable()) 
+         {
+        delete base;
+        }
+        if(
+            PunchOut_Request__c.SObjectType.getDescribe().isAccessible() &&
+            Schema.sObjectType.PunchOut_Request__c.isDeletable()) {
 				delete  punch; 
-        
+        }
         
         //string accessToken=PunchOutLoginCXMLParse.getAccessToken(clientId,clientSecret);
-        list<PunchOut_Request__c> punchOut=[select Id,payloadID__c,Operation__c,Street__c,City__c,State__c,PostalCode__c,Country__c,CXML_data__c From PunchOut_Request__c Where payloadID__c=:payloadID];
+        list<PunchOut_Request__c> punchOut=[select Id,payloadID__c,Operation__c,Street__c,City__c,State__c,PostalCode__c,Country__c,CXML_data__c From PunchOut_Request__c Where payloadID__c=:payloadID WITH SECURITY_ENFORCED];
         String redirectURL;
         ////when punchOut size is Equal to zero
         PunchOut_Request__c rqt=new PunchOut_Request__c();
         system.debug('punchOut::'+punchOut.size());
         system.debug('operation::'+operation);
         if(punchOut.size()==0 && operation=='create'){
+          
             rqt.Operation__c=operation;
             rqt.BuyerCookie__c=buyerCookie;
             rqt.TimeStamp__c=DateTime.Valueof(timeStamp.replace('T', ' '));
@@ -362,8 +427,11 @@ public class PunchOutLoginCXMLParse {
              rqt.PostalCode__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.postalCode;
              rqt.Country__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.country;
              rqt.CXML_data__c=cxmlData;
+             if(
+                PunchOut_Request__c.SObjectType.getDescribe().isAccessible() &&
+                Schema.sObjectType.PunchOut_Request__c.isCreateable()) {
             insert rqt;
-            
+                }
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
            
         }else if(punchOut.size()>0 && operation=='edit'){
@@ -375,13 +443,18 @@ public class PunchOutLoginCXMLParse {
              punchOut[0].PostalCode__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.postalCode;
              punchOut[0].Country__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.country;
              punchOut[0].CXML_data__c=cxmlData;
+             if(PunchOut_Request__c.SObjectType.getDescribe().isAccessible() &&
+             Schema.sObjectType.PunchOut_Request__c.isUpdateable()) {
             update punchOut;
+             }
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
            
         }else if(punchOut.size()>0 && operation=='inspect'){
             punchOut[0].Operation__c=operation;
-           
-            update punchOut;
+            if(PunchOut_Request__c.SObjectType.getDescribe().isAccessible() &&
+            Schema.sObjectType.PunchOut_Request__c.isUpdateable()) {
+           update punchOut;
+            }
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
            
         }
@@ -396,10 +469,16 @@ public class PunchOutLoginCXMLParse {
         System.debug('returnSetupResp::'+returnSetupResp);
         return returnSetupResp;
     }
+    /**
+     * @description generating accesstoken
+     * @return access token
+     * @param clientId
+     * @param clientSecret 
+     * @param userNameAndPassWord
+     */
     
-    
-    public static string getAccessToken(String clientId, String clientSecret,string UserNameAndPassWord) {
-        List<String> names  = UserNameAndPassWord.split('#');
+    public static string getAccessToken(String clientId, String clientSecret,string userNameAndPassWord) {
+        List<String> names  = userNameAndPassWord.split('#');
         string userName=names[0];
         string endPointUrl=names[1];
         Auth.JWT jwt = new Auth.JWT();
@@ -416,13 +495,16 @@ public class PunchOutLoginCXMLParse {
         
         //Get the access token
         String accessToken = bearer.getAccessToken();
-        system.debug('Access Token-->'+accessToken);
+        //system.debug('Access Token-->'+accessToken);
         return accessToken;
         
         
 
         
     }
-    
+    /**
+     * @description Exception Class
+     
+     */
     public class PunchOutLoginException extends Exception {}
 }

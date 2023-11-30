@@ -397,7 +397,7 @@
                
 				</aura:if>
                     <aura:If isTrue="{!v.isOperation}">
-                    <lightning:button class="slds-button slds-button--brand" iconName="utility:package_org" onclick="{!c.ConfirmOrder}">{!$Label.c.Confirm_Order}</lightning:button>
+                    <lightning:button class="slds-button slds-button--brand" iconName="utility:package_org" onclick="{!c.ConfirmOrder}">PunchOut</lightning:button>
                    </aura:If>
                         <lightning:button class="slds-button slds-button--neutral" iconName="utility:close" onclick="{!c.closeModal}">{!$Label.c.Cancel}</lightning:button>
                     

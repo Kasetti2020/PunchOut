@@ -28,6 +28,8 @@
     <!--VisulaForcePage-->
     <aura:attribute name="myParam" type="String" />
     
+    <!--Added by Mahadevaprasad on 30/11/2023-->
+    <aura:attribute name="priceChanged" type="Boolean" default="false"/>
     <!--Added by Raghu on 12/11/2021-->
     <aura:attribute name="TotalOrderAmmount" type="Decimal"/>
     <aura:attribute name="renderTotalAmmount" type="Boolean" default="true"/>
@@ -188,6 +190,9 @@
                                      </aura:if>
                                      <aura:if isTrue="{!cartDetail.Status=='Inactive'}">
                                     <p><b style="width:140px;display:inline-block;">{!$Label.c.STATUS} </b><span style="color:#a41f34;">: {!cartDetail.Status}</span></p>
+                                     </aura:if>
+                                    <aura:if isTrue="{!cartDetail.priceChanged}">
+                                    <p><b style="width:140px;display:inline-block;">Price</b><span style="color:#a41f34;">: Changed</span></p>
                                      </aura:if>
                                         <!--</aura:if>-->
                                 </td>

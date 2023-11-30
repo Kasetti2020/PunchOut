@@ -1,4 +1,11 @@
-public class PunchOutOrderCXMLParse {
+/**
+* @Author      :   Mahadevaprasad R
+* @description       :   This class is used parse cxml into jSon
+* @TestClass   :   PunchOutCXMLgenerateTest
+* @Date        :   10-11-2023
+*/
+
+public with sharing class PunchOutOrderCXMLParse {
     
     public class CXML {
         public Header header { get; set; }
@@ -7,16 +14,16 @@ public class PunchOutOrderCXMLParse {
         public string timestamp {get;set;}
     }
     public class Header {
-        public  fromNode fromNode { get; set; }
+        public  FromNode fromNode { get; set; }
         public To to { get; set; }
         public Sender sender { get; set; }
         
     }
-    public class fromNode {
-        public Credential Credential;
+    public class FromNode {
+        public Credential credential;
     }
     public class To {
-        public Credential Credential;
+        public Credential credential;
     }
     
     public class Credential {
@@ -81,7 +88,7 @@ public class PunchOutOrderCXMLParse {
     }
     
     public class BrowserFormPost {
-        public String URL { get; set; }
+        public String uRL { get; set; }
     }
     
     public class Money {
@@ -172,7 +179,7 @@ public class PunchOutOrderCXMLParse {
         cxml.header = new Header();
         /////Parse Header From Node
         Dom.XmlNode fromNode=headerNode.getChildElement('From', null);
-        cxml.header.fromNode = parseFrom(fromNode.getChildElement('Credential', null));
+        cxml.header.FromNode = parseFrom(fromNode.getChildElement('Credential', null));
         /////Parse Header To Node
         Dom.XmlNode to=headerNode.getChildElement('To', null);
         cxml.header.To = parseTo(to.getChildElement('Credential', null));
@@ -190,15 +197,15 @@ public class PunchOutOrderCXMLParse {
         if(String.isBlank(cxml.payloadID)||String.isBlank(cxml.payloadID)){
              cxmlreturn= PunchOutCXMLgenerate.xmlError('POST XML payloadID is not valid:',cxml.payloadID,cxml.timeStamp,'400','Bad Request');
         } else {
-      cxmlreturn = PunchOutOrderCXMLParse.BaseOrderCreation(cxml);
+      cxmlreturn = PunchOutOrderCXMLParse.baseOrderCreation(cxml);
         }
         return cxmlreturn;
     }
     
     
     //////////From Node ////////
-    public static fromNode parseFrom(Dom.XmlNode credentialNode) {
-        fromNode fr=new fromNode();
+    public static FromNode parseFrom(Dom.XmlNode credentialNode) {
+        FromNode fr=new FromNode();
         Credential credential = new Credential();
         credential.domain = credentialNode.getAttribute('domain', null);
         credential.identity = credentialNode.getChildElement('Identity', null).getText();
@@ -405,54 +412,33 @@ public class PunchOutOrderCXMLParse {
         return charge;
     }
     
-    public static string BaseOrderCreation(CXML cxml) {
-        /* Base_Order__c base=new Base_Order__c();
-base.Start_Process__c=false;
-
-base.CustomerParty_Name__c=cxml.request.OrderRequest.itemOutList[0].ItemID.supplierPartID;
-base.SupplierParty_CNUF__c=cxml.request.OrderRequest.itemOutList[0].ItemID.supplierPartAuxiliaryID;
-insert base;
-list<Base_Order_Detail__c> baseLineList=new list<Base_Order_Detail__c>();
-for(ItemOut item: cxml.request.OrderRequest.itemOutList){
-
-Base_Order_Detail__c  baseLine=new Base_Order_Detail__c();
-baseLine.Base_Order__c=base.Id;
-baseLine.Quantity__c=item.quantity;
-baseLine.Ordered_Quantity__c = Integer.valueOf(item.quantity);
-baseLine.Supply_Quantity__c =item.quantity;
-baseLine.Supply_Quantity_num__c = Integer.valueOf(item.quantity);
-baseLine.Remaining_Qty__c = Integer.valueOf(item.quantity);
-baseLine.Size__c=item.ItemDetail.classification;
-baseLine.Colour__c=item.ItemDetail.unitOfMeasure;
-baseLine.print__c=item.ItemDetail.manufacturerName;
-baseLineList.add(baseLine);
-}
-insert baseLineList;
-System.debug('base><><>'+base.Id);
-Base_Order__c baseupdate=new Base_Order__c();
-baseupdate.Id=base.Id;
-baseupdate.Start_Process__c=true;
-baseupdate.Processing_Status__c='Draft';
-baseupdate.PunchOut_Status__c='Order Confirmed';
-baseupdate.Retailer_code__c='Saver';
-update baseupdate;
-
-*/
+    public static string baseOrderCreation(CXML cxml) {
+             
+       Boolean cxmlInvalidModel=false;
+        Boolean cxmlShipTO=false;
+        Boolean cxmlPrice=false;
+        string returnValue;
+        system.debug('cxml.payloadID><>'+cxml.payloadID);
+        list<PunchOut_Request__c> punch = [select Id,payloadID__c,Operation__c,Createddate,timestamp__c From PunchOut_Request__c where payloadID__c =:cxml.payloadID WITH SECURITY_ENFORCED ];
         
+        
+        /////// Order Confrim Cxml validation 
+        if(punch.size()>0){
+            cxmlInvalidModel= PunchOutValidation.InActiveModelID(punch[0].Id);
+            cxmlShipTO= PunchOutValidation.GetShipTOAddress(punch[0].Id,cxml);
+            cxmlPrice= PunchOutValidation.GetPriceValue(punch[0].Id);
+            
+        }
+       
+           
        
         
-        system.debug('cxml.payloadID><>'+cxml.payloadID);
-        //list<PunchOut_Request__c> punch = [select Id,payloadID__c,Operation__c,Createddate,timestamp__c From PunchOut_Request__c where payloadID__c =:cxml.payloadID ];
         
-        string returnValue;
-        list<Base_Order__c> baseupdate=[select id,Start_Process__c,Processing_Status__c,Retailer_code__c,PunchOut_Request__c,PunchOut_Request__r.payloadID__c from Base_Order__c where PunchOut_Request__r.payloadID__c =:cxml.payloadID ];
+        list<Base_Order__c> baseupdate=[select id,Start_Process__c,Processing_Status__c,Retailer_code__c,PunchOut_Request__c,PunchOut_Request__r.payloadID__c from Base_Order__c where PunchOut_Request__r.payloadID__c =:cxml.payloadID WITH SECURITY_ENFORCED ];
         System.debug('baseupdate><>'+baseupdate);
         
-        /////// validation
-        if(baseupdate.size()>0){
-       Boolean InactiveMOdel= PunchOutValidation.InActiveModelID(baseupdate[0].PunchOut_Request__c);
-            }
-        if(baseupdate.size()>0){
+        
+        if(baseupdate.size()>0 &&(!cxmlShipTO)&&(!cxmlInvalidModel)&&(!cxmlPrice)){
         returnValue=PunchOutCXMLgenerate.xmlError('DataUploaded Successfully',cxml.payloadID,cxml.timestamp,'200','Ok') ;
         system.debug('returnValue><>'+returnValue);
         for(Base_Order__c b:baseupdate){
@@ -460,13 +446,24 @@ update baseupdate;
             b.Processing_Status__c='Draft';
             b.PunchOut_Status__c='Order Confirmed';
             b.Retailer_code__c='Saver';
-            
-        }
+                    }
+                    if(Base_Order__c.sObjectType.getDescribe().isAccessible() &&
+             Schema.sObjectType.Base_Order__c.isUpdateable()){
         Update baseupdate;
+             }
         }
         ////if payloadID is Is not valid error message will generate 
-        else if(baseupdate.size()==0){
-             returnValue= PunchOutCXMLgenerate.xmlError('POST XML payloadID Is not valid',cxml.payloadID,cxml.timestamp,'400','Bad Request');
+        else if(baseupdate.size()==0 ){
+             returnValue= PunchOutCXMLgenerate.xmlError('POST XML is not valid:PayloadID is Invalid',cxml.payloadID,cxml.timestamp,'400','Bad Request');
+        } ////if ModelIds are Invalid error message will generate 
+        else if(cxmlInvalidModel){
+             returnValue= PunchOutCXMLgenerate.xmlError('POST XML is not valid:ModelIds are Invalid',cxml.payloadID,cxml.timestamp,'400','Bad Request');
+        }////if ShipTo addres isInvalid error message will generate 
+        else if(cxmlShipTO){
+             returnValue= PunchOutCXMLgenerate.xmlError('POST XML is not valid:ShipTo addres is Invalid',cxml.payloadID,cxml.timestamp,'400','Bad Request');
+        }////if Product Price value Changed error message will generate 
+        else if(cxmlPrice){
+            returnValue= PunchOutCXMLgenerate.xmlError('POST XML is not valid:Product Price value Changed',cxml.payloadID,cxml.timestamp,'400','Bad Request');
         }
         
         

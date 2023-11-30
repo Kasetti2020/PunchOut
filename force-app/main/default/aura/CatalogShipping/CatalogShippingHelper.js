@@ -22,7 +22,7 @@
                            // alert(response.getReturnValue().length);
                             component.set('v.CartValue',response.getReturnValue().length);
                             component.set('v.DisplayCartDetail',response.getReturnValue());
-                           // console.log('DisplayCartDetail<>>>'+JSON.stringify(DisplayCartDetail));
+                           console.log('DisplayCartDetailNew<>>>'+JSON.stringify(response.getReturnValue()));
                             //alert( component.get('v.DisplayCartDetail').Id);
                             //Added By Raghu On 12/11/2021 starts
                             //To get the Total Order Amount
@@ -145,8 +145,8 @@
          //temp= numberFormat.format(temp);
         //Added By Raghu On 12/11/2021 ends
         var action = component.get("c.deleteProductFromCart");
-        alert(CartDisplay[index].Id);
-        alert(CartDisplay[index].SOid);
+       // alert(CartDisplay[index].Id);
+       // alert(CartDisplay[index].SOid);
         action.setParams({ 
             "soliId": CartDisplay[index].Id,
             "soId":CartDisplay[index].SOid
@@ -380,7 +380,7 @@
     checkingAddAndCloneData:function(component,event,helper,custid) 
     { 
         console.log('checkingAddAndCloneData>>');
-        alert(custid);
+       // alert(custid);
         var AddandCloneData=component.get('c.checkLengthAddAndCloneDataToDelete');
         AddandCloneData.setParams({
             "customerid": custid

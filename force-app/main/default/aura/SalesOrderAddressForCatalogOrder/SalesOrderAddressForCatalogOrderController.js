@@ -21,7 +21,7 @@
         action1.setCallback(this, function(response) {
            
             var state = response.getState();
-            alert(state);
+           // alert(state);
              if (state === "SUCCESS") 
             {
             var res = response.getReturnValue();
@@ -29,6 +29,14 @@
             component.set("v.ShipAddressListOld", res.billAddListRqt);
                 console.log('Bill Old TO<><>>'+JSON.stringify(res.billAddListRqt));
             component.set("v.OldShipTo", res.billAddListRqt);
+               if(res.billAddListRqt!==null)
+                    var toastEvent = $A.get("e.force:showToast");
+    toastEvent.setParams({
+        "title": "Alert!",
+        "message": "ShipTo Address is Chnaged",
+        "type": "Error",
+    });
+    toastEvent.fire();
             }
         });
         $A.enqueueAction(action1);

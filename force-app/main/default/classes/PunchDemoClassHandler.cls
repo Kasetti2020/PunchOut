@@ -1,6 +1,4 @@
-
-
-public without sharing class PunchOutWebServiceHandler {
+public without sharing class PunchDemoClassHandler {
     
     //method to initiate recursive parsing of XML stream
     public static Map<String, Object> xmlToMap(String xml){
@@ -21,7 +19,7 @@ public without sharing class PunchOutWebServiceHandler {
             
             //result map having data from the XML string as a map
             System.debug('jsonResult::::'+jsonResult);
-        PunchOutWebServiceHandler.LoginUrl(jsonResult);
+        PunchDemoClassHandler.LoginUrl(jsonResult);
         return jsonResult;
         
         

@@ -94,7 +94,7 @@
         var PricebookData = productData.tempMap[indexarr[1]].value.priceBookId;
         var actionsave = component.get("c.saveSO");
       // var newVal = sParameterName[1]+'T'+component.get("v.searchedCurrency");
-        //alert(newVal);
+        alert('currency><>>>>'+currency);
         var storedRecordId = window.localStorage.getItem("recordUrlId");
 
         // Set the attribute with the stored ID
