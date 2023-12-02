@@ -94,12 +94,12 @@
         var PricebookData = productData.tempMap[indexarr[1]].value.priceBookId;
         var actionsave = component.get("c.saveSO");
       // var newVal = sParameterName[1]+'T'+component.get("v.searchedCurrency");
-        alert('currency><>>>>'+currency);
+        //alert('currency><>>>>'+currency);
         var storedRecordId = window.localStorage.getItem("recordUrlId");
 
         // Set the attribute with the stored ID
         component.set("v.recordId", storedRecordId);
-        alert(storedRecordId);
+       // alert(storedRecordId);
         actionsave.setParams({ 
             customerData : custid,
             retailercode : retailercode,
@@ -109,7 +109,7 @@
             custRefModel : custRefModel,
             selectedCurrency:component.get("v.selectedCurrency"),
             searchedCurrency:component.get("v.searchedCurrency"),
-            panoutId:storedRecordId
+            panoutId:sParameterName[1]
         });
         actionsave.setCallback(this, function(response) 
                                {

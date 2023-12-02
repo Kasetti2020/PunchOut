@@ -352,11 +352,13 @@
         $A.enqueueAction(action);
     },
     getCartCount: function(component, event,helper) 
-    { var currentUrl = window.location.href;
-        var sParameterName = currentUrl.split('=');
+    { 
+        
+        var retrievedData = sessionStorage.getItem('PunchOutRqtId');
+       // alert(retrievedData);
         var action = component.get('c.getCartDataCount');
         action.setParams({ 
-            "customerid": sParameterName[1]
+            "customerid": retrievedData
         });
         action.setCallback(this, function(actionResult) {
             var status=actionResult.getState();

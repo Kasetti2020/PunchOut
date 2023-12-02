@@ -1,16 +1,29 @@
-public class PunchOutOrderCreation {
+/**
+* @Author      :   Mahadevaprasad R
+* @description :   This class is used for the base order to sales order creation
+* @TestClass   :   PunchOutOrderCreationTest
+* @Date        :   20-11-2023
+*/
+public with sharing class PunchOutOrderCreation {
     @InvocableMethod(label='Punch Out Order Creation' description='Punch Out Order Creation')
+      /** 
+     *@description this methode is used to create sales order
+    
+    *@param inputParams List of base order 
+   
+    *  */
     public static void checkforOrderType (List<string> inputParams) {
-        List<Base_Order__c> BaseOrList=PunchOutOrderCreation.getBaseOrderdDetails(inputParams);
+        List<Base_Order__c> baseOrList=PunchOutOrderCreation.getBaseOrderdDetails(inputParams);
         
-        if(BaseOrList.size() > 0){
-            String baseordId=BaseOrList[0].Id;
+        if(baseOrList.size() > 0){
+            String baseordId=baseOrList[0].Id;
+            baseordId=String.escapeSingleQuotes(baseordId);
        // String baseCountry=BaseOrList[0].baseOrderCountry;
         System.debug('baseordId>>'+baseordId);
        // System.debug('baseCountry>>'+baseCountry);
         
         String jsonarreyName;
-        List<JF_SF_Field_Mapping__c> jfsfFieldsList = [SELECT id,ObjectNames1__c,ObjectNames2__c,SF_Object1_Field_Name__c,SF_Object2_Field_Name__c,Service_Type__c,ChildObjectName1__c,ChildObjectName2__c,RecordType__c FROM JF_SF_Field_Mapping__c WHERE Service_Type__c='a2lHz000000nhcdIAA'];
+        List<JF_SF_Field_Mapping__c> jfsfFieldsList = [SELECT id,ObjectNames1__c,ObjectNames2__c,SF_Object1_Field_Name__c,SF_Object2_Field_Name__c,Service_Type__c,ChildObjectName1__c,ChildObjectName2__c,RecordType__c FROM JF_SF_Field_Mapping__c WHERE Service_Type__c='a2lHz000000nhcdIAA' WITH SECURITY_ENFORCED];
         System.debug('jfsfFieldsList::'+jfsfFieldsList);
         
         Map<String, String> objectAndFieldMap = new Map<String, String>();
@@ -113,7 +126,7 @@ public class PunchOutOrderCreation {
                             newRecord.put(mappingParts[0], fieldValue);
                             
                             recordsList.add(newRecord); // Add the new sObject to your list
-                            //System.debug('recordsList:::'+recordsList);
+                            // System.debug('recordsList:::'+recordsList);
                             
                         } else {
                             existingRecord.put(mappingParts[0], fieldValue);
@@ -125,6 +138,7 @@ public class PunchOutOrderCreation {
         }
         
         System.debug('recordsList::'+recordsList);
+        
         insert recordsList;
         
         List<SObject> childRecordsList = new List<SObject>();
@@ -226,51 +240,75 @@ public class PunchOutOrderCreation {
         bo.Id = boMap.get('Base_Order__c');
         bo.Processing_Status__c = 'Success';
         bo.Start_Process__c = false;
+        if(Base_Order__c.sObjectType.getDescribe().isAccessible() &&
+            Schema.sObjectType.Base_Order__c.isUpdateable()){
         update bo;
-            Base_Order__c base=[select id,PunchOut_Request__c from Base_Order__c Where Id=:BaseOrList[0].Id];
-            PunchOut_Request__c punch =[select id,payloadID__c,BuyerCookie__c,TimeStamp__c from PunchOut_Request__c where Id=:base.PunchOut_Request__c ];
+            }
+            Base_Order__c base=[select id,PunchOut_Request__c from Base_Order__c Where Id=:baseOrList[0].Id WITH SECURITY_ENFORCED];
+            PunchOut_Request__c punch =[select id,payloadID__c,BuyerCookie__c,TimeStamp__c from PunchOut_Request__c where Id=:base.PunchOut_Request__c  WITH SECURITY_ENFORCED];
             
-            BaseOrList[0].TimeStamp__c=punch.TimeStamp__c;
-            BaseOrList[0].payloadID__c=punch.payloadID__c;
-            BaseOrList[0].BuyerCookie__c=punch.BuyerCookie__c;
+            baseOrList[0].TimeStamp__c=punch.TimeStamp__c;
+            baseOrList[0].payloadID__c=punch.payloadID__c;
+            baseOrList[0].BuyerCookie__c=punch.BuyerCookie__c;
             
-            BaseOrList[0].Processing_Status__c='Success';
+            baseOrList[0].Processing_Status__c='Success';
             try {
-                Update BaseOrList;
-                
+                if(Base_Order__c.sObjectType.getDescribe().isAccessible() &&
+            Schema.sObjectType.Base_Order__c.isUpdateable()){
+                Update baseOrList;
+            }
+                if(PunchOut_Request__c.sObjectType.getDescribe().isAccessible() &&
+             Schema.sObjectType.PunchOut_Request__c.isDeletable()){
                 delete punch;
+             }
             } catch(DmlException e) {
                 System.debug('The following exception has occurred: ' + e.getMessage());
             }
         }
     }
-    
+     /** 
+     *@description this methode is used to get base order records
+    *@return List of base order 
+    *@param inputParams list of base order ID
+    *  */
     public static List<Base_Order__c> getBaseOrderdDetails (List<string> inputParams) {
         
-        List<Base_Order__c> baseOrderList=[SELECT Id,BuyerCookie__c,payloadID__c,TimeStamp__c, Name, Logical_ID__c, Order_Date_Time__c,Component_ID__c, Task_ID__c, Creation_Date_Time__c, Action_Code__c, Document_ID__c, Note__c, Note_Priority_Level__c, XML_File_Name__c, Processing_Status__c, CustomerParty_PartyTypeNumber__c, CustomerParty_PartyNumber__c, CustomerParty_PartySubNumber__c, CustomerParty_CNUF__c, CustomerParty_Name__c, CustomerParty_BillTo_CityName__c, CustomerParty_BillTo_Country_Code__c, CustomerParty_BillTo_Postal_Code__c, CustomerParty_BillTo_Email__c, CustomerParty_BillTo_Telephone__c, CustomerParty_ShipTo_Address1__c, CustomerParty_ShipTo_Address2__c, CustomerParty_ShipTo_Address3__c, CustomerParty_ShipTo_Address4__c, CustomerParty_ShipTo_CityName__c, CustomerParty_ShipTo_Country_Code__c, CustomerParty_ShipTo_Postal_Code__c, CustomerParty_ShipTo_Email__c, CustomerParty_ShipTo_Telephone__c, SupplierParty_PartyTypeNumber__c, SupplierParty_PartyNumber__c, SupplierParty_PartySubNumber__c, SupplierParty_CNUF__c, SupplierParty_Name__c, SupplierParty_OrderDateTime__c, Start_Process__c, TechnicalParty_PartyTypeNumber__c, TechnicalParty_PartyNumber__c, TechnicalParty_PartySubNumber__c, CustomerParty_BillTo_Address1__c, CustomerParty_BillTo_Address2__c, CustomerParty_BillTo_Address3__c, CustomerParty_BillTo_Address4__c,Document_Customer_Order_Id__c FROM Base_Order__c WHERE Id= : inputParams]; 
+        List<Base_Order__c> baseOrderList=[SELECT Id,BuyerCookie__c,payloadID__c,TimeStamp__c, Name, Logical_ID__c, Order_Date_Time__c,Component_ID__c, Task_ID__c, Creation_Date_Time__c, Action_Code__c, Document_ID__c, Note__c, Note_Priority_Level__c, XML_File_Name__c, Processing_Status__c, CustomerParty_PartyTypeNumber__c, CustomerParty_PartyNumber__c, CustomerParty_PartySubNumber__c, CustomerParty_CNUF__c, CustomerParty_Name__c, CustomerParty_BillTo_CityName__c, CustomerParty_BillTo_Country_Code__c, CustomerParty_BillTo_Postal_Code__c, CustomerParty_BillTo_Email__c, CustomerParty_BillTo_Telephone__c, CustomerParty_ShipTo_Address1__c, CustomerParty_ShipTo_Address2__c, CustomerParty_ShipTo_Address3__c, CustomerParty_ShipTo_Address4__c, CustomerParty_ShipTo_CityName__c, CustomerParty_ShipTo_Country_Code__c, CustomerParty_ShipTo_Postal_Code__c, CustomerParty_ShipTo_Email__c, CustomerParty_ShipTo_Telephone__c, SupplierParty_PartyTypeNumber__c, SupplierParty_PartyNumber__c, SupplierParty_PartySubNumber__c, SupplierParty_CNUF__c, SupplierParty_Name__c, SupplierParty_OrderDateTime__c, Start_Process__c, TechnicalParty_PartyTypeNumber__c, TechnicalParty_PartyNumber__c, TechnicalParty_PartySubNumber__c, CustomerParty_BillTo_Address1__c, CustomerParty_BillTo_Address2__c, CustomerParty_BillTo_Address3__c, CustomerParty_BillTo_Address4__c,Document_Customer_Order_Id__c FROM Base_Order__c WHERE Id= : inputParams WITH SECURITY_ENFORCED]; 
         System.debug('baseOrderList><>>>'+baseOrderList);
         return baseOrderList;
         
         
         
     } 
+     /** 
+     *@description this methode is used to wrapper class
+    *@return Base Order details
+    *@param baseorder base order Id
+    *  */
      public static List<Base_Order_Detail__c> getBaseOrderdLineDetails (Id baseorder) {
         
-        List<Base_Order_Detail__c> SoliList =[select id,CurrencyIsoCode,Size__c,Price_100_pcs__c,print__c,Price_Specification_Book_Product__c,variable_data_product__c,Product_Description__c, name,Base_Order__c,Products__c,Local_SKU__c,Colour__c,Quantity__c,Product_image_url__c,Full_Box_Order__c,BOX_QTY__c,Price_Product_by_Currency__c,Ordered_Quantity__c,Supply_Quantity__c,Supply_Quantity_num__c from Base_Order_Detail__c where Base_Order__c=:baseorder ];
+        List<Base_Order_Detail__c> soliList =[select id,CurrencyIsoCode,Size__c,Price_100_pcs__c,print__c,Price_Specification_Book_Product__c,variable_data_product__c,Product_Description__c, name,Base_Order__c,Products__c,Local_SKU__c,Colour__c,Quantity__c,Product_image_url__c,Full_Box_Order__c,BOX_QTY__c,Price_Product_by_Currency__c,Ordered_Quantity__c,Supply_Quantity__c,Supply_Quantity_num__c from Base_Order_Detail__c where Base_Order__c=:baseorder WITH SECURITY_ENFORCED ];
             
-        System.debug('SoliList><>>>'+SoliList);
-        return SoliList;
+        System.debug('SoliList><>>>'+soliList);
+        return soliList;
         
         
         
     }
-    
+     /** 
+     *@description this methode is used to wrapper class
+    *@return String
+    *@param inputString
+    *  */
       public static String removeCommaAtEnd(String inputString){
         String finalString = inputString.substring(0, inputString.length() - 1);
         return finalString;
     }
+      /** 
+     *@description this methode is used to wrapper class
     
-    public class getBaseOrderValues {
+    *  */
+    public class GetBaseOrderValues {
         @InvocableVariable(label='passId')
         public String baseOrderId;
         @InvocableVariable(label='countryName')

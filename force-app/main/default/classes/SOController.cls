@@ -970,7 +970,7 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
         if(SOList.size()>0)  
         {
             //Mahadevaprasad SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Sales_Order__c,Products__c,Print__c,Products__r.Name,Sales_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Sales_Order__r.Retailer_Code1__r.name,Sales_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Sales_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Sales_Order_Line_Items__c where Sales_Order__r.RecordTypeID =: CartRecordType AND Sales_Order__c =:SOList[0].id  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
-            SOliList =[select id,Price_Product_by_Currency__r.Price_100_pcs__c,Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c,Supply_Quantity__c,Price_100_pcs__c,name,Base_Order__c,Products__c,Print__c,Products__r.Name,Base_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Base_Order__r.Retailer_Code1__r.name,Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Base_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Base_Order_Detail__c where Base_Order__c IN:baseIds  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
+            SOliList =[select id,Base_Order__r.PunchOut_Status__c,Price_Product_by_Currency__r.Price_100_pcs__c,Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c,Supply_Quantity__c,Price_100_pcs__c,name,Base_Order__c,Products__c,Print__c,Products__r.Name,Base_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Base_Order__r.Retailer_Code1__r.name,Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Base_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Base_Order_Detail__c where Base_Order__c IN:baseIds  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
             system.debug(' SOliList>>'+ SOliList);
             for(Base_Order_Detail__c SOLI:SOliList)
             {
@@ -995,9 +995,12 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
                 productobj.ShowPriceInOrder = SOLI.Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c;
                 productobj.variableDataProduct = SOLI.variable_data_product__c;
                 productobj.Status =  SOLI.Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c;
-                
-                productobj.priceChanged=true;
-                
+                if(SOLI.Base_Order__r.PunchOut_Status__c=='Product Added'){
+                productobj.punchOutStatus=true;
+                }else{
+                     productobj.punchOutStatus=false;
+
+                }
                 if(String.ValueOf(SOLI.Price_Product_by_Currency__r.Price_100_pcs__c)!=SOLI.Price_100_pcs__c){
                productobj.priceChanged=true;
 }
@@ -5159,6 +5162,8 @@ string cxmlValue=PunchOutCXMLgenerate.generateCXML(punchOutRqt);
         public String SOid {get;set;}
         @AuraEnabled
         public String Name {get;set;}
+         @AuraEnabled
+        public Boolean punchOutStatus {get;set;}
         @AuraEnabled
         public Boolean priceChanged {get;set;}
         @AuraEnabled
@@ -5974,6 +5979,7 @@ string cxmlValue=PunchOutCXMLgenerate.generateCXML(punchOutRqt);
         PunchOut_Request__c punch=[select id,Operation__c,payloadID__c from PunchOut_Request__c where Id=:recordId];
         System.debug('Operation><>>>>>'+punch.Operation__c);
         return punch.Operation__c;
-    }   
+    } 
+     
     //Added by Mahadevaprasad  on 07/11/2023 Ends
 }

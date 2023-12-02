@@ -97,10 +97,10 @@
                     <lightning:icon size="small"  alternativeText="{!$Label.c.Event}" iconName="utility:user" class="user-icon" />
            </td> <td>
             <lightning:buttonMenu label="{!v.CustomerInfo.First_Name__c +' '+ v.CustomerInfo.Last_Name__c}" onselect="{!c.handleClick}" variant="bare">
-                <lightning:menuItem value="1" label="{!$Label.c.My_Profile}"/>
-                <lightning:menuItem value="2" label="{!$Label.c.Edit_Address}"/>
+               <!-- <lightning:menuItem value="1" label="{!$Label.c.My_Profile}"/>
+                <lightning:menuItem value="2" label="{!$Label.c.Edit_Address}"/>-->
                 <lightning:menuItem value="3" label="{!$Label.c.Edit_Retailer_Data}"/>
-                <lightning:menuItem value="4" label="{!$Label.c.Change_Password}"/>
+                <!--<lightning:menuItem value="4" label="{!$Label.c.Change_Password}"/> -->
                 <lightning:menuItem value="6" label="{!$Label.c.Change_Language}"/>
                 <lightning:menuItem value="5" label="{!$Label.c.Logout}"/>
             </lightning:buttonMenu>

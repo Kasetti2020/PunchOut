@@ -218,8 +218,10 @@
                                 </aura:if>
                                  <td data-label="Amount" style="text-align:center;">
                                       <aura:if isTrue="{!v.isOperation}">
+                                       <aura:if isTrue="{!cartDetail.punchOutStatus}">   
                                     <lightning:buttonIcon name="{!ind}" iconName="utility:delete" size="large" variant="bare" onclick="{!c.deleteProduct}" alternativeText="{!$Label.c.Remove}" />
-                                    </aura:if>
+                                   </aura:if>
+                                          </aura:if>
                                 </td>
                             </tr>
                         </aura:iteration>

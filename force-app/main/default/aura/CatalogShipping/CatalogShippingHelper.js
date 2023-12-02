@@ -136,6 +136,7 @@
         $A.enqueueAction(action);
         
     },
+   
     // Added by mahadevaprasad on 07/11/2023 ends
     toDeleteProductCart:function(component, event,helper,index) {
         var CartDisplay =component.get('v.DisplayCartDetail');

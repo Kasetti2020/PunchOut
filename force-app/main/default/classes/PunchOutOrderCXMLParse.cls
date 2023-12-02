@@ -161,7 +161,12 @@ public with sharing class PunchOutOrderCXMLParse {
     
     
     
-    
+     /** 
+     *@description this methode is used to generate redirect url Cxml for login
+    *@return  success cxml string
+    *@param cxmlData cxml data  
+   
+    *  */
     public static string parseCXML(String cxmlData) {
         Dom.Document doc = new Dom.Document();
         doc.load(cxmlData);
@@ -201,7 +206,13 @@ public with sharing class PunchOutOrderCXMLParse {
         }
         return cxmlreturn;
     }
+    /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  credentialNode cxml parse to convert Json 
     
+    *  */
     
     //////////From Node ////////
     public static FromNode parseFrom(Dom.XmlNode credentialNode) {
@@ -213,7 +224,13 @@ public with sharing class PunchOutOrderCXMLParse {
         System.debug('frOm><>>>'+fr);
         return fr;
     }
+     /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  credentialNode cxml parse to convert Json 
     
+    *  */
     //////////TO Node ////////
     public static TO parseTo(Dom.XmlNode credentialNode) {
         TO to=new TO();
@@ -224,7 +241,13 @@ public with sharing class PunchOutOrderCXMLParse {
         System.debug('frOm><>>>'+to);
         return to;
     }
+     /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  senderNode cxml parse to convert Json 
     
+    *  */
     //////////Sender Node ////////
     public static Sender parseSender(Dom.XmlNode senderNode) {
         Sender send=new Sender();
@@ -237,7 +260,13 @@ public with sharing class PunchOutOrderCXMLParse {
         return send;
     }
     
+     /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  requestNode cxml parse to convert Json 
     
+    *  */
     
     //////////requestNode Node ////////
     public static OrderRequest parseOrderRequest(Dom.XmlNode requestNode) {
@@ -264,6 +293,13 @@ public with sharing class PunchOutOrderCXMLParse {
         return orderRequest;
     }
     ////////////OrderRequestHeader node
+     /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  headerNode cxml parse to convert Json 
+    
+    *  */
     public static OrderRequestHeader parseOrderRequestHeader(Dom.XmlNode headerNode) {
         OrderRequestHeader orderRequestHeader = new OrderRequestHeader();
         orderRequestHeader.orderID = headerNode.getAttribute('orderID', null);
@@ -276,20 +312,38 @@ public with sharing class PunchOutOrderCXMLParse {
         return orderRequestHeader;
         
     }
+     /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  moneyNode cxml parse to convert Json 
     
+    *  */
     public static Money parseMoney(Dom.XmlNode moneyNode) {
         Money money = new Money();
         money.currencyNode = moneyNode.getAttribute('currency', null);
         money.value = Decimal.valueOf(moneyNode.getText());
         return money;
     }
+     /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  shipToNode cxml parse to convert Json 
     
+    *  */
     public static ShipTo parseShipTo(Dom.XmlNode shipToNode) {
         ShipTo shipTo = new ShipTo();
         shipTo.address = parseAddress(shipToNode.getChildElement('Address', null));
         return shipTo;
     }
+     /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  addressNode cxml parse to convert Json 
     
+    *  */
     public static Address parseAddress(Dom.XmlNode addressNode) {
         Address address = new Address();
         address.addressID = addressNode.getAttribute('addressID', null);
@@ -301,19 +355,39 @@ public with sharing class PunchOutOrderCXMLParse {
         address.Fax = parseFax(addressNode.getChildElement('Fax', null));
         return address;
     }
+      /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  postalPhone cxml parse to convert Json 
     
+    *  */
     public static Phone parsePhone(Dom.XmlNode postalPhone) {
         Phone phone = new Phone();
         phone.TelephoneNumber = parseTelephoneNumber(postalPhone.getChildElement('TelephoneNumber', null));
         
         return phone;
     }
+      /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  postalFax cxml parse to convert Json 
+    
+    *  */
     public static Fax parseFax(Dom.XmlNode postalFax) {
         Fax fax = new Fax();
         fax.TelephoneNumber = parseTelephoneNumber(postalFax.getChildElement('TelephoneNumber', null));
         
         return fax;
     }
+     /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  postalTelephoneNumber cxml parse to convert Json 
+    
+    *  */
     public static TelephoneNumber parseTelephoneNumber(Dom.XmlNode postalTelephoneNumber) {
         TelephoneNumber telephoneNumber = new TelephoneNumber();
         telephoneNumber.countryCode = postalTelephoneNumber.getChildElement('CountryCode', null).getText();
@@ -325,7 +399,13 @@ public with sharing class PunchOutOrderCXMLParse {
     }
     
     
+     /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  postalAddressNode cxml parse to convert Json 
     
+    *  */
     public static PostalAddress parsePostalAddress(Dom.XmlNode postalAddressNode) {
         PostalAddress postalAddress = new PostalAddress();
         postalAddress.name = postalAddressNode.getAttribute('Name', null);
@@ -338,7 +418,13 @@ public with sharing class PunchOutOrderCXMLParse {
         return postalAddress;
     }
     
+     /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  itemDetailNode cxml parse to convert Json 
     
+    *  */
     
     
     
@@ -364,6 +450,13 @@ public with sharing class PunchOutOrderCXMLParse {
         
         return itemDetail;
     }
+      /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  unitPriceNode cxml parse to convert Json 
+    
+    *  */
     public static UnitPrice parseunitPrice(Dom.XmlNode unitPriceNode) {
         UnitPrice fr=new UnitPrice();
         
@@ -374,7 +467,13 @@ public with sharing class PunchOutOrderCXMLParse {
         return fr;
     }
     
+     /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  itemIDNode cxml parse to convert Json 
     
+    *  */
     
     
     public static ItemID parseItemID(Dom.XmlNode itemIDNode) {
@@ -383,14 +482,26 @@ public with sharing class PunchOutOrderCXMLParse {
         item.supplierPartID = itemIDNode.getChildElement('SupplierPartID', null).getText();
         return item;
     }
+    /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  distributionNode cxml parse to convert Json 
     
+    *  */
     public static Distribution parseDistribution(Dom.XmlNode distributionNode) {
         Distribution distribution = new Distribution();
         distribution.accounting = parseAccounting(distributionNode.getChildElement('Accounting', null));
         distribution.charge = parseCharge(distributionNode.getChildElement('Charge', null));
         return distribution;
     }
+    /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  accountingNode cxml parse to convert Json 
     
+    *  */
     public static Accounting parseAccounting(Dom.XmlNode accountingNode) {
         Accounting accounting = new Accounting();
         accounting.segments = new List<AccountingSegment>();
@@ -405,13 +516,27 @@ public with sharing class PunchOutOrderCXMLParse {
         
         return accounting;
     }
+    /** 
+     *@description this methode is used to parse cxml
+    *@return  parse cxml
+   
+    *@param  chargeNode cxml parse to convert Json 
     
+    *  */
     public static Charge parseCharge(Dom.XmlNode chargeNode) {
         Charge charge = new Charge();
         charge.money = parseMoney(chargeNode.getChildElement('Money', null));
         return charge;
     }
     
+ /** 
+     *@description this methode is used to base order creation
+    *@return  cxml Value Error or success
+   
+    *@param  cxml parse Json Value 
+    
+    *  */
+
     public static string baseOrderCreation(CXML cxml) {
              
        Boolean cxmlInvalidModel=false;
@@ -424,9 +549,9 @@ public with sharing class PunchOutOrderCXMLParse {
         
         /////// Order Confrim Cxml validation 
         if(punch.size()>0){
-            cxmlInvalidModel= PunchOutValidation.InActiveModelID(punch[0].Id);
-            cxmlShipTO= PunchOutValidation.GetShipTOAddress(punch[0].Id,cxml);
-            cxmlPrice= PunchOutValidation.GetPriceValue(punch[0].Id);
+            cxmlInvalidModel= PunchOutValidation.inActiveModelID(punch[0].Id);
+            cxmlShipTO= PunchOutValidation.getShipTOAddress(punch[0].Id,cxml);
+            cxmlPrice= PunchOutValidation.getPriceValue(punch[0].Id);
             
         }
        
