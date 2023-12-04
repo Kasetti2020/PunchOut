@@ -7,10 +7,17 @@
          component.set('v.selectedCompany',component.get("v.selectedCompany"));
          helper.pickListVal(component,component.get("v.selectedCompany"),'Order_Country__c','Preferred_Currency__c');
          component.set('v.selectedCurrency',component.get("v.selectedCurrency"));
+      /////url id getting here 
+        
         var currentUrl = window.location.href;
         var sParameterName = currentUrl.split('=');
         sessionStorage.setItem('PunchOutRqtId', sParameterName[1]);
-       // alert(sParameterName[1]);
+       var retrievedData = sessionStorage.getItem('PunchOutRqtId');
+       
+        if(retrievedData !== 'undefined'){
+        document.cookie=sParameterName[1];
+        }
+        
     },
     //Product seach functon
     Search: function(component, event, helper) 

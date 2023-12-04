@@ -5,7 +5,7 @@
 * @Date        :   10-11-2023
 */
 
-public with sharing class PunchOutOrderCXMLParse {
+public  class PunchOutOrderCXMLParse {
     
     public class CXML {
         public Header header { get; set; }
@@ -434,7 +434,7 @@ public with sharing class PunchOutOrderCXMLParse {
         itemDetail.unitPrice = parseUnitPrice(itemDetailNode.getChildElement('UnitPrice', null));
         System.debug('UnitOfMeasure<><>'+itemDetailNode.getChildElement('UnitOfMeasure', null).getText());
         itemDetail.unitOfMeasure = itemDetailNode.getChildElement('UnitOfMeasure', null).getText();
-        itemDetail.classification = itemDetailNode.getChildElement('Classification', null).getAttribute('domain', null);
+        itemDetail.classification = itemDetailNode.getChildElement('Classification', null).getText();
         itemDetail.manufacturerName = itemDetailNode.getChildElement('ManufacturerName', null).getText();
         itemDetail.url = itemDetailNode.getChildElement('URL', null).getText();
         itemDetail.extrinsics = new List<Extrinsic>();
@@ -546,20 +546,24 @@ public with sharing class PunchOutOrderCXMLParse {
         system.debug('cxml.payloadID><>'+cxml.payloadID);
         list<PunchOut_Request__c> punch = [select Id,payloadID__c,Operation__c,Createddate,timestamp__c From PunchOut_Request__c where payloadID__c =:cxml.payloadID WITH SECURITY_ENFORCED ];
         
-        
+        list<string> modelID=new list<string>();
+        for(ItemOut i:cxml.Request.OrderRequest.itemOutList){
+            modelID.add(i.ItemDetail.classification);
+        }
+       system.debug('cxml.payloadID><>'+modelID);
         /////// Order Confrim Cxml validation 
         if(punch.size()>0){
             cxmlInvalidModel= PunchOutValidation.inActiveModelID(punch[0].Id);
             cxmlShipTO= PunchOutValidation.getShipTOAddress(punch[0].Id,cxml);
             cxmlPrice= PunchOutValidation.getPriceValue(punch[0].Id);
-            
+            // PunchOutValidation.getbaseOrder(punch[0].Id,modelID);
         }
        
            
        
         
         
-        list<Base_Order__c> baseupdate=[select id,Start_Process__c,Processing_Status__c,Retailer_code__c,PunchOut_Request__c,PunchOut_Request__r.payloadID__c from Base_Order__c where PunchOut_Request__r.payloadID__c =:cxml.payloadID WITH SECURITY_ENFORCED ];
+        list<Base_Order__c> baseupdate=[select id,Start_Process__c,Processing_Status__c,Retailer_code__c,PunchOut_Request__c,PunchOut_Request__r.payloadID__c from Base_Order__c where PunchOut_Request__r.payloadID__c =:cxml.payloadID  ];
         System.debug('baseupdate><>'+baseupdate);
         
         
@@ -571,11 +575,11 @@ public with sharing class PunchOutOrderCXMLParse {
             b.Processing_Status__c='Draft';
             b.PunchOut_Status__c='Order Confirmed';
             b.Retailer_code__c='Saver';
+            Update  b;
                     }
-                    if(Base_Order__c.sObjectType.getDescribe().isAccessible() &&
-             Schema.sObjectType.Base_Order__c.isUpdateable()){
-        Update baseupdate;
-             }
+               System.debug('baseupdate><>'+baseupdate);    
+        
+            
         }
         ////if payloadID is Is not valid error message will generate 
         else if(baseupdate.size()==0 ){

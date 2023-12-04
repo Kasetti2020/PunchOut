@@ -9,9 +9,9 @@
     <aura:iteration items="{!v.AddressList}" var="Add" indexVar="ind">
         <div class="slds-m-bottom--large1">
             <article class="slds-tile slds-media">
-                <div class="slds-media__figure">
+               <!-- <div class="slds-media__figure">
                     <ui:inputCheckbox text="{!Add.Id}" value="{!Add.Is_Default__c}" name="{!ind}" change ="{!c.changeAddress}"/>
-                </div>
+                </div>-->
                 <div class="slds-media__body">
                     
                     <div class="slds-tile__detail">

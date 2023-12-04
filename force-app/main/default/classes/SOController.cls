@@ -859,10 +859,11 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
         if(SOList.size()>0)  
         {
             //Mahadevaprasad SOliList =[select id,Supply_Quantity__c,Price_100_pcs__c,name,Sales_Order__c,Products__c,Print__c,Products__r.Name,Sales_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Sales_Order__r.Retailer_Code1__r.name,Sales_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Sales_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Sales_Order_Line_Items__c where Sales_Order__r.RecordTypeID =: CartRecordType AND Sales_Order__c =:SOList[0].id  AND Added_As_a_Label__c=false];//  AND Added_As_a_Label__c=false Added by seema .
-            SOliList =[select id,Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c,Supply_Quantity__c,Price_100_pcs__c,name,Base_Order__c,Products__c,Print__c,Products__r.Name,Base_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Base_Order__r.Retailer_Code1__r.name,Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Base_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Base_Order_Detail__c where Base_Order__c IN:baseIds  AND Added_As_a_Label__c=false AND Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c='Active'];//  AND Added_As_a_Label__c=false Added by seema .
+            SOliList =[select id,Price_Product_by_Currency__r.Price_100_pcs__c,Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c,Supply_Quantity__c,Price_100_pcs__c,name,Base_Order__c,Products__c,Print__c,Products__r.Name,Base_Order__r.RecordType.Name,Quantity__c,Size__c,Colour__c,Local_SKU__c,Product_Description__c,Product_image_url__c,Base_Order__r.Retailer_Code1__r.name,Base_Order__r.Retailer_Code1__r.Show_Price_in_Order__c,Base_Order__r.Retailer_Code1__r.Remarks__c,Full_Box_Order__c,BOX_QTY__c,Price_Specification_Book_Product__c,Price_Specification_Book_Product__r.Name,Price_Specification_Book_Product__r.Id, Price_Specification_Book_Product__r.MOQ__c,Products__r.Id,Price_Specification_Book_Product__r.UOM_Price__c, Products__r.Sub_category__c,Remarks__c,CurrencyIsoCode,Price_Product_by_Currency__r.MagNET_Price_Code__c,Price_Product_by_Currency__r.UOM_Price__c,Order_UOM__c,variable_data_product__c from Base_Order_Detail__c where Base_Order__c IN:baseIds  AND Added_As_a_Label__c=false AND Price_Specification_Book_Product__r.Product_Unique_ID__r.Status__c='Active'];//  AND Added_As_a_Label__c=false Added by seema .
             system.debug(' SOliList>>'+ SOliList);
             for(Base_Order_Detail__c SOLI:SOliList)
             {
+                if(String.ValueOf(SOLI.Price_Product_by_Currency__r.Price_100_pcs__c)==SOLI.Price_100_pcs__c){
                 SOLIWrapper productobj = new SOLIWrapper();
                 productobj.id = SOLI.id;
                 productobj.SOid = SOLI.Base_Order__c;
@@ -926,6 +927,7 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
                 }
                 system.debug(' productobj :::'+ productobj);
                 prodwrapList.add(productobj);
+            }
             }
             system.debug(' prodwrapList4567 :::'+ prodwrapList);
             return prodwrapList;
@@ -3149,6 +3151,7 @@ string cxmlValue=PunchOutCXMLgenerate.generateCXML(punchOutRqt);
                     b.CustomerParty_ShipTo_State__c=punchoutShipTO[0].State__c;
                     b.CustomerParty_ShipTo_Country__c=punchoutShipTO[0].Country__c;
                      b.CustomerParty_ShipTo_Postal_Code__c=punchoutShipTO[0].PostalCode__c;
+                    b.PunchOut_Status__c='Punched Out';
                 }  
                 update basePunchOutList;
             }
@@ -5370,14 +5373,16 @@ string cxmlValue=PunchOutCXMLgenerate.generateCXML(punchOutRqt);
      @AuraEnabled
     public static addressWrapper  getAllOldShipTO(Id punchoutID)
     {
+        System.debug('punchoutID>>>>'+punchoutID);
         boolean shipToChanged=false;
         addressWrapper addWrap = new addressWrapper();
         List<PunchOut_Request__c> billRqt = new List<PunchOut_Request__c>();
         
         billRqt=[select Id,payloadID__c,Operation__c,Street__c,City__c,State__c,PostalCode__c,Country__c,Address_Name__c From PunchOut_Request__c Where Id=:punchoutID];
-        list<Base_Order__c> basePunchOutList=[select Id,PunchOut_Request__c,CustomerParty_ShipTo_Address1__c,CustomerParty_ShipTo_CityName__c,CustomerParty_ShipTo_Postal_Code__c,CustomerParty_ShipTo_Country__c,CustomerParty_ShipTo_Address2__c,CustomerParty_ShipTo_State__c from Base_Order__c where PunchOut_Request__c=:punchoutID ];
+        list<Base_Order__c> basePunchOutList=[select Id,PunchOut_Request__c,CustomerParty_ShipTo_Address1__c,CustomerParty_ShipTo_CityName__c,CustomerParty_ShipTo_Postal_Code__c,CustomerParty_ShipTo_Country__c,CustomerParty_ShipTo_Address2__c,CustomerParty_ShipTo_State__c from Base_Order__c where PunchOut_Request__c=:punchoutID And PunchOut_Status__c='Punched Out'];
          System.debug('basePunchOutList>>>>'+basePunchOutList);
         System.debug('billRqt>>>>'+billRqt);
+        if(basePunchOutList.size()>0){
         if((basePunchOutList[0].CustomerParty_ShipTo_Address1__c)!=(billRqt[0].Address_Name__c)){
             shipToChanged=true;
         }else if((basePunchOutList[0].CustomerParty_ShipTo_Address2__c)!=(billRqt[0].Street__c)){
@@ -5395,7 +5400,9 @@ string cxmlValue=PunchOutCXMLgenerate.generateCXML(punchOutRqt);
         else if((basePunchOutList[0].CustomerParty_ShipTo_Country__c)!=(billRqt[0].Country__c)){
             shipToChanged=true;  
         }
-        
+        }else{
+            
+        }
         System.debug('shipToChanged>>>>'+shipToChanged);
         
         if(shipToChanged){

@@ -283,6 +283,9 @@
         $A.enqueueAction(actionCall);       
     },
     GetcustomInfoid: function(component, event,helper) {
+        
+       
+     
         var action = component.get("c.getcostomerinfo");
         action.setParams({
             "retailerCode":	component.get("v.SelectedRetailercode"),
@@ -354,11 +357,12 @@
     getCartCount: function(component, event,helper) 
     { 
         
-        var retrievedData = sessionStorage.getItem('PunchOutRqtId');
+         var cookieString=document.cookie;
+         var rqtId = cookieString.split(';');
        // alert(retrievedData);
         var action = component.get('c.getCartDataCount');
         action.setParams({ 
-            "customerid": retrievedData
+            "customerid": rqtId[0]
         });
         action.setCallback(this, function(actionResult) {
             var status=actionResult.getState();

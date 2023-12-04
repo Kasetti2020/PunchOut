@@ -1,7 +1,7 @@
 ({
     toGetcustomerData:function(component, event,helper){
-         var currentUrl = window.location.href;
-        var sParameterName = currentUrl.split('=');
+          var cookieString=document.cookie;
+         var rqtId = cookieString.split(';');
         var action1 = component.get("c.FetchCustData");
         action1.setCallback(this, function(response){
             var state = response.getState();
@@ -12,7 +12,7 @@
                 var actiongetcart = component.get("c.getAllCartDetails");
                 var custid =component.get("v.DisplayCustDetail");
                 actiongetcart.setParams({ 
-                    "punchoutID": sParameterName[1]
+                    "punchoutID": rqtId[0]
                 });
                 actiongetcart.setCallback(this, function(response){
                     var state = response.getState();
@@ -30,7 +30,22 @@
                                 for(let i=0;i<response.getReturnValue().length;i++){
                                     totalAmmount += component.get("v.DisplayCartDetail")[i].TotalPriceByCurrency;
                                     if(component.get("v.DisplayCartDetail")[i].Status=='Inactive'){
-                                       component.set('v.InactiveStatus',true);
+                                        component.set('v.InactiveStatus',true);
+                                        var toastEvent = $A.get("e.force:showToast");
+                                        toastEvent.setParams({
+                                            "title": "InActive ModelID!",
+                                            "message": "Model status is Inactive",
+                                            "type":"error"
+                                        });
+                                        toastEvent.fire();
+                                    } if(component.get("v.DisplayCartDetail")[i].priceChanged==true){
+                                         var toastEvent = $A.get("e.force:showToast");
+                                        toastEvent.setParams({
+                                            "title": "PriceChanged",
+                                            "message": "Price Chnaged in the model",
+                                            "type":"error"
+                                        });
+                                        toastEvent.fire();
                                     }
                                 }
                                 totalAmmount = totalAmmount.toFixed(2);
@@ -84,12 +99,12 @@
     // Added by mahadevaprasad on 07/11/2023 starts
     punchOutmethod:function(component, event,helper){
          //alert('punchOut');
-         var currentUrl = window.location.href;
-        var sParameterName = currentUrl.split('=');
+          var cookieString=document.cookie;
+         var rqtId = cookieString.split(';');
         //component.set('v.recordId',sParameterName);
         //alert(sParameterName[1]);
         var action = component.get("c.punchOutMethod");
-        action.setParams({ recordId : sParameterName[1] });
+        action.setParams({ recordId : rqtId[0] });
         action.setCallback(this, function(response) {
             var state = response.getState();
             if (state === "SUCCESS") {
@@ -437,11 +452,11 @@
         var retrievedValue = window.sessionStorage.getItem("recordUrlId");
         //alert(retrievedValue);
         
-        var currentUrl = window.location.href;
-        var sParameterName = currentUrl.split('=');
+         var cookieString=document.cookie;
+         var rqtId = cookieString.split(';');
         var AddandCloneData=component.get('c.checkLengthAddAndCloneDataToDelete');
         AddandCloneData.setParams({
-            "punchOutRqt":sParameterName[1]
+            "punchOutRqt":rqtId[0]
         });
         AddandCloneData.setCallback(this, function(response) {
             var state = response.getState();
@@ -536,7 +551,7 @@
         var sParameterName = currentUrl.split('=');
         var action1 = component.get("c.ClearCartDetails");
         action1.setParams({ 
-            "punchoutID":sParameterName[1]
+            "punchoutID":rqtId[0]
         });
         action1.setCallback(this, function(response){
             var state = response.getState();

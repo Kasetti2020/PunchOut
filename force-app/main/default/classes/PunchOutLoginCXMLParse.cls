@@ -5,7 +5,7 @@
 * @Date        :   29-10-2023
 **/
 
-public with sharing class PunchOutLoginCXMLParse {
+public without sharing class PunchOutLoginCXMLParse {
    /**
      * @description Cxml Wrapper Class
      
@@ -345,10 +345,13 @@ public with sharing class PunchOutLoginCXMLParse {
     public static string xmlLoginMethod(CXML cxml,string cxmlData){
         
         
-       
             
         System.debug(cxml);
         String returnSetupResp;
+        
+     if(String.isBlank(cxml.payloadID)||String.isBlank(cxml.payloadID)){
+                 return   returnSetupResp= PunchOutCXMLgenerate.xmlError('POST XML payloadID is not valid:',cxml.payloadID,cxml.timeStamp,'400','Bad Request');
+                }
         /////From Wrapper class 
         string buyerCookie=cxml.request.PunchOutSetupRequest.buyerCookie;
         string operation=cxml.request.PunchOutSetupRequest.operation;
@@ -381,7 +384,7 @@ public with sharing class PunchOutLoginCXMLParse {
             returnSetupResp= PunchOutCXMLgenerate.xmlError('Sender identity or shared secret is invalid',payloadID,timeStamp,'401','Unauthorized');
             return returnSetupResp;
         }
-        /// if it more than one day punchout not did value are deleting
+        /// if it more than one day punchout not done,then value are deleting
          
         DateTime currentDate = DateTime.now();
         currentDate=currentDate-1;
@@ -443,18 +446,23 @@ public with sharing class PunchOutLoginCXMLParse {
              punchOut[0].PostalCode__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.postalCode;
              punchOut[0].Country__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.country;
              punchOut[0].CXML_data__c=cxmlData;
-             if(PunchOut_Request__c.SObjectType.getDescribe().isAccessible() &&
-             Schema.sObjectType.PunchOut_Request__c.isUpdateable()) {
+             
             update punchOut;
-             }
+             
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
            
         }else if(punchOut.size()>0 && operation=='inspect'){
             punchOut[0].Operation__c=operation;
-            if(PunchOut_Request__c.SObjectType.getDescribe().isAccessible() &&
-            Schema.sObjectType.PunchOut_Request__c.isUpdateable()) {
+             punchOut[0].Address_Name__c=cxml.request.punchOutSetupRequest.shipTo.address.name;
+            punchOut[0].Street__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.street;
+             punchOut[0].City__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.city;
+             punchOut[0].State__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.state;
+             punchOut[0].PostalCode__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.postalCode;
+             punchOut[0].Country__c=cxml.request.punchOutSetupRequest.shipTo.address.postalAddress.country;
+             punchOut[0].CXML_data__c=cxmlData;
+             
            update punchOut;
-            }
+            
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
            
         }
@@ -470,7 +478,7 @@ public with sharing class PunchOutLoginCXMLParse {
         return returnSetupResp;
     }
     /**
-     * @description generating accesstoken
+     * @description generating accessToken
      * @return access token
      * @param clientId
      * @param clientSecret 

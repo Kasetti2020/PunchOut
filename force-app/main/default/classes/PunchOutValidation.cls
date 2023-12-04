@@ -7,7 +7,7 @@
 
 
 
-public with sharing class PunchOutValidation {
+public without sharing class PunchOutValidation {
  /** 
      *@description this methode is used to checking Inactive Modelid Based On cxml Payload Id and If any one model is in active status order Rejected And Error cxml will return
     *@return  its return boolean value
@@ -69,18 +69,49 @@ public with sharing class PunchOutValidation {
     
     public static Boolean getPriceValue(string punchOutRqt) {
     Boolean priceValue=false;
-        
+        System.debug('punchOutRqt><>'+punchOutRqt);
    List<Base_Order_Detail__c>  baseLine =[select id,Base_Order__r.PunchOut_Request__c,Price_Product_by_Currency__r.Price_100_pcs__c,Price_100_pcs__c from Base_Order_Detail__c where Base_Order__r.PunchOut_Request__c=:punchOutRqt  AND Added_As_a_Label__c=false WITH SECURITY_ENFORCED];
        
        
-        
+        System.debug('baseLine><>'+baseLine);
         for(Base_Order_Detail__c b:baseLine){
-            System.debug(String.ValueOf(b.Price_Product_by_Currency__r.Price_100_pcs__c)+'   '+b.Price_100_pcs__c);
+            System.debug('PriceValue><>'+String.ValueOf(b.Price_Product_by_Currency__r.Price_100_pcs__c)+'   '+b.Price_100_pcs__c);
             if(String.ValueOf(b.Price_Product_by_Currency__r.Price_100_pcs__c)!=b.Price_100_pcs__c){
                 priceValue=true;
 }
         }
-        System.debug(priceValue);
+        System.debug('priceValue><><'+priceValue);
     return priceValue;
+    }
+      /** 
+     *@description this methode is used to checking based on model sales order creating 
+    *@return  its return boolean value
+    *@param punchOutRqt PunchOut_Request__c Object Id
+     *@param modelId list of model name
+    
+    *  */
+    
+    public static Boolean getbaseOrder(string punchOutRqt,list<string> modelId) {
+        Boolean priceValue=false;
+       System.debug('modelId<><>'+modelId);
+        try {
+            
+           set<id> base=new set<id>();
+            List<Base_Order_Detail__c>  baseLine =[select id,Base_Order__r.PunchOut_Request__c,Products__r.name,Base_Order__c from Base_Order_Detail__c where Base_Order__r.PunchOut_Request__c=:punchOutRqt  AND Added_As_a_Label__c=false And Products__r.Name <>:modelId WITH SECURITY_ENFORCED];
+             System.debug('baseLine<><>'+baseLine);
+            for(Base_Order_Detail__c b:baseLine){
+               base.add(b.Base_Order__c); 
+            }
+            list<Base_Order__c> basevalue=[select id from Base_Order__c where id IN:base];
+            
+            delete baseLine;
+            delete basevalue;
+           // priceValue=true;
+            
+        } catch(DmlException e) {
+            System.debug('The following exception has occurred: ' + e.getMessage());
+            priceValue=false;
+        }
+        return priceValue;
     }
     }

@@ -3,6 +3,7 @@
     {
        // var spinner = component.find('spinner');
         //$A.util.toggleClass(spinner, "slds-hide");
+        
         helper.toGetcustomerData(component, event,helper);  
          helper.punchOutmethod(component, event,helper); 
           
@@ -58,12 +59,14 @@
        // helper.checkingOpenVisualForcePage(component,event,helper,custid); 
     },
     BacktoCatalog : function(component, event,helper) {
+          var cookieString=document.cookie;
+         var rqtId = cookieString.split(';');
         component.set("v.parentcmp",true);
         component.set("v.Shipcmp",false);
         var urlString = window.location.href;
         var CommunityBaseURL = urlString.substring(0, urlString.indexOf("/s/"));
         //alert(CommunityBaseURL+'/s/catalog-order')
-        window.location = CommunityBaseURL+'/s/catalog-order?';
+        window.location = CommunityBaseURL+'/s/catalog-order?='+rqtId[0];
         
         //$A.get('e.force:refreshView').fire();
     },

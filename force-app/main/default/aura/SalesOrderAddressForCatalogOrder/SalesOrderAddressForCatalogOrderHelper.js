@@ -2,8 +2,8 @@
     toGetCustomerAddess : function(component, event,helper) 
     {
         
-         var currentUrl = window.location.href;
-        var sParameterName = currentUrl.split('=');
+           var cookieString=document.cookie;
+         var rqtId = cookieString.split(';');
         var custInfoid =component.get("v.CustomerInfoID");
         var retailerName =component.get("v.retailerName");
         console.log("retailer name>>>>"+retailerName);
@@ -14,7 +14,7 @@
             "retailer": retailerName,
             "retailercodeId":component.get("v.retailerCodeId"),
             "orderSource": component.get("v.OrderSource"),
-            "punchRqtId":sParameterName[1]
+            "punchRqtId":rqtId[0]
         });
         action.setCallback(this, function(response){
             var state = response.getState();
@@ -150,14 +150,14 @@
     
     
     toGetcustomerData:function(component, event,helper){
-         var currentUrl = window.location.href;
-        var sParameterName = currentUrl.split('=');
+         var cookieString=document.cookie;
+         var rqtId = cookieString.split(';');
        
                var action = component.get("c.getAllActiveCartDetails");
         
         action.setParams({ 
            
-            "punchoutID":sParameterName[1]
+            "punchoutID":rqtId[0]
         });
         action.setCallback(this, function(response){
                     alert('state');

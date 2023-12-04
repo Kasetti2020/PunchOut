@@ -2,41 +2,47 @@
     doInit : function(component, event,helper) 
     {
         
-        var currentUrl = window.location.href;
-        var sParameterName = currentUrl.split('=');
-          var action = component.get("c.getAllActiveCartDetails");
-        action.setParams({ "punchoutID" : sParameterName[1] });
+        var cookieString=document.cookie;
+        var rqtId = cookieString.split(';');
+        var action = component.get("c.getAllActiveCartDetails");
+        action.setParams({ "punchoutID" : rqtId[0] });
         action.setCallback(this, function(response) {
-           // alert('123');
+            // alert('123');
             console.log(response.getReturnValue());
             console.log('DisplayCartDetail><>>'+JSON.stringify(response.getReturnValue()));
             component.set('v.DisplayCartDetail',response.getReturnValue());
         });
         $A.enqueueAction(action);
-          
-         var currentUrl = window.location.href;
-        var sParameterName = currentUrl.split('=');
-          var action1 = component.get("c.getAllOldShipTO");
-        action1.setParams({ "punchoutID" : sParameterName[1] });
+        
+        var cookieString=document.cookie;
+        var rqtId = cookieString.split(';');
+       // alert(rqtId[0]);
+        var action1 = component.get("c.getAllOldShipTO");
+        action1.setParams({ "punchoutID" : rqtId[0] });
         action1.setCallback(this, function(response) {
-           
-            var state = response.getState();
-           // alert(state);
-             if (state === "SUCCESS") 
-            {
-            var res = response.getReturnValue();
             
-            component.set("v.ShipAddressListOld", res.billAddListRqt);
+            var state = response.getState();
+            // alert(state);
+            if (state === "SUCCESS") 
+            {
+                var res = response.getReturnValue();
+                
+                component.set("v.ShipAddressListOld", res.billAddListRqt);
                 console.log('Bill Old TO<><>>'+JSON.stringify(res.billAddListRqt));
-            component.set("v.OldShipTo", res.billAddListRqt);
-               if(res.billAddListRqt!==null)
-                    var toastEvent = $A.get("e.force:showToast");
-    toastEvent.setParams({
-        "title": "Alert!",
-        "message": "ShipTo Address is Chnaged",
-        "type": "Error",
-    });
-    toastEvent.fire();
+                component.set("v.OldShipTo", res.billAddListRqt);
+                alert(JSON.stringify(res));
+                var oldShipto = res;
+                if(component.get("v.OldShipTo")){
+                    alert(JSON.stringify(res.billAddListRqt));
+                
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    "title": "Alert!",
+                    "message": "ShipTo Address is Changed",
+                    "type": "Error",
+                });
+                toastEvent.fire();
+            }
             }
         });
         $A.enqueueAction(action1);
@@ -170,26 +176,26 @@
     
     ConfirmOrder : function(component,event,helper)
     {
-        var currentUrl = window.location.href;
-        var sParameterName = currentUrl.split('=');
-                var action = component.get("c.deleteInactiveModel");
+        var cookieString=document.cookie;
+        var rqtId = cookieString.split(';');
+        var action = component.get("c.deleteInactiveModel");
         action.setParams({ 
-            "punchoutID": sParameterName[1]
+            "punchoutID": rqtId[0]
             
         });
         action.setCallback(this, function(response){
             var state = response.getState();
             var res = response.getReturnValue();
-           //alert('delete');
-          if(state === 'SUCCESS'){
-             
-               
+            //alert('delete');
+            if(state === 'SUCCESS'){
+                
+                
             }
             else if(state === 'ERROR'){
                 //alert('ERROR OCCURED.'+JSON.stringify(response.getError()));
             }
-        
-           
+            
+            
         });
         $A.enqueueAction(action);
         
@@ -202,7 +208,7 @@
         
         //--Validation for PO to SO Default Address Selection Starts here-----
         
-     /*ma   var billAddressList = component.get('v.BillAddressList');
+        /*ma   var billAddressList = component.get('v.BillAddressList');
         var checkDefaultBillAddress = false;
         for(var i = 0 ; i<billAddressList.length ; i++)
         {
@@ -738,50 +744,50 @@
         var DefaultInvoiceToID;
         
         // validations for Supplier Code and Manufacturer Code
-            if(SO.Supplier_Code__c=='NULL' ||SO.Supplier_Code__c=='')
-            {
-                var toastEvent = $A.get("e.force:showToast");
-                toastEvent.setParams({
-                    "title": $A.get("$Label.c.Warning"),
-                    "type" : "warning",
-                    "message": $A.get("$Label.c.Please_give_Supplier_Code")
-                });
-                toastEvent.fire();
-                return;
-            }
-             if(SO.Supplier_Code__c != null && SO.Supplier_Code__c.length> 255){
-                
-                    var toastEvent = $A.get("e.force:showToast");
-                    toastEvent.setParams({
-                        "title": $A.get("$Label.c.Warning"),
-                        "type" : "warning",
-                        "message": $A.get("$Label.c.Supplier_Vendor_Code_should_be_less_than_or_equal_to_255_characters")
-                    });
-                    toastEvent.fire();
-                    return;
-            }
-            if(SO.Manufacturer_Code__c=='NULL' ||SO.Manufacturer_Code__c=='')
-            {
-                var toastEvent = $A.get("e.force:showToast");
-                toastEvent.setParams({
-                    "title": $A.get("$Label.c.Warning"),
-                    "type" : "warning",
-                    "message": $A.get("$Label.c.Please_give_Manufacturer_Factory_POF_Code")
-                });
-                toastEvent.fire();
-                return;
-            }
-            if(SO.Manufacturer_Code__c != null && SO.Manufacturer_Code__c.length> 255){
-                
-                    var toastEvent = $A.get("e.force:showToast");
-                    toastEvent.setParams({
-                        "title": $A.get("$Label.c.Warning"),
-                        "type" : "warning",
-                        "message": $A.get("$Label.c.Manufacturer_Factory_POF_Code_should_be_less_than_or_equal_to_255_characters")
-                    });
-                    toastEvent.fire();
-                    return;
-            }
+        if(SO.Supplier_Code__c=='NULL' ||SO.Supplier_Code__c=='')
+        {
+            var toastEvent = $A.get("e.force:showToast");
+            toastEvent.setParams({
+                "title": $A.get("$Label.c.Warning"),
+                "type" : "warning",
+                "message": $A.get("$Label.c.Please_give_Supplier_Code")
+            });
+            toastEvent.fire();
+            return;
+        }
+        if(SO.Supplier_Code__c != null && SO.Supplier_Code__c.length> 255){
+            
+            var toastEvent = $A.get("e.force:showToast");
+            toastEvent.setParams({
+                "title": $A.get("$Label.c.Warning"),
+                "type" : "warning",
+                "message": $A.get("$Label.c.Supplier_Vendor_Code_should_be_less_than_or_equal_to_255_characters")
+            });
+            toastEvent.fire();
+            return;
+        }
+        if(SO.Manufacturer_Code__c=='NULL' ||SO.Manufacturer_Code__c=='')
+        {
+            var toastEvent = $A.get("e.force:showToast");
+            toastEvent.setParams({
+                "title": $A.get("$Label.c.Warning"),
+                "type" : "warning",
+                "message": $A.get("$Label.c.Please_give_Manufacturer_Factory_POF_Code")
+            });
+            toastEvent.fire();
+            return;
+        }
+        if(SO.Manufacturer_Code__c != null && SO.Manufacturer_Code__c.length> 255){
+            
+            var toastEvent = $A.get("e.force:showToast");
+            toastEvent.setParams({
+                "title": $A.get("$Label.c.Warning"),
+                "type" : "warning",
+                "message": $A.get("$Label.c.Manufacturer_Factory_POF_Code_should_be_less_than_or_equal_to_255_characters")
+            });
+            toastEvent.fire();
+            return;
+        }
         
         if(component.get("v.OrderSource")=="PO")
         {
