@@ -37,7 +37,7 @@ public without sharing class SOController
         Price_Specification_Book_Product__c prodData =new Price_Specification_Book_Product__c();
         Price_Product_by_Currency__c priceproductbycurrency;
         
-        prodData =[select id,Product_Unique_ID__c,CurrencyIsoCode,Product_Unique_ID__r.Business_Vertical__c, Local_SKU__c,Color__c,Retailer_Code__c,Retailer_Code__r.Full_Box_Order__c,BOX_QTY__c,Description__c,Price_100pcs__c,Price_1000pcs__c,Product_image_url__c,Product_Size__c,Order_to_Company__c,Print_Shop__c,Product_Family__c,Customer_Ref_Model__c ,EUR_Rebate_pc__c,EUR_Reuse_Rebate_pc__c,USD_Rebate_pc__c,USD_Reuse_Rebate_pc__c,Sizer_Print__c,Variable_Data_Product__c from Price_Specification_Book_Product__c where id =:priceBookProId];
+        prodData =[select id,Product_Unique_ID__c,Product_Unique_ID__r.name,CurrencyIsoCode,Product_Unique_ID__r.Business_Vertical__c, Local_SKU__c,Color__c,Retailer_Code__c,Retailer_Code__r.Full_Box_Order__c,BOX_QTY__c,Description__c,Price_100pcs__c,Price_1000pcs__c,Product_image_url__c,Product_Size__c,Order_to_Company__c,Print_Shop__c,Product_Family__c,Customer_Ref_Model__c ,EUR_Rebate_pc__c,EUR_Reuse_Rebate_pc__c,USD_Rebate_pc__c,USD_Reuse_Rebate_pc__c,Sizer_Print__c,Variable_Data_Product__c from Price_Specification_Book_Product__c where id =:priceBookProId];
         system.debug('prodData>>>>'+prodData);
         if(priceByCurr!=null)
         {  
@@ -145,6 +145,7 @@ prodData.CurrencyIsoCode=con.Preferred_Currency__c.split('-')[0];
             soli.BOX_QTY__c =prodData.BOX_QTY__c;
             soli.Product_image_url__c=prodData.Product_image_url__c;
             soli.Price_Specification_Book_Product__c = prodData.Id;
+            soli.Model_Id__c = prodData.Product_Unique_ID__r.name;
             // Ma soli.Printshop_Pick__c = prodData.Print_Shop__c;
             // Ma soli.Family__c = prodData.Product_Family__c;
             if(priceByCurr!=null)

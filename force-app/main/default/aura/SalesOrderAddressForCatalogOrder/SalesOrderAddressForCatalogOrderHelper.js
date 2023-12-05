@@ -481,11 +481,18 @@
     toastEvent.fire();
                var myParamValue = response.getReturnValue();
         console.log('checkingAddAndCloneData>>'+myParamValue);
-        
-        var urlString = window.location.href;
+      var  vfPageUrl = '/apex/PunchOutPage';
+              var param1=myParamValue;
+              const urlWithParams = `${vfPageUrl}?param1=${param1}`;
+              console.log(urlWithParams);
+               var urlString = window.location.href;
+                        var CommunityBaseURL = urlString.substring(0, urlString.indexOf("/s/"));
+                        window.location.href = CommunityBaseURL+'/s/punchoutpage?'+urlWithParams;
+              //window.location.href = urlWithParams;
+       /* var urlString = window.location.href;
                         var CommunityBaseURL = urlString.substring(0, urlString.indexOf("/s/"));
                         window.location.href = CommunityBaseURL+'/s/punchoutpage?myParam='+ encodeURIComponent(myParamValue);
-
+*/
             }
             else if(state === 'ERROR'){
                 alert('ERROR OCCURED.'+JSON.stringify(response.getError()));

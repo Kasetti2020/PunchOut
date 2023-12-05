@@ -260,7 +260,7 @@
                                 <aura:If isTrue="{!v.isOperation}">
                                 <lightning:button class="slds-button slds-button_brand slds-m-top_medium" iconName="utility:record_update" variant="UPDATE CART" label="{!$Label.c.UPDATE_CART}" title="{!$Label.c.UPDATE_CART}" onclick="{! c.UpdateCart}"/>
 </aura:If>
-                                    <lightning:button class="{!v.PlaceorderBtn==true?'slds-button slds-button_brand slds-m-top_medium slds-button_disabled':'slds-button slds-button_brand slds-m-top_medium '}" aura:id="placeorder" disabled="{!v.PlaceorderBtn}" iconName="utility:cart" variant="PLACE ORDER" label="{!$Label.c.PLACE_ORDER}" title="{!$Label.c.PLACE_ORDER}" onclick="{! c.placeOrders }" />
+                                    <lightning:button class="{!v.PlaceorderBtn==true?'slds-button slds-button_brand slds-m-top_medium slds-button_disabled':'slds-button slds-button_brand slds-m-top_medium '}" aura:id="placeorder" disabled="{!v.PlaceorderBtn}" iconName="utility:cart" variant="PLACE ORDER" label="View Order" title="{!$Label.c.PLACE_ORDER}" onclick="{! c.placeOrders }" />
                             </aura:If>   
                         </aura:If>
                             

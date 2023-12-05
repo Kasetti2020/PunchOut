@@ -286,7 +286,7 @@ public static void cancelledOrders(string  orderDate,string orderID,string paylo
     for (SObject record : sList) {
         Dom.XmlNode itemIn = punchOutOrderMessage.addChildElement('ItemIn', null, null);
         Dom.XmlNode itemId = itemIn.addChildElement('ItemID', null, null);
-                    itemId.addChildElement('SupplierPartID', null, null).addTextNode(baseList[0].OrderSource__c);
+                    
         itemId.addChildElement('SupplierPartAuxiliaryID', null, null).addTextNode(baseList[0].Company__c);
             Dom.XmlNode itemDetail = itemIn.addChildElement('ItemDetail', null, null);
         Dom.XmlNode unitPrice = itemDetail.addChildElement('UnitPrice', null, null);
@@ -316,11 +316,12 @@ public static void cancelledOrders(string  orderDate,string orderID,string paylo
         
                         unitPriceMoney.setAttribute('currency', String.valueOf(fieldValue));
                 }
-        else if(fieldName=='Description'){
-                    itemDetail.addChildElement('Description', null, null).addTextNode(String.valueOf(fieldValue));
-                }else if(fieldName=='UnitOfMeasure'){
+        else if(fieldName=='SupplierPartID'){
+                    //itemDetail.addChildElement('Description', null, null).addTextNode(String.valueOf(fieldValue));
+                    itemId.addChildElement('SupplierPartID', null, null).addTextNode(String.valueOf(fieldValue));
+                }else if(fieldName=='SupplierPartID'){
                     System.debug('objectField::'+fieldName);
-                    //itemDetail.addChildElement('UnitOfMeasure', null, null).addTextNode(String.valueOf(fieldValue));
+                   // itemId.addChildElement('SupplierPartID', null, null).addTextNode(String.valueOf(fieldValue));
                 } else if(fieldName=='currency'){
                     unitPriceMoney.addTextNode(String.valueOf(fieldValue));
                 }

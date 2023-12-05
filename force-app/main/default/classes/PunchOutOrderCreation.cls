@@ -4,7 +4,7 @@
 * @TestClass   :   PunchOutOrderCreationTest
 * @Date        :   20-11-2023
 */
-public with sharing class PunchOutOrderCreation {
+public  class PunchOutOrderCreation {
     @InvocableMethod(label='Punch Out Order Creation' description='Punch Out Order Creation')
       /** 
      *@description this methode is used to create sales order
@@ -253,14 +253,12 @@ public with sharing class PunchOutOrderCreation {
             
             baseOrList[0].Processing_Status__c='Success';
             try {
-                if(Base_Order__c.sObjectType.getDescribe().isAccessible() &&
-            Schema.sObjectType.Base_Order__c.isUpdateable()){
+               
                 Update baseOrList;
-            }
-                if(PunchOut_Request__c.sObjectType.getDescribe().isAccessible() &&
-             Schema.sObjectType.PunchOut_Request__c.isDeletable()){
+           
+               
                 delete punch;
-             }
+             
             } catch(DmlException e) {
                 System.debug('The following exception has occurred: ' + e.getMessage());
             }

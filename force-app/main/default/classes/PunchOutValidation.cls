@@ -97,11 +97,12 @@ public without sharing class PunchOutValidation {
         try {
             
            set<id> base=new set<id>();
-            List<Base_Order_Detail__c>  baseLine =[select id,Base_Order__r.PunchOut_Request__c,Products__r.name,Base_Order__c from Base_Order_Detail__c where Base_Order__r.PunchOut_Request__c=:punchOutRqt  AND Added_As_a_Label__c=false And Products__r.Name <>:modelId WITH SECURITY_ENFORCED];
+            List<Base_Order_Detail__c>  baseLine =[select id,Base_Order__r.PunchOut_Request__c,Products__r.name,Base_Order__c from Base_Order_Detail__c where Base_Order__r.PunchOut_Request__c=:punchOutRqt   And Products__r.Name !=:modelId WITH SECURITY_ENFORCED];
              System.debug('baseLine<><>'+baseLine);
             for(Base_Order_Detail__c b:baseLine){
                base.add(b.Base_Order__c); 
             }
+            System.debug('base<><>'+base);
             list<Base_Order__c> basevalue=[select id from Base_Order__c where id IN:base];
             
             delete baseLine;

@@ -153,7 +153,7 @@
                                 </td>
                                 <td data-label="Close Date" >
                                     <aura:if isTrue="{!cartDetail.fullboxQty}">
-                                        <lightning:input type="number" name="{!ind}" value="{!cartDetail.Quantity}" onchange="{!c.CalculateBoxQty}"  disabled="{isQuantity}"	/>
+                                        <lightning:input type="number" name="{!ind}" value="{!cartDetail.Quantity}" onchange="{!c.CalculateBoxQty}"  disabled="true"	/>
                                         <aura:set attribute="else">
                                             <lightning:input type="number" aura:id="myInput" name="{!ind}" value="{!cartDetail.Quantity}"  onchange="{!c.CalculateBoxQty}"/>
                                         </aura:set>
@@ -393,7 +393,7 @@
                 
                 <div class="slds-modal__footer slds-p-around--x-small">
                    <aura:if isTrue="{!v.OldShipTo}">
-                   <h1 class="slds-col slds-text-align_left" style="color:#a41f34;" >Notification:&nbsp; ShipTo Address is Chnaged</h1>
+                   <h1 class="slds-col slds-text-align_left" style="color:#a41f34;" >Notification:&nbsp; ShipTo Address is Changed</h1>
                
 				</aura:if>
                     <aura:If isTrue="{!v.isOperation}">
@@ -460,5 +460,10 @@
     <!-- Modal Box ends here -->
     <div class="slds-backdrop slds-backdrop--open"></div>
     
-    
+     <aura:attribute name="cxmlData" type="String" />
+
+    <form aura:id="cxmlForm" onsubmit="{!c.handleFormSubmit}">
+        <input type="hidden" name="cXML-urlencoded" id="cxml" value="{!v.cxmlData}" />
+        <button type="submit">Submit</button>
+    </form>
 </aura:component>

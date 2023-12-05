@@ -203,7 +203,12 @@ public without sharing class PunchOutLoginCXMLParse {
                 cxml.request.punchOutSetupRequest = parsePunchOutSetupRequest(requestNode.getChildElement('PunchOutSetupRequest', null));
                 //////payloadID is Empty error cxml will generate
                 if(String.isBlank(cxml.payloadID)||String.isBlank(cxml.payloadID)){
-                    returnXml= PunchOutCXMLgenerate.xmlError('POST XML payloadID is not valid:',cxml.payloadID,cxml.timeStamp,'400','Bad Request');
+                    returnXml= PunchOutCXMLgenerate.xmlError('POST XML payloadID is not valid: payloadId is empty Or Invalid',cxml.payloadID,cxml.timeStamp,'400','Bad Request');
+                }
+               else if(String.isBlank(cxml.header.sender.credential.sharedSecret)||String.isBlank(cxml.header.sender.credential.sharedSecret)){
+                    returnXml= PunchOutCXMLgenerate.xmlError('POST XML payloadID is not valid:Sender identity or shared secret is invalid',cxml.payloadID,cxml.timeStamp,'400','Bad Request');
+                }  else if(String.isBlank(cxml.header.sender.credential.identity)||String.isBlank(cxml.header.sender.credential.identity)){
+                    returnXml= PunchOutCXMLgenerate.xmlError('POST XML payloadID is not valid:Sender identity or shared secret is invalid',cxml.payloadID,cxml.timeStamp,'400','Bad Request');
                 }
                 else{
                 System.debug('PunchOutLoginCXMLParse><>>>'+cxml);
@@ -349,34 +354,28 @@ public without sharing class PunchOutLoginCXMLParse {
         System.debug(cxml);
         String returnSetupResp;
         
-     if(String.isBlank(cxml.payloadID)||String.isBlank(cxml.payloadID)){
-                 return   returnSetupResp= PunchOutCXMLgenerate.xmlError('POST XML payloadID is not valid:',cxml.payloadID,cxml.timeStamp,'400','Bad Request');
-                }
+  
         /////From Wrapper class 
         string buyerCookie=cxml.request.PunchOutSetupRequest.buyerCookie;
         string operation=cxml.request.PunchOutSetupRequest.operation;
         string timeStamp=cxml.timestamp;
         string payloadID=cxml.payloadID;
-        string clientSecret=cxml.header.sender.credential.sharedSecret;
-        string clientId=cxml.header.sender.credential.identity;
+        string clientId=cxml.header.sender.credential.sharedSecret;
+        string userName=cxml.header.sender.credential.identity;
         System.debug('clientId><><'+clientId);
         map<string,string> punchMap=new map<string,string>();
         string accessToken;
         
-        /////from custom metadata getting all recordS
-        list<PunchOut_User_Credential__mdt> mcs = PunchOut_User_Credential__mdt.getAll().values();
-        for(PunchOut_User_Credential__mdt panch:mcs){
-            punchMap.put(panch.Client_Id__c,panch.UserName__c+'#'+panch.EndPointUrl__c);
-        }
+       
         
         
         try{
             
-            if(punchMap.containsKey(clientId)){
+            
                 string userNameAndPassWord=punchMap.get(clientId);
-                accessToken=PunchOutLoginCXMLParse.getAccessToken(clientId,clientSecret,userNameAndPassWord);
+                accessToken=PunchOutLoginCXMLParse.getAccessToken(userName,clientId);
                
-            }
+            
         }
         catch(PunchOutLoginException ex){
             system.debug('Error Occured while inserting order');
@@ -485,10 +484,10 @@ public without sharing class PunchOutLoginCXMLParse {
      * @param userNameAndPassWord
      */
     
-    public static string getAccessToken(String clientId, String clientSecret,string userNameAndPassWord) {
-        List<String> names  = userNameAndPassWord.split('#');
-        string userName=names[0];
-        string endPointUrl=names[1];
+    public static string getAccessToken(String userName, String clientId) {
+        //List<String> names  = userNameAndPassWord.split('#');
+        //string userName=names[0];
+       // string endPointUrl=names[1];
         Auth.JWT jwt = new Auth.JWT();
         jwt.setSub(userName);
         jwt.setAud('https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory'); 
@@ -497,9 +496,9 @@ public without sharing class PunchOutLoginCXMLParse {
         //Create the object that signs the JWT bearer token
         Auth.JWS jws = new Auth.JWS(jwt,'salesforcemainetti');
         String token = jws.getCompactSerialization();
-        //String tokenEndpoint ='https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/services/oauth2/token';
+        String tokenEndpoint ='https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/services/oauth2/token';
         
-        Auth.JWTBearerTokenExchange bearer = new Auth.JWTBearerTokenExchange(endPointUrl, jws);
+        Auth.JWTBearerTokenExchange bearer = new Auth.JWTBearerTokenExchange(tokenEndpoint, jws);
         
         //Get the access token
         String accessToken = bearer.getAccessToken();

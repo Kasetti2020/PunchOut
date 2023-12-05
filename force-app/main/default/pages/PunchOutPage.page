@@ -1,25 +1,15 @@
 <apex:page showHeader="true" sidebar="true" Controller="PunchOutOrderMessageController" >
-    <h1>
-        Punched Out
-    </h1>
-    <apex:repeat var="case" value="{!StringList}"/> 
+    
+    
+  <apex:repeat var="case" value="{!StringList}"/> 
     <form id="cxml_form" method="POST" action="https://servicerest-xml-137b1767f8f8.herokuapp.com/xml-parser">
-        <input type="hidden" name="cXML-urlencoded" id="cxml" />
+        <input type="hidden" name="cXML-urlencoded" value="{!StringList}" />
         
     </form>
     <script type="text/javascript">
-    // JavaScript to handle the URL and parameters
-    var currentURL = window.parent.location.search;
-    const urlParms = new URLSearchParams(currentURL);
-    var xml = urlParms.get('myParam');
-    // alert(urlParms.get('myParam'));
-    var element=document.getElementById('cxml');
-    element.value=xml;
-    //alert(element.value);
+    
     document.getElementById('cxml_form').submit()
-    </script>
     
-    
-    
+    </script>                                              
     
 </apex:page>

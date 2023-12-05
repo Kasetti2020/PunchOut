@@ -85,9 +85,9 @@
     <!--Spinner End-->
     <div class="cart-button-group">        
         <aura:If isTrue="{!v.parentcmp}">
-            <aura:If isTrue="{!v.viewbulk}">
+           <!-- <aura:If isTrue="{!v.viewbulk}">
                 <lightning:button label="{!$Label.c.ADD_TO_CART}" onclick="{!c.bulkAdd}" class="view-cart1 slds-m-left_x-small" iconName="utility:add" disabled= "{!v.disableBulkAdd}"/>
-            </aura:If>
+            </aura:If> -->
              <lightning:button label="{!$Label.c.VIEW_CART}" onclick="{!c.Shipcmp}" class="view-cart1 slds-m-left_x-small" iconName="utility:cart"/>
 			<lightning:badge label="{!v.CartCount}" id="Cartcount" value="{!v.CartCount}" class="cart-number"/>
             <!--<a onclick="{!c.Shipcmp}" class="view-cart" title="View Cart"><lightning:icon iconName="utility:shopping_bag" alternativeText="Approved"/>  </a>-->

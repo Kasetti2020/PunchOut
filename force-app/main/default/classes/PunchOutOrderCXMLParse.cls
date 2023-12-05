@@ -200,9 +200,9 @@ public  class PunchOutOrderCXMLParse {
         cxml.request.orderRequest = parseOrderRequest(requestNode.getChildElement('OrderRequest', null));
         system.debug('PunchOutOrderCXMLParse<><><'+cxml);
         if(String.isBlank(cxml.payloadID)||String.isBlank(cxml.payloadID)){
-             cxmlreturn= PunchOutCXMLgenerate.xmlError('POST XML payloadID is not valid:',cxml.payloadID,cxml.timeStamp,'400','Bad Request');
+             cxmlreturn= PunchOutCXMLgenerate.xmlError('POST XML payloadID is not valid: payloadId is empty Or Invalid',cxml.payloadID,cxml.timeStamp,'400','Bad Request');
         } else {
-      cxmlreturn = PunchOutOrderCXMLParse.baseOrderCreation(cxml);
+      cxmlreturn = PunchOutOrderCXMLParse.baseOrderCreation(cxml,cxmlData);
         }
         return cxmlreturn;
     }
@@ -537,7 +537,7 @@ public  class PunchOutOrderCXMLParse {
     
     *  */
 
-    public static string baseOrderCreation(CXML cxml) {
+    public static string baseOrderCreation(CXML cxml,string cxmlData) {
              
        Boolean cxmlInvalidModel=false;
         Boolean cxmlShipTO=false;
@@ -548,7 +548,7 @@ public  class PunchOutOrderCXMLParse {
         
         list<string> modelID=new list<string>();
         for(ItemOut i:cxml.Request.OrderRequest.itemOutList){
-            modelID.add(i.ItemDetail.classification);
+            modelID.add(i.ItemID.SupplierPartID);
         }
        system.debug('cxml.payloadID><>'+modelID);
         /////// Order Confrim Cxml validation 
@@ -556,7 +556,7 @@ public  class PunchOutOrderCXMLParse {
             cxmlInvalidModel= PunchOutValidation.inActiveModelID(punch[0].Id);
             cxmlShipTO= PunchOutValidation.getShipTOAddress(punch[0].Id,cxml);
             cxmlPrice= PunchOutValidation.getPriceValue(punch[0].Id);
-            // PunchOutValidation.getbaseOrder(punch[0].Id,modelID);
+             PunchOutValidation.getbaseOrder(punch[0].Id,modelID);
         }
        
            
@@ -575,10 +575,11 @@ public  class PunchOutOrderCXMLParse {
             b.Processing_Status__c='Draft';
             b.PunchOut_Status__c='Order Confirmed';
             b.Retailer_code__c='Saver';
-            Update  b;
+            b.Cxml_Data__c=cxmlData;
+            
                     }
                System.debug('baseupdate><>'+baseupdate);    
-        
+        Update  baseupdate;
             
         }
         ////if payloadID is Is not valid error message will generate 

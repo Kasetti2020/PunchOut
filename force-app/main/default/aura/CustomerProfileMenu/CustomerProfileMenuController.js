@@ -11,12 +11,13 @@
         $A.util.addClass(helpText, 'slds-hide');
     },
     handleClick : function(cmp, event, helper) {
+        
         //alert('Inside alert????');
         var menuValue = event.detail.menuItem.get("v.value");
         //var source = event.getSource();
         //var label = source.get("v.label");
         var label = '23';
-        //alert('label>>>'+label);
+        alert('menuValue>>>'+menuValue);
         //console.log('label'+label);
        /*if(label =='My Profile')
         {
@@ -123,12 +124,14 @@
 
         if(menuValue =='5')
         {
+           
             //alert('Inside Logout>>>>');
             var urlString = window.location.href;
             var CommunityBaseURL = urlString.substring(0, urlString.indexOf("/s/"));
             //alert('Inside CommunityBaseURL>>>>'+CommunityBaseURL);
-            window.location.replace(CommunityBaseURL+"/secur/logout.jsp?retUrl="+CommunityBaseURL+"/s/login");
-
+           window.location.replace("https://heroku-xml-40154aff6536.herokuapp.com/");
+             
+//window.location.close(CommunityBaseURL+"/secur/logout.jsp?retUrl="+CommunityBaseURL+"/s/login");
         }
         
       

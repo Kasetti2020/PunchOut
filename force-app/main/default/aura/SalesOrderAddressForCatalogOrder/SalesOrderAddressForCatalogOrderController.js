@@ -30,10 +30,10 @@
                 component.set("v.ShipAddressListOld", res.billAddListRqt);
                 console.log('Bill Old TO<><>>'+JSON.stringify(res.billAddListRqt));
                 component.set("v.OldShipTo", res.billAddListRqt);
-                alert(JSON.stringify(res));
+                //alert(JSON.stringify(res));
                 var oldShipto = res;
                 if(component.get("v.OldShipTo")){
-                    alert(JSON.stringify(res.billAddListRqt));
+                    //alert(JSON.stringify(res.billAddListRqt));
                 
                 var toastEvent = $A.get("e.force:showToast");
                 toastEvent.setParams({
