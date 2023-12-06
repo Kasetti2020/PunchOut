@@ -1,4 +1,4 @@
-Global class PunchOutDemoclass {
+Global with sharing class PunchOutDemoclass {
     public static void parseXMl(Map<String, Object> jsonResult){
         
          string valueFromDeserliz=  JSON.serialize(jsonResult);
@@ -346,12 +346,15 @@ Global class PunchOutDemoclass {
     }
     
      public static void storeInSession() {
-       DateTime dt = DateTime.parse('06/16/2015 11:46 AM');
-Cache.Session.put('ns1.partition1.orderDate', dt);
-if (Cache.Session.contains('ns1.partition1.orderDate')) {
-    DateTime cachedDt = (DateTime)Cache.Session.get('ns1.partition1.orderDate');
-    System.debug(cachedDt);
-}
+      String partitionInput = 'PunchOut';
+            
+            Cache.SessionPartition  sessionPartition = Cache.Session.getPartition(partitionInput);
+            System.debug('sessionPartition><>>'+sessionPartition);
+            
+            //sessionPartition.put('PunchOutId', 'a2jHz0000006jahIAA');
+            
+            Id punchOutRefId= (Id)sessionPartition.get('PunchOutId');
+            System.debug('punchOutRefId><>'+punchOutRefId);
      }
 
 

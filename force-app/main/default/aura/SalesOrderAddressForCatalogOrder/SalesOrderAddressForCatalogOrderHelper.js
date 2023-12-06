@@ -482,12 +482,24 @@
                var myParamValue = response.getReturnValue();
         console.log('checkingAddAndCloneData>>'+myParamValue);
       var  vfPageUrl = '/apex/PunchOutPage';
-              var param1=myParamValue;
+              var param1='a2jHz0000006jahIAA';
               const urlWithParams = `${vfPageUrl}?param1=${param1}`;
               console.log(urlWithParams);
                var urlString = window.location.href;
                         var CommunityBaseURL = urlString.substring(0, urlString.indexOf("/s/"));
-                        window.location.href = CommunityBaseURL+'/s/punchoutpage?'+urlWithParams;
+              console.log(CommunityBaseURL+'/s/punchoutpage?'+urlWithParams);
+              
+               var urlEvent = $A.get("e.force:navigateToURL");
+        urlEvent.setParams({
+            "url":"punchoutpage?Id="+param1
+        });
+            console.log('New Url><>><>>'+urlEvent);  
+        urlEvent.fire();
+              
+              
+              
+                        //window.location.href = CommunityBaseURL+'/s/punchoutpage?'+urlWithParams;
+              //console.log(CommunityBaseURL+'/s/punchoutpage?'+urlWithParams);
               //window.location.href = urlWithParams;
        /* var urlString = window.location.href;
                         var CommunityBaseURL = urlString.substring(0, urlString.indexOf("/s/"));

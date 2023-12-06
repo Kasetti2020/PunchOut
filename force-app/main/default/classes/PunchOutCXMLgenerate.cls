@@ -334,4 +334,18 @@ public static void cancelledOrders(string  orderDate,string orderID,string paylo
         System.debug('xmlString><>>>>>>'+xmlString);
         return xmlString;
     }
+    
+    
+     public static void storeInSession() {
+      String partitionInput = 'PunchOut';
+            
+            Cache.SessionPartition  sessionPartition = Cache.Session.getPartition(partitionInput);
+            System.debug('sessionPartition><>>'+sessionPartition.isAvailable());
+            
+            //sessionPartition.put('PunchOutId', 'a2jHz0000006jahIAA');
+            
+            Id punchOutRefId= (Id)sessionPartition.get('PunchOutId');
+            System.debug('punchOutRefId><>'+punchOutRefId);
+     }
+
 }

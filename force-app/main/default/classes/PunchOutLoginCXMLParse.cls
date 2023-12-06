@@ -212,7 +212,8 @@ public without sharing class PunchOutLoginCXMLParse {
                 }
                 else{
                 System.debug('PunchOutLoginCXMLParse><>>>'+cxml);
-                returnXml= PunchOutLoginCXMLParse.xmlLoginMethod(cxml,cxmlData);
+                returnXml=new PunchOutLoginCXMLParse().xmlLoginMethod(cxml,cxmlData);
+                     
                 }
                 
             }
@@ -347,7 +348,7 @@ public without sharing class PunchOutLoginCXMLParse {
     * @param cxmlData 
      * @param cxml 
     * */  
-    public static string xmlLoginMethod(CXML cxml,string cxmlData){
+    public  string xmlLoginMethod(CXML cxml,string cxmlData){
         
         
             
@@ -433,9 +434,21 @@ public without sharing class PunchOutLoginCXMLParse {
                 PunchOut_Request__c.SObjectType.getDescribe().isAccessible() &&
                 Schema.sObjectType.PunchOut_Request__c.isCreateable()) {
             insert rqt;
+                   
                 }
+            System.debug('before ');
+            String partitionInput = 'PunchOut';
+            
+            Cache.SessionPartition  sessionPartition = Cache.Session.getPartition(partitionInput);
+             System.debug('Session Availabel'+sessionPartition.isAvailable());
+            if(sessionPartition.isAvailable()){
+            sessionPartition.put('PunchOutId', rqt.Id);
+            
+            Id punchOutRefId= (Id)sessionPartition.get('PunchOutId');
+            System.debug('punchOutRefId><>'+punchOutRefId);
+            }
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+rqt.Id;
-           
+            
         }else if(punchOut.size()>0 && operation=='edit'){
             punchOut[0].Operation__c=operation;
             punchOut[0].Address_Name__c=cxml.request.punchOutSetupRequest.shipTo.address.name;
@@ -447,7 +460,16 @@ public without sharing class PunchOutLoginCXMLParse {
              punchOut[0].CXML_data__c=cxmlData;
              
             update punchOut;
+             String partitionInput = 'PunchOut';
+            
+          /*  Cache.SessionPartition  sessionPartition = Cache.Session.getPartition(partitionInput);
+            System.debug('sessionPartition><>>'+sessionPartition.isAvailable());
              
+            sessionPartition.put('PunchOutId', punchOut[0].Id);
+            
+            Id punchOutRefId= (Id)sessionPartition.get('PunchOutId');
+            System.debug('punchOutRefId><>'+punchOutRefId);
+             */
             redirectURL = 'https://mainetti--lightsand.sandbox.my.site.com/MagNETFactory/secur/frontdoor.jsp?sid='+accessToken+'&retURL=/MagNETFactory/s/catalog-order?requestId='+punchOut[0].Id;
            
         }else if(punchOut.size()>0 && operation=='inspect'){

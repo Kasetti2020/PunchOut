@@ -359,7 +359,7 @@
         
          var cookieString=document.cookie;
          var rqtId = cookieString.split(';');
-       // alert(retrievedData);
+        alert(rqtId[0]);
         var action = component.get('c.getCartDataCount');
         action.setParams({ 
             "customerid": rqtId[0]

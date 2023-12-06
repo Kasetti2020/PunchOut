@@ -73,6 +73,8 @@
             if(status=="SUCCESS")
             {
                 component.set('v.RoList', actionResult.getReturnValue());
+                component.set("v.SelectRetailer",actionResult.getReturnValue());
+                 component.set("v.showConfirmDialog",true);
             }
         });
         $A.enqueueAction(action);

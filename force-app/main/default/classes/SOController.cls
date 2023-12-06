@@ -125,7 +125,9 @@ prodData.CurrencyIsoCode=con.Preferred_Currency__c.split('-')[0];
             }
             So.OwnerId =config.SalesOrder_OwnerId__c; 
             system.debug('Solist>>>>'+So);
-            insert So;                                                            
+            insert So;
+            
+            
             system.debug('So>>>>'+So);
             Base_Order_Detail__c soli=new Base_Order_Detail__c();
             soli.Base_Order__c=So.id;
