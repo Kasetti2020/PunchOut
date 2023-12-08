@@ -832,7 +832,15 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
   
     }
     //<!--Added By Mahadevaprasad on 28/11/2023 Ends -->
-   
+   @AuraEnabled
+       public static Integer getLeadTime(string punchoutID)
+    {
+        Integer leadTime;
+        Expected_ExFactory_Date__c leadDate=[SELECT LeadTime__c FROM Expected_ExFactory_Date__c	];
+    
+        
+        return leadTime=(Integer)leadDate.LeadTime__c;
+    }
   @AuraEnabled
        public static List<SOLIWrapper>  getAllActiveCartDetails(Id punchoutID)
     {
@@ -954,6 +962,14 @@ soli.Customer_Ref_Model__c = prodData.Customer_Ref_Model__c;    */
     @AuraEnabled
     public static List<SOLIWrapper>  getAllCartDetails(id punchoutID)
     {
+        
+        
+         String partitionInput = 'PunchOut';
+        
+        Cache.SessionPartition  sessionPartition = Cache.Session.getPartition(partitionInput);
+        
+        Id punchOutRefId= (Id)sessionPartition.get('PunchOutId');
+        System.debug('punchOutRefId><>'+punchOutRefId);
         //Mahadevaprasad List<Sales_Order__c> SOList=new List<Sales_Order__c>();
         //Mahadevaprasad List<Sales_Order_Line_Items__c> SOliList=new List<Sales_Order_Line_Items__c>();
         List<Base_Order__c> SOList=new List<Base_Order__c>();
@@ -3800,19 +3816,27 @@ string cxmlValue=PunchOutCXMLgenerate.generateCXML(punchOutRqt);
     {
         List<string> listToReturn = new List<string>();
         //listToReturn.add('aaa');listToReturn.add('bbb');listToReturn.add('ccc');listToReturn.add('ddd');
-        
+        if(controllingValue=='SAVERS'){
+            controllingValue='DECATHLON';
+        }
         Map<String, List<String>> ControllersAndDependents = new Map<String, List<String>>();
         Online_Enquiry__c oe = new Online_Enquiry__c();
         ControllersAndDependents = RegistrationService.getDependentMap(oe,controllingFields,dependentField);
-        
+         for (String fieldName : ControllersAndDependents.keySet()){
+            
+            System.debug('RetailerCode>>>' + fieldName);
+        }
         if(ControllersAndDependents.containskey(controllingValue))
         {
+            System.debug(controllingValue);
             listToReturn = ControllersAndDependents.get(controllingValue);
         }
         else
         {
             System.debug('retailer '+controllingValue+' not found in '+ControllersAndDependents.keyset());
         }
+        
+        System.debug('listToReturn<><>'+listToReturn);
         return listToReturn;
     }
     

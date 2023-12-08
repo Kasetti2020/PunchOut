@@ -5,11 +5,15 @@
         $A.util.toggleClass(spinner, "slds-hide");
         
         helper.Getcontactid(component, event, helper);
+         
+       // alert('123');
+       // this.Catalogcmp(component, event,helper);
     },
     Catalogcmp :function(component, event, helper) 
     {
-        component.set("v.onselectRetailer",event.currentTarget.name);
-        
+       // alert();
+        //component.set("v.onselectRetailer",event.currentTarget.name);
+        component.set("v.onselectRetailer",component.get("v.retailerValue"));
         var RList = component.get("v.RoList");
         for(var i=0;i<RList.length;i++){
             if(RList[i].Name==event.currentTarget.name){

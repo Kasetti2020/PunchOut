@@ -72,12 +72,33 @@
             var status=actionResult.getState();
             if(status=="SUCCESS")
             {
+                component.set("v.retailerValue",actionResult.getReturnValue()[0].Name);
+                //alert('Retailer'+JSON.stringify(actionResult.getReturnValue()[0].Name));
                 component.set('v.RoList', actionResult.getReturnValue());
                 component.set("v.SelectRetailer",actionResult.getReturnValue());
-                 component.set("v.showConfirmDialog",true);
+                //alert();
+               this.RetailerValuecmp(component, event,helper);
             }
         });
         $A.enqueueAction(action);
+    },
+    RetailerValuecmp :function(component, event, helper) 
+    {
+       // alert('Retailer');
+        //component.set("v.onselectRetailer",event.currentTarget.name);
+        component.set("v.onselectRetailer",component.get("v.retailerValue"));
+        var RList = component.get("v.RoList");
+       // alert(RList);
+        for(var i=0;i<RList.length;i++){
+            if(RList[i].Name==component.get("v.retailerValue")){
+                component.set("v.onselectRetailercode",RList[i].Id);
+            }
+        } 
+        //alert('inside');
+        var res = this.pickListVal(component,component.get("v.onselectRetailer"),'Retailer_Code_Hidden__c','Order_Country__c');
+        component.set("v.SelectRetailer",component.get("v.retailerValue"));
+        this.GetcustomInfoid(component, event, helper);
+        component.set("v.showConfirmDialog",true);
     },
     loadCatalogOrder: function(component, event,helper) 
     {
@@ -88,6 +109,9 @@
     {
         //alert('controllingValue:'+controllingValue+' controllingFields:'+controllingFields+' dependentField:'+dependentField);
         var actionCall = component.get("c.getDependentPicklistValues");
+      //  alert(controllingValue);
+       // alert(controllingFields);
+       // alert(dependentField);
         actionCall.setParams({
             "controllingValue":	controllingValue,
             "controllingFields": controllingFields,
@@ -118,6 +142,7 @@
         $A.enqueueAction(actionCall);       
     },
     GetcustomInfoid: function(component, event,helper) {
+       // alert(component.get("v.SelectRetailer"));
         var action = component.get("c.getcostomerRetailerData");
         action.setParams({
             "retailerCode":	component.get("v.SelectRetailer"),
@@ -137,8 +162,8 @@
                 var errors = response.getError();
                 if (errors) {
                     if (errors[0] && errors[0].message) {
-                        alert("Error message: " + 
-                              errors[0].message);
+                      //  alert("1Error message: " + 
+                         //     errors[0].message);
                     }
                     
                 } else {

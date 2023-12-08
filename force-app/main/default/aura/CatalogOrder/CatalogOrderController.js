@@ -1,6 +1,7 @@
 ({ 
     doInit : function(component, event,helper,page) 
     {
+       
           helper.GetcustomInfoid(component, event, helper);
         var res = helper.pickListVal(component,component.get("v.SelectedRetailer"),'Retailer_Code_Hidden__c','Order_Country__c');
         helper.getCartCount(component, event, helper);
@@ -8,7 +9,7 @@
          helper.pickListVal(component,component.get("v.selectedCompany"),'Order_Country__c','Preferred_Currency__c');
          component.set('v.selectedCurrency',component.get("v.selectedCurrency"));
       /////url id getting here 
-        
+         helper.startTimer(component);
         var currentUrl = window.location.href;
         var sParameterName = currentUrl.split('=');
         sessionStorage.setItem('PunchOutRqtId', sParameterName[1]);

@@ -2,14 +2,7 @@ global with sharing class PunchOutOrderMessageController {
     global String getStringList { get; set; }
     global String getStringUrl { get; set; }
     
-    public punchOutOrderMessageController(){
-        string recordIdUrl = ApexPages.currentPage().getParameters().get('Id');
-         System.Url recordId = URL.getOrgDomainUrl();
-                System.Url recordUrl = URL.getCurrentRequestUrl();
-       // string path = URL.getPath();
-        System.debug('recordId><>'+recordId);
-        System.debug('recordUrl><>'+recordUrl);
-    } 
+   
     public  String getStringList() {
        /* System.debug('Inside Methode');
         string recordId = System.currentPagereference().getParameters().get('Id');
@@ -24,9 +17,9 @@ global with sharing class PunchOutOrderMessageController {
          String partitionInput = 'PunchOut';
             
             Cache.SessionPartition  sessionPartition = Cache.Session.getPartition(partitionInput);
-        Id punchOutRefId= (Id)sessionPartition.get('PunchOutId');
-            System.debug('punchOutRefId><>'+punchOutRefId);
-       string recordId='a2jHz0000006jahIAA';
+        string recordId= (String)sessionPartition.get('PunchOutId');
+            System.debug('recordId><>'+recordId);
+    //  recordId='a2jHz0000006jg6IAA';
         PunchOut_Request__c punch =[select Id,payloadID__c,TimeStamp__c,Street__c,City__c,State__c,PostalCode__c,Country__c,Address_Name__c From PunchOut_Request__c where Id=: recordId WITH SECURITY_ENFORCED ];
         
         list<Base_Order__c> baseList =[select Id,PunchOut_Request__c,OrderSource__c,Company__c From Base_Order__c Where PunchOut_Request__c=:recordId WITH SECURITY_ENFORCED] ;

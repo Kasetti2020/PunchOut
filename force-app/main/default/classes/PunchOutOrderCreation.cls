@@ -14,9 +14,10 @@ public  class PunchOutOrderCreation {
     *  */
     public static void checkforOrderType (List<string> inputParams) {
         List<Base_Order__c> baseOrList=PunchOutOrderCreation.getBaseOrderdDetails(inputParams);
-        
+        System.debug('baseOrList>>'+baseOrList);
+        for(integer i=0;i<baseOrList.size();i++){
         if(baseOrList.size() > 0){
-            String baseordId=baseOrList[0].Id;
+            String baseordId=baseOrList[i].Id;
             baseordId=String.escapeSingleQuotes(baseordId);
        // String baseCountry=BaseOrList[0].baseOrderCountry;
         System.debug('baseordId>>'+baseordId);
@@ -240,29 +241,30 @@ public  class PunchOutOrderCreation {
         bo.Id = boMap.get('Base_Order__c');
         bo.Processing_Status__c = 'Success';
         bo.Start_Process__c = false;
-        if(Base_Order__c.sObjectType.getDescribe().isAccessible() &&
-            Schema.sObjectType.Base_Order__c.isUpdateable()){
+        
         update bo;
-            }
-            Base_Order__c base=[select id,PunchOut_Request__c from Base_Order__c Where Id=:baseOrList[0].Id WITH SECURITY_ENFORCED];
+           
+            Base_Order__c base=[select id,PunchOut_Request__c from Base_Order__c Where Id=:baseOrList[i].Id WITH SECURITY_ENFORCED];
             PunchOut_Request__c punch =[select id,payloadID__c,BuyerCookie__c,TimeStamp__c from PunchOut_Request__c where Id=:base.PunchOut_Request__c  WITH SECURITY_ENFORCED];
             
-            baseOrList[0].TimeStamp__c=punch.TimeStamp__c;
-            baseOrList[0].payloadID__c=punch.payloadID__c;
-            baseOrList[0].BuyerCookie__c=punch.BuyerCookie__c;
+            baseOrList[i].TimeStamp__c=punch.TimeStamp__c;
+            baseOrList[i].payloadID__c=punch.payloadID__c;
+            baseOrList[i].BuyerCookie__c=punch.BuyerCookie__c;
             
-            baseOrList[0].Processing_Status__c='Success';
+            baseOrList[i].Processing_Status__c='Success';
             try {
                
                 Update baseOrList;
            
                
-                delete punch;
-             
             } catch(DmlException e) {
                 System.debug('The following exception has occurred: ' + e.getMessage());
             }
         }
+        }
+        list<PunchOut_Request__c> p=[select Id,payloadID__c,Operation__c,Street__c,City__c,State__c,PostalCode__c,Country__c,CXML_data__c From PunchOut_Request__c ];
+system.debug('p::'+p.size());
+delete p;
     }
      /** 
      *@description this methode is used to get base order records

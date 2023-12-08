@@ -345,16 +345,19 @@ Global with sharing class PunchOutDemoclass {
         }
     }
     
-     public static void storeInSession() {
-      String partitionInput = 'PunchOut';
+     public static void storeInSession(Id punchId) {
+     // String partitionInput = 'local.PunchOut';
+            System.debug('punchId><>>'+punchId);
+           // Cache.SessionPartition  sessionPartition = Cache.Session.getPartition(partitionInput);
+            //System.debug('sessionPartition><>>'+sessionPartition.isAvailable());
+           
+         Cache.Org.put('PunchOutId', punchId);
+         Object value = Cache.Org.get('PunchOutId');
+         System.debug('value><>'+value);
+           // sessionPartition.put('PunchOutId', punchId);
             
-            Cache.SessionPartition  sessionPartition = Cache.Session.getPartition(partitionInput);
-            System.debug('sessionPartition><>>'+sessionPartition);
-            
-            //sessionPartition.put('PunchOutId', 'a2jHz0000006jahIAA');
-            
-            Id punchOutRefId= (Id)sessionPartition.get('PunchOutId');
-            System.debug('punchOutRefId><>'+punchOutRefId);
+           // Id punchOutRefId= (Id)sessionPartition.get('PunchOutId');
+            //System.debug('punchOutRefId><>'+punchOutRefId);
      }
 
 

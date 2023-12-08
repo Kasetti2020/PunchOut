@@ -2,8 +2,31 @@
     doInit : function(component, event,helper) 
     {
         
+        
         var cookieString=document.cookie;
         var rqtId = cookieString.split(';');
+         var action2 = component.get("c.getLeadTime");
+    action2.setParams({ "punchoutID" : rqtId[0] });
+
+            action2.setCallback(this, function(response) {
+        var state = response.getState();
+        if (state === "SUCCESS") {
+            var returnValue = response.getReturnValue();
+            //alert(returnValue);
+            component.set("v.LeadTime", returnValue);
+             var today = new Date();
+       // alert(component.get("v.LeadTime"));
+        today.setDate(today.getDate() + component.get("v.LeadTime"));
+        var formattedDate = $A.localizationService.formatDate(today, "yyyy-MM-dd");
+        
+        component.set("v.salesOrderObj.Expected_Delivery_Date__c",formattedDate);
+        
+    // alert(component.get("v.LeadTime"))
+        }
+    });
+
+    $A.enqueueAction(action2);
+        
         var action = component.get("c.getAllActiveCartDetails");
         action.setParams({ "punchoutID" : rqtId[0] });
         action.setCallback(this, function(response) {
@@ -46,9 +69,14 @@
             }
         });
         $A.enqueueAction(action1);
+        
+        
+        
+        
+        
         helper.toGetCustomerAddess(component, event,helper);
         // helper.toGetcustomerData(component, event,helper);
-        //alert('order Source '+component.get("v.OrderSource"));
+        alert('order Source '+component.get("v.OrderSource"));
         if(component.get("v.OrderSource")=="PO")
         {
             var confirmPO = component.get("v.comfirmPOList");
@@ -69,11 +97,8 @@
             }
             component.set("v.salesOrderObj.Order_Number__c",retailerPOnumber);
         }
-        var today = new Date();
-        //today.setDate(today.getDate() + 1);
-        var formattedDate = $A.localizationService.formatDate(today, "yyyy-MM-dd");
-        component.set("v.salesOrderObj.Expected_Delivery_Date__c",formattedDate);
         
+       
     },
     changeAddress : function(component, event,helper) 
     {
@@ -565,7 +590,7 @@
         //alert('changeDate');
         var GivenDate = component.get('v.salesOrderObj.Expected_Delivery_Date__c');
         var today = new Date();
-        today.setDate(today.getDate() + 1);
+        today.setDate(today.getDate() + component.get("v.LeadTime"));
         var presentDate = $A.localizationService.formatDate(today, "yyyy-MM-dd");
         if(GivenDate<presentDate)
         {

@@ -854,10 +854,15 @@ CurrCode = ResCurr[0];
     }Ma*/
      public static Integer getCartDataCount(Id customerid)
     {
+        
+        System.debug('User SeesionID<>>>'+System.UserInfo.getSessionId());
         String partitionInput = 'PunchOut';
+        
         Cache.SessionPartition  sessionPartition = Cache.Session.getPartition(partitionInput);
+        sessionPartition.put('PunchOutId', customerid);
         Id punchOutRefId= (Id)sessionPartition.get('PunchOutId');
         System.debug('punchOutRefId><>'+punchOutRefId);
+        System.debug('sessionPartition><>>'+sessionPartition.isAvailable());
         list<Base_Order__c> SOList =[select id,PunchOut_Request__r.Id from Base_Order__c where PunchOut_Request__r.Id=:customerid ];
         Integer count= SOList.size();
         system.debug('count>>>'+count);

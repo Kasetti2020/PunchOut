@@ -1,7 +1,7 @@
 <aura:component  Controller="CatalogOrderController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global">
     
     <aura:attribute name="RoList" type="List"/>
-    <aura:attribute name="Retailercmp" type="Boolean" default="true"/>
+    <aura:attribute name="Retailercmp" type="Boolean" default="false"/>
     <aura:attribute name="Catalogcmp" type="Boolean" default="false"/>
     <aura:attribute name="isCartCreated" type="Boolean" default="false"/>
     <aura:attribute name="completeWrap" type="list"/> 
@@ -9,7 +9,7 @@
     <aura:attribute name="SelectRetailer" type="String"/>  
     <aura:attribute name="onselectcustomeid" type="String"/> 
     <aura:attribute name="onselectRetailercode" type="Integer"/>
-    
+    <aura:attribute name="retailerValue" type="String"/>
     
     <aura:attribute name="cartVertical" type="String" default="Hanger Business"/>
     <aura:attribute name="cartCompany" type="String" default=""/>
@@ -138,7 +138,7 @@
                     
                     <!--Modal Box Button Start-->
                     <footer class="slds-modal__footer">
-                        <lightning:button name='Cancel' label='{!$Label.c.Cancel}' onclick='{!c.cancelPopUp}'/>
+                      <!--  <lightning:button name='Cancel' label='{!$Label.c.Cancel}' onclick='{!c.cancelPopUp}'/>-->
                         <lightning:button variant="brand" name='Start Order' label='{!$Label.c.Start_Order}' onclick='{!c.handleStartOrder}'/>
                     </footer>
                     <!--Modal Box Button End-->

@@ -18,6 +18,7 @@
     <aura:attribute name="ShipAddressIndex" type="integer" default="0" />
     <aura:attribute name="BuyerAddressIndex" type="integer" default="0" />
     <aura:attribute name="InvoiceAddressIndex" type="integer" default="0" />
+    <aura:attribute name="LeadTime" type="integer" default="0" />
     <aura:attribute name="OrderSource" type="String" />
     <aura:attribute name="suzhouFlag" type="Boolean" default="false"/>
      <aura:attribute name="OldShipTo" type="Boolean" default="false"/>
@@ -223,7 +224,7 @@
                             
                             <div class="slds-col slds-size_1-of-3 slds-m-bottom--x-small1">
                                <div class="slds-truncate ">
-                                    <lightning:input type="date" aura:id="ExpectedDeliveryDate" name="ExpectedDeliveryDate" label="{!$Label.c.Expected_Ex_Factory_Date}" messageWhenValueMissing="Complete this field." value="{!v.salesOrderObj.Expected_Delivery_Date__c}" title="{!v.salesOrderObj.Expected_Delivery_Date__c}" onchange="{!c.changeDate}" required="true"/>
+                                    <lightning:input type="date" aura:id="ExpectedDeliveryDate" name="ExpectedDeliveryDate" label="{!$Label.c.Expected_Ex_Factory_Date}" messageWhenValueMissing="Complete this field." value="{!v.salesOrderObj.Expected_Delivery_Date__c}" title="{!v.salesOrderObj.Expected_Delivery_Date__c}" onchange="{!c.changeDate}" required="true" min="{!v.salesOrderObj.Expected_Delivery_Date__c}"/>
                                 </div>
                               
                             </div>

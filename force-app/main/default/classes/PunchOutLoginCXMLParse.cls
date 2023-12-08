@@ -460,8 +460,10 @@ public without sharing class PunchOutLoginCXMLParse {
              punchOut[0].CXML_data__c=cxmlData;
              
             update punchOut;
-             String partitionInput = 'PunchOut';
             
+            System.debug('User SeesionID<>>>'+System.UserInfo.getUserId());
+             String partitionInput = 'PunchOut';
+           // PunchOutDemoclass.storeInSession(punchOut[0].Id);
           /*  Cache.SessionPartition  sessionPartition = Cache.Session.getPartition(partitionInput);
             System.debug('sessionPartition><>>'+sessionPartition.isAvailable());
              

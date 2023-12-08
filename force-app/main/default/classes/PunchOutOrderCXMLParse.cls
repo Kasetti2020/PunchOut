@@ -568,7 +568,7 @@ public  class PunchOutOrderCXMLParse {
         
         
         if(baseupdate.size()>0 &&(!cxmlShipTO)&&(!cxmlInvalidModel)&&(!cxmlPrice)){
-        returnValue=PunchOutCXMLgenerate.xmlError('DataUploaded Successfully',cxml.payloadID,cxml.timestamp,'200','Ok') ;
+        returnValue=PunchOutCXMLgenerate.xmlError('Order Confirmed Successfully',cxml.payloadID,cxml.timestamp,'200','Ok') ;
         system.debug('returnValue><>'+returnValue);
         for(Base_Order__c b:baseupdate){
             b.Start_Process__c=true;

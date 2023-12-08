@@ -1,5 +1,8 @@
 <apex:page showHeader="true" sidebar="true" Controller="PunchOutOrderMessageController" >
-    SuccessFully PunchedOut....
+   
+       
+    
+    
     
   <apex:repeat var="case" value="{!StringList}"/> 
     <form id="cxml_form" method="POST" action="https://servicerest-xml-137b1767f8f8.herokuapp.com/xml-parser">
@@ -11,17 +14,20 @@
     
       
     function PunchOutSubmit(){
-      document.getElementById('status').innerHTML='PunchOut Proccessing';
+       
+     
     document.getElementById('cxml_form').submit();
-      document.getElementById('status').innerHTML='PunchedOut SuccessFully';
+       document.getElementById('status').innerHTML='PunchedOut Successfully';
         return false;
         }
     
-    PunchOutSubmit();
+    
+       PunchOutSubmit();
+   
     </script> 
-    <h1>
-        <div id="status"/> 
+    
+       <div id="status">Processing PunchedOut.... </div>
      
-    </h1>
+    
     
 </apex:page>

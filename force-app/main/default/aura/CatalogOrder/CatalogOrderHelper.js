@@ -76,9 +76,64 @@
         $A.enqueueAction(action);
        // console.log('helper productSearch');
             
-            
     },
-    
+    // Added by mahadevaprasad on 07/11/2023 starts
+    punchOutmethod:function(component, event,helper){
+         alert('punchOut');
+          var cookieString=document.cookie;
+         var rqtId = cookieString.split(';');
+        //component.set('v.recordId',sParameterName);
+        //alert(sParameterName[1]);
+        var action = component.get("c.punchOutMethod");
+        action.setParams({ recordId : rqtId[0] });
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                
+               // alert("From server: " + response.getReturnValue());
+                var resultvalue=response.getReturnValue();
+               // alert(resultvalue);
+                //component.set('v.isOperation',true)
+                if(resultvalue=='create'){
+                    //component.set('v.isOperation',true);
+                   // component.set('v.isQuantity',false);
+                   
+                } else  if(resultvalue=='edit'){
+                    component.set('v.isShipcmp',true);
+                    // component.set('v.isQuantity',false);
+                     
+                }
+                else  if(resultvalue=='inspect'){
+                   // component.set('v.isOperation',false);
+                    component.set('v.isShipcmp',true);
+                   
+                    
+                }
+                  
+                
+            }
+            else if (state === "INCOMPLETE") {
+                // do something
+            }
+                else if (state === "ERROR") {
+                    var errors = response.getError();
+                    if (errors) {
+                        if (errors[0] && errors[0].message) {
+                            console.log("Error message: " + 
+                                        errors[0].message);
+                        }
+                    } else {
+                        console.log("Unknown error");
+                    }
+                }
+        });
+        
+        
+        $A.enqueueAction(action);
+        
+    },
+   
+    // Added by mahadevaprasad on 07/11/2023 ends
 
     //Product seach functon
     productSearch: function(component, event,helper) //revoked onClick of the search button
@@ -280,7 +335,23 @@
                 alert('Error : ' + JSON.stringify(response.getError()));
             } 
         });
-        $A.enqueueAction(actionCall);       
+        $A.enqueueAction(actionCall);
+       
+        // Store the intervalId in an attribute to clear the interval later if needed
+       
+          
+    },
+    startTimer: function(component) {
+        alert('timer');
+        // Set the interval to call the helper method every 5000 milliseconds (5 seconds)
+        var intervalId = setInterval($A.getCallback(function() {
+            // Call your helper method here
+            alert('insideTimer');
+             this.punchOutmethod();
+        }), 5000);
+
+        // Store the intervalId in an attribute
+        component.set("v.intervalId", intervalId);
     },
     GetcustomInfoid: function(component, event,helper) {
         
@@ -359,7 +430,7 @@
         
          var cookieString=document.cookie;
          var rqtId = cookieString.split(';');
-        alert(rqtId[0]);
+       // alert(rqtId[0]);
         var action = component.get('c.getCartDataCount');
         action.setParams({ 
             "customerid": rqtId[0]
@@ -375,6 +446,7 @@
             }
         });
         $A.enqueueAction(action);
+          
     },
     
 
